@@ -1,0 +1,63 @@
+# PyCharm / JetBrains
+.idea/
+*.iml
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.python-version
+.env
+
+# Packaging
+build/
+dist/
+.eggs/
+*.egg-info/
+*.egg
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.cache/
+
+# Type checker caches
+.mypy_cache/
+.pyre/
+.pytype/
+
+# Lint/tool caches
+.tox/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Database
+*.db
+*.sqlite3
+postgresql_data/
+
+# IDE-specific files that were committed
+.idea/*
+!.idea/.gitkeep
+
+# Scripts (if you don't want to commit them)
+productivity_tracker/scripts/**
