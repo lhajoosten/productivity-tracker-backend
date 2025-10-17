@@ -10,7 +10,8 @@ engine = create_engine(
     pool_pre_ping=True,
     pool_size=5,
     max_overflow=10,
-    pool_recycle=300,
+    pool_recycle=3600,
+    isolation_level="READ COMMITTED",
 )
 
 # Create SessionLocal class

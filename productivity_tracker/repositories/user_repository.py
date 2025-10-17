@@ -9,28 +9,25 @@ from productivity_tracker.database.entities.role import Role
 from productivity_tracker.database.entities.user import User
 from productivity_tracker.repositories.base import BaseRepository
 
+logger = __import__("logging").getLogger(__name__)
+
 
 class UserRepository(BaseRepository[User]):
-    """Repository for User-specific database operations."""
+    """Repository for User database operations."""
 
     def __init__(self, db: Session):
         super().__init__(User, db)
 
-    def get_by_email(self, email: str) -> User | None:
-        """Get user by email."""
-        return (
-            self.db.query(User)
-            .filter(User.email == email, User.is_deleted is False)
-            .first()
-        )
-
     def get_by_username(self, username: str) -> User | None:
         """Get user by username."""
-        return (
-            self.db.query(User)
-            .filter(User.username == username, User.is_deleted is False)
-            .first()
-        )
+        logger.debug(f"Querying user by username: {username}")
+        user = self.db.query(User).filter(User.username == username).first()
+        logger.debug(f"Query result for {username}: {user}")
+        return user
+
+    def get_by_email(self, email: str) -> User | None:
+        """Get user by email."""
+        return self.db.query(User).filter(User.email == email).first()
 
     def get_by_email_or_username(self, email: EmailStr, username: str) -> User | None:
         """Get user by email or username."""

@@ -1,8 +1,5 @@
 from productivity_tracker.core.database import Base, SessionLocal, engine, get_db
+from productivity_tracker.database.entities.role import Permission, Role
+from productivity_tracker.database.entities.user import User
 
-from .entities.role import Permission, Role
-
-# TODO: Import entity models once they are created
-from .entities.user import User
-
-__all__ = ["Base", "engine", "SessionLocal", "get_db", "User", "Role", "Permission"]
+__all__ = ["Base", "engine", "get_db", "SessionLocal", "User", "Role", "Permission"]

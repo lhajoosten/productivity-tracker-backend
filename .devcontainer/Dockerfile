@@ -26,6 +26,9 @@ RUN poetry install --no-root --only main && rm -rf $POETRY_CACHE_DIR
 # Copy application code
 COPY . .
 
+# Copy Alembic configuration
+COPY alembic.ini ./
+
 # Install project
 RUN poetry install --only-root
 

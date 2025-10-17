@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
-    # Database
+    # Database settings
     DATABASE_URL: str
     POSTGRES_HOST: str
     POSTGRES_USER: str
@@ -48,7 +48,10 @@ class Settings(BaseSettings):
     COOKIE_MAX_AGE: int
 
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", case_sensitive=True
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="ignore",
     )
 
 

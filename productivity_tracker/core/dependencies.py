@@ -1,3 +1,6 @@
+import logging
+from uuid import UUID
+
 from fastapi import Cookie, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -5,6 +8,8 @@ from productivity_tracker.core.security import decode_token
 from productivity_tracker.core.settings import settings
 from productivity_tracker.database import get_db
 from productivity_tracker.database.entities import User
+
+logger = logging.getLogger(__name__)
 
 
 async def get_current_user(
@@ -22,15 +27,21 @@ async def get_current_user(
         raise credentials_exception
 
     payload = decode_token(access_token)
+
     if payload is None:
         raise credentials_exception
 
-    user_id: str = payload.get("sub")
+    user_id_str: str = payload.get("sub")
     token_type: str = payload.get("type")
 
-    # nosec B105 - This is a token type check, not a hardcoded password
-    if user_id is None or token_type != "access":  # nosec
+    if user_id_str is None or token_type != "access":  # nosec
         raise credentials_exception
+
+    # Convert string UUID to UUID object
+    try:
+        user_id = UUID(user_id_str)
+    except (ValueError, AttributeError) as e:
+        raise credentials_exception from e
 
     user = db.query(User).filter(User.id == user_id, User.is_deleted is False).first()
 

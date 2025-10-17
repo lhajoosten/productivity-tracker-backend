@@ -71,7 +71,7 @@ def login(
     )
 
     refresh_token_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    refresh_token = create_refresh_token(  # ← Store the token
+    refresh_token = create_refresh_token(
         data={"sub": str(user.id)}, expires_delta=refresh_token_expires
     )
 
@@ -84,62 +84,13 @@ def login(
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
-    # Return refresh_token in response body
-    return {
-        "message": "Login successful",
-        "user": UserListResponse.model_validate(user),
-        "refresh_token": refresh_token,  # ← Add this
-    }
-
-
-@router.post("/refresh", response_model=Token)
-def refresh_token(
-    response: Response,
-    token_data: RefreshTokenRequest,
-    db: Session = Depends(get_db),
-):
-    """Refresh access token using refresh token."""
-    payload = decode_token(token_data.refresh_token)
-
-    if not payload or payload.get("type") != "refresh":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid refresh token",
-        )
-
-    user_id = payload.get("sub")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid refresh token",
-        )
-
-    # Verify user still exists and is active
-    user_service = UserService(db)
-    user = user_service.get_user(user_id)
-
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
-        )
-
-    # Create new access token
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": str(user.id)}, expires_delta=access_token_expires
+    return LoginResponse(
+        message="Login successful",
+        user=UserListResponse.model_validate(user),
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",  # nosec
     )
-
-    # Set new access token cookie
-    response.set_cookie(
-        key=settings.COOKIE_NAME,
-        value=access_token,
-        httponly=settings.COOKIE_HTTPONLY,
-        secure=settings.COOKIE_SECURE,
-        samesite=settings.COOKIE_SAMESITE,
-        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-    )
-
-    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.post("/logout")
@@ -147,6 +98,51 @@ def logout(response: Response):
     """Logout user by clearing the access token cookie."""
     response.delete_cookie(key=settings.COOKIE_NAME)
     return {"message": "Logout successful"}
+
+
+@router.post("/refresh", response_model=Token)
+def refresh_token(
+    response: Response,
+    refresh_data: RefreshTokenRequest,
+    db: Session = Depends(get_db),
+):
+    """Refresh access token using refresh token."""
+    try:
+        payload = decode_token(refresh_data.refresh_token)
+        if payload.get("type") != "refresh":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token type"
+            )
+
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload"
+            )
+
+        # Create new access token
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user_id}, expires_delta=access_token_expires
+        )
+
+        # Set new cookie
+        response.set_cookie(
+            key=settings.COOKIE_NAME,
+            value=access_token,
+            httponly=settings.COOKIE_HTTPONLY,
+            secure=settings.COOKIE_SECURE,
+            samesite=settings.COOKIE_SAMESITE,
+            max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        )
+
+        return Token(access_token=access_token, token_type="bearer")  # nosec
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token",
+        ) from e
 
 
 @router.get("/me", response_model=UserResponse)

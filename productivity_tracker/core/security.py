@@ -33,6 +33,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     """Create a JWT access token."""
     to_encode = data.copy()
+    to_encode.update({"type": "access"})  # nosec
+
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
@@ -40,7 +42,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
 
-    to_encode.update({"exp": expire, "type": "access"})
+    to_encode.update({"exp": expire, "type": "access"})  # nosec
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )

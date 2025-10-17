@@ -209,7 +209,9 @@ class LoginResponse(BaseModel):
 
     message: str
     user: UserListResponse
+    access_token: str
     refresh_token: str
+    token_type: str
 
 
 # Resolve forward references
