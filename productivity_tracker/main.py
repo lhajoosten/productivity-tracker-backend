@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from sqlalchemy.exc import SQLAlchemyError
 
 from productivity_tracker.api import auth, health, permissions, roles
 from productivity_tracker.core.database import Base, engine
@@ -9,6 +11,10 @@ from productivity_tracker.core.logging_config import get_logger, setup_logging
 from productivity_tracker.core.middleware import (
     RequestLoggingMiddleware,
     SecurityHeadersMiddleware,
+    general_exception_handler,
+    http_exception_handler,
+    sqlalchemy_exception_handler,
+    validation_exception_handler,
 )
 from productivity_tracker.core.settings import settings
 
@@ -24,6 +30,12 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+# Register handlers in this order (more specific first)
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
+app.add_exception_handler(Exception, general_exception_handler)
 
 # Add CORS middleware
 app.add_middleware(
@@ -45,15 +57,13 @@ app.add_middleware(RequestLoggingMiddleware)
 
 # Add trusted host middleware (only in production)
 if not settings.DEBUG:
-    app.add_middleware(
-        TrustedHostMiddleware, allowed_hosts=["localhost.com", "*.localhost.com"]
-    )
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=[".com", "*.localhost.com"])
 
-# Include routers
-app.include_router(health.router)
-app.include_router(auth.router)
-app.include_router(roles.router)
-app.include_router(permissions.router)
+# Include routers with `/api/v1` prefix for versioning
+app.include_router(health.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1")
+app.include_router(roles.router, prefix="/api/v1")
+app.include_router(permissions.router, prefix="/api/v1")
 
 
 @app.on_event("startup")

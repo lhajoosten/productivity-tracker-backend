@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from productivity_tracker.core.logging_config import get_logger
 from productivity_tracker.core.security import hash_password, verify_password
-from productivity_tracker.database.entities.user import User
+from productivity_tracker.database import User
 from productivity_tracker.models.auth import UserCreate, UserPasswordUpdate, UserUpdate
 from productivity_tracker.repositories.user_repository import UserRepository
 
@@ -73,7 +73,7 @@ class UserService:
 
     def get_all_users(
         self, skip: int = 0, limit: int = 100, active_only: bool = True
-    ) -> list[User]:
+    ) -> list[type[User]] | list[User]:
         """Get all users with pagination."""
         if active_only:
             return self.repository.get_active_users(skip, limit)
@@ -170,7 +170,9 @@ class UserService:
         user = self.get_user(user_id)
         return self.repository.remove_role(user, role_id)
 
-    def search_users(self, query: str, skip: int = 0, limit: int = 100) -> list[User]:
+    def search_users(
+        self, query: str, skip: int = 0, limit: int = 100
+    ) -> list[type[User]]:
         """Search users by username or email."""
         return self.repository.search_users(query, skip, limit)
 

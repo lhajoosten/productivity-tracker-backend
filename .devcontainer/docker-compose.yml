@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: productivity_app
+    volumes:
+      - ..:/app:cached
+    ports:
+      - "3456:8500"
+    command: uvicorn productivity_tracker.main:app --host 0.0.0.0 --port 8500 --reload
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    env_file:
+      - ../.env
+    networks:
+      - productivity-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: productivity_postgres
+    env_file:
+      - ../.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lhajoosten} -d ${POSTGRES_DB:-productivity_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - productivity-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: productivity_minio
+    command: server /data --console-address ":9001"
+    env_file:
+      - ../.env
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - productivity-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: productivity_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - productivity-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: productivity_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    env_file:
+      - ../.env
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - productivity-network
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: productivity_redis_commander
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - productivity-network
+
+networks:
+  productivity-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  minio_data:
+  redis_data:
+  pgadmin_data:

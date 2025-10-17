@@ -2,9 +2,12 @@ import logging
 import time
 from collections.abc import Callable
 
-from fastapi import Request
+from fastapi import HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from sqlalchemy.exc import SQLAlchemyError
+from starlette import status
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
+from starlette.responses import JSONResponse, Response
 
 logger = logging.getLogger(__name__)
 
@@ -96,3 +99,52 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         )
 
         return response
+
+
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Handle Pydantic validation errors."""
+    errors = []
+    for error in exc.errors():
+        errors.append(
+            {
+                "field": " -> ".join(str(x) for x in error["loc"]),
+                "message": error["msg"],
+                "type": error["type"],
+            }
+        )
+
+    logger.warning(f"Validation error on {request.url.path}: {errors}")
+
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": "Validation error", "errors": errors},
+    )
+
+
+async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
+    """Handle SQLAlchemy database errors."""
+    logger.error(f"Database error on {request.url.path}: {str(exc)}")
+
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "A database error occurred. Please try again later."},
+    )
+
+
+async def general_exception_handler(request: Request, exc: Exception):
+    """Handle unexpected exceptions."""
+    logger.error(
+        f"Unhandled exception on {request.url.path}: {str(exc)}", exc_info=True
+    )
+
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "An unexpected error occurred"},
+    )
+
+
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Handle FastAPI HTTP exceptions."""
+    logger.warning(f"HTTP {exc.status_code} on {request.url.path}: {exc.detail}")
+
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})

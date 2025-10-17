@@ -2,7 +2,6 @@ from datetime import timedelta
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from productivity_tracker.core.dependencies import (
@@ -19,6 +18,7 @@ from productivity_tracker.database import get_db
 from productivity_tracker.database.entities.user import User
 from productivity_tracker.models.auth import (
     AssignRolesToUser,
+    LoginRequest,
     LoginResponse,
     RefreshTokenRequest,
     Token,
@@ -46,13 +46,12 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", response_model=LoginResponse)
 def login(
     response: Response,
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    form_data: LoginRequest,
     db: Session = Depends(get_db),
 ):
     """Login user and set access token cookie."""
     user_service = UserService(db)
 
-    # Authenticate user
     user = user_service.authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -66,18 +65,16 @@ def login(
             status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
         )
 
-    # Create tokens
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
 
     refresh_token_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    create_refresh_token(
+    refresh_token = create_refresh_token(  # ← Store the token
         data={"sub": str(user.id)}, expires_delta=refresh_token_expires
     )
 
-    # Set access token cookie
     response.set_cookie(
         key=settings.COOKIE_NAME,
         value=access_token,
@@ -87,9 +84,11 @@ def login(
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
+    # Return refresh_token in response body
     return {
         "message": "Login successful",
         "user": UserListResponse.model_validate(user),
+        "refresh_token": refresh_token,  # ← Add this
     }
 
 

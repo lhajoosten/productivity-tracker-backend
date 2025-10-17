@@ -2,6 +2,7 @@
 
 from uuid import UUID
 
+from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 from productivity_tracker.database.entities.role import Role
@@ -31,7 +32,7 @@ class UserRepository(BaseRepository[User]):
             .first()
         )
 
-    def get_by_email_or_username(self, email: str, username: str) -> User | None:
+    def get_by_email_or_username(self, email: EmailStr, username: str) -> User | None:
         """Get user by email or username."""
         return (
             self.db.query(User)
@@ -42,7 +43,7 @@ class UserRepository(BaseRepository[User]):
             .first()
         )
 
-    def get_active_users(self, skip: int = 0, limit: int = 100) -> list[User]:
+    def get_active_users(self, skip: int = 0, limit: int = 100) -> list[type[User]]:
         """Get all active users."""
         return (
             self.db.query(User)
@@ -52,7 +53,7 @@ class UserRepository(BaseRepository[User]):
             .all()
         )
 
-    def get_superusers(self) -> list[User]:
+    def get_superusers(self) -> list[type[User]]:
         """Get all superusers."""
         return (
             self.db.query(User)
@@ -86,7 +87,7 @@ class UserRepository(BaseRepository[User]):
             self.db.refresh(user)
         return user
 
-    def get_users_by_role(self, role_name: str) -> list[User]:
+    def get_users_by_role(self, role_name: str) -> list[type[User]]:
         """Get all users with a specific role."""
         return (
             self.db.query(User)
@@ -95,7 +96,9 @@ class UserRepository(BaseRepository[User]):
             .all()
         )
 
-    def search_users(self, query: str, skip: int = 0, limit: int = 100) -> list[User]:
+    def search_users(
+        self, query: str, skip: int = 0, limit: int = 100
+    ) -> list[type[User]]:
         """Search users by username or email."""
         search_pattern = f"%{query}%"
         return (
