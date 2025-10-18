@@ -14,6 +14,8 @@ ENV/
 env/
 .python-version
 .env
+.env.*
+!.env.example
 
 # Packaging
 build/
