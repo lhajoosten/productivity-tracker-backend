@@ -7,10 +7,12 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from productivity_tracker.api import auth, health, permissions, roles
 from productivity_tracker.core.database import Base, engine
+from productivity_tracker.core.exceptions import AppException
 from productivity_tracker.core.logging_config import get_logger, setup_logging
 from productivity_tracker.core.middleware import (
     RequestLoggingMiddleware,
     SecurityHeadersMiddleware,
+    app_exception_handler,
     general_exception_handler,
     http_exception_handler,
     sqlalchemy_exception_handler,
@@ -32,6 +34,7 @@ app = FastAPI(
 )
 
 # Register handlers in this order (more specific first)
+app.add_exception_handler(AppException, app_exception_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)

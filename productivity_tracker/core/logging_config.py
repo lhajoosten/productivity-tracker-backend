@@ -1,6 +1,7 @@
 """Logging configuration for the application."""
 
 import logging
+import os
 import sys
 from logging.handlers import RotatingFileHandler, TimedRotatingFileHandler
 from pathlib import Path
@@ -38,12 +39,11 @@ class ColoredFormatter(logging.Formatter):
 def setup_logging():
     """Configure application logging with proper handlers and formatters."""
 
+    # Skip file logging during tests if PYTEST_CURRENT_TEST is set
+    is_testing = os.getenv("PYTEST_CURRENT_TEST") is not None
+
     # Determine log level based on environment
     log_level = logging.DEBUG if settings.DEBUG else logging.INFO
-
-    # Create logs directory if it doesn't exist
-    log_dir = Path("logs")
-    log_dir.mkdir(exist_ok=True)
 
     # Console format (with colors in debug mode)
     console_format = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
@@ -70,32 +70,53 @@ def setup_logging():
 
     root_logger.addHandler(console_handler)
 
-    # File Handler - Application logs (rotating by size)
-    app_file_handler = RotatingFileHandler(
-        log_dir / "app.log",
-        maxBytes=10 * 1024 * 1024,  # 10MB
-        backupCount=5,
-        encoding="utf-8",
-    )
-    app_file_handler.setLevel(logging.INFO)
-    app_file_handler.setFormatter(
-        logging.Formatter(file_format, datefmt="%Y-%m-%d %H:%M:%S")
-    )
-    root_logger.addHandler(app_file_handler)
+    # Only add file handlers if not testing
+    if not is_testing:
+        try:
+            # Create logs directory if it doesn't exist
+            log_dir = Path("logs")
+            log_dir.mkdir(exist_ok=True)
 
-    # File Handler - Error logs (daily rotation)
-    error_file_handler = TimedRotatingFileHandler(
-        log_dir / "error.log",
-        when="midnight",
-        interval=1,
-        backupCount=30,
-        encoding="utf-8",
-    )
-    error_file_handler.setLevel(logging.ERROR)
-    error_file_handler.setFormatter(
-        logging.Formatter(file_format, datefmt="%Y-%m-%d %H:%M:%S")
-    )
-    root_logger.addHandler(error_file_handler)
+            # Ensure the directory is writable
+            if not os.access(log_dir, os.W_OK):
+                # If not writable, just use console logging
+                root_logger.warning(
+                    f"Log directory {log_dir} is not writable, skipping file logging"
+                )
+                configure_third_party_loggers()
+                return
+
+            # File Handler - Application logs (rotating by size)
+            app_file_handler = RotatingFileHandler(
+                log_dir / "app.log",
+                maxBytes=10 * 1024 * 1024,  # 10MB
+                backupCount=5,
+                encoding="utf-8",
+            )
+            app_file_handler.setLevel(logging.INFO)
+            app_file_handler.setFormatter(
+                logging.Formatter(file_format, datefmt="%Y-%m-%d %H:%M:%S")
+            )
+            root_logger.addHandler(app_file_handler)
+
+            # File Handler - Error logs (daily rotation)
+            error_file_handler = TimedRotatingFileHandler(
+                log_dir / "error.log",
+                when="midnight",
+                interval=1,
+                backupCount=30,
+                encoding="utf-8",
+            )
+            error_file_handler.setLevel(logging.ERROR)
+            error_file_handler.setFormatter(
+                logging.Formatter(file_format, datefmt="%Y-%m-%d %H:%M:%S")
+            )
+            root_logger.addHandler(error_file_handler)
+        except (PermissionError, OSError) as e:
+            # If we can't create file handlers, just log to console
+            root_logger.warning(
+                f"Could not set up file logging: {e}. Using console only."
+            )
 
     # Configure third-party loggers
     configure_third_party_loggers()

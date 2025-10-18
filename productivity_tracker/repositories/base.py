@@ -3,8 +3,10 @@
 from typing import Generic, TypeVar
 from uuid import UUID
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from productivity_tracker.core.exceptions import DatabaseError
 from productivity_tracker.database.entities.base import BaseEntity
 
 ModelType = TypeVar("ModelType", bound=BaseEntity)
@@ -19,32 +21,50 @@ class BaseRepository(Generic[ModelType]):
 
     def get_by_id(self, id: UUID, include_deleted: bool = False) -> ModelType | None:
         """Get a single record by ID."""
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
         query = self.db.query(self.model).filter(self.model.id == id)
         if not include_deleted:
-            query = query.filter(self.model.is_deleted is False)
+            query = query.filter(self.model.is_deleted == False)  # noqa: E712
         return query.first()
 
     def get_all(
         self, skip: int = 0, limit: int = 100, include_deleted: bool = False
     ) -> list[ModelType]:
         """Get all records with pagination."""
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
         query = self.db.query(self.model)
         if not include_deleted:
-            query = query.filter(self.model.is_deleted is False)
+            query = query.filter(self.model.is_deleted == False)  # noqa: E712
         return query.offset(skip).limit(limit).all()
 
     def create(self, obj: ModelType) -> ModelType:
         """Create a new record."""
-        self.db.add(obj)
-        self.db.commit()
-        self.db.refresh(obj)
-        return obj
+        try:
+            self.db.add(obj)
+            self.db.commit()
+            self.db.refresh(obj)
+            return obj
+        except IntegrityError as e:
+            self.db.rollback()
+            raise DatabaseError(
+                message=f"Database integrity error when creating {self.model.__name__}",
+                original_error=e,
+            ) from e
 
     def update(self, obj: ModelType) -> ModelType:
         """Update an existing record."""
-        self.db.commit()
-        self.db.refresh(obj)
-        return obj
+        try:
+            self.db.commit()
+            self.db.refresh(obj)
+            return obj
+        except IntegrityError as e:
+            self.db.rollback()
+            raise DatabaseError(
+                message=f"Database integrity error when updating {self.model.__name__}",
+                original_error=e,
+            ) from e
 
     def delete(self, id: UUID, soft: bool = True) -> bool:
         """Delete a record (soft delete by default)."""
@@ -72,7 +92,9 @@ class BaseRepository(Generic[ModelType]):
 
     def count(self, include_deleted: bool = False) -> int:
         """Count total records."""
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
         query = self.db.query(self.model)
         if not include_deleted:
-            query = query.filter(self.model.is_deleted is False)
+            query = query.filter(self.model.is_deleted == False)  # noqa: E712
         return query.count()

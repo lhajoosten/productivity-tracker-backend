@@ -2,9 +2,12 @@
 
 from uuid import UUID
 
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from productivity_tracker.core.exceptions import (
+    ResourceAlreadyExistsError,
+    ResourceNotFoundError,
+)
 from productivity_tracker.database.entities.role import Role
 from productivity_tracker.models.auth import RoleCreate, RoleUpdate
 from productivity_tracker.repositories.role_repository import RoleRepository
@@ -22,9 +25,10 @@ class RoleService:
         # Check if role already exists
         existing_role = self.repository.get_by_name(role_data.name)
         if existing_role:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Role with name '{role_data.name}' already exists",
+            raise ResourceAlreadyExistsError(
+                resource_type="Role",
+                field="name",
+                value=role_data.name,
             )
 
         # Create new role
@@ -46,18 +50,14 @@ class RoleService:
         """Get role by ID."""
         role = self.repository.get_by_id(role_id)
         if not role:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Role not found"
-            )
+            raise ResourceNotFoundError(resource_type="Role", resource_id=str(role_id))
         return role
 
     def get_role_by_name(self, name: str) -> Role:
         """Get role by name."""
         role = self.repository.get_by_name(name)
         if not role:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=f"Role '{name}' not found"
-            )
+            raise ResourceNotFoundError(resource_type="Role", resource_id=name)
         return role
 
     def get_all_roles(self, skip: int = 0, limit: int = 100) -> list[Role]:
@@ -72,9 +72,10 @@ class RoleService:
         if role_data.name and role_data.name != role.name:
             existing = self.repository.get_by_name(role_data.name)
             if existing:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Role with name '{role_data.name}' already exists",
+                raise ResourceAlreadyExistsError(
+                    resource_type="Role",
+                    field="name",
+                    value=role_data.name,
                 )
             role.name = role_data.name
 

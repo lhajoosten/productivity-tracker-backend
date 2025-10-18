@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  test-db:
+    image: postgres:15-alpine
+    container_name: productivity-tracker-test-db
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: test_productivity_tracker
+    ports:
+      - "5433:5432"  # Use different port to avoid conflicts with dev DB
+    volumes:
+      - test_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d test_productivity_tracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test-network
+
+volumes:
+  test_db_data:
+    driver: local
+
+networks:
+  test-network:
+    driver: bridge

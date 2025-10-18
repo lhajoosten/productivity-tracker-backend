@@ -1,9 +1,14 @@
 import logging
 from uuid import UUID
 
-from fastapi import Cookie, Depends, HTTPException, status
+from fastapi import Cookie, Depends
 from sqlalchemy.orm import Session
 
+from productivity_tracker.core.exceptions import (
+    InactiveUserError,
+    InvalidTokenError,
+    PermissionDeniedError,
+)
 from productivity_tracker.core.security import decode_token
 from productivity_tracker.core.settings import settings
 from productivity_tracker.database import get_db
@@ -17,36 +22,37 @@ async def get_current_user(
     db: Session = Depends(get_db),
 ) -> User:
     """Get the current authenticated user from the access token cookie."""
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
     if not access_token:
-        raise credentials_exception
+        raise InvalidTokenError(reason="No authentication token provided")
 
     payload = decode_token(access_token)
 
     if payload is None:
-        raise credentials_exception
+        raise InvalidTokenError(reason="Token validation failed")
 
     user_id_str: str = payload.get("sub")
     token_type: str = payload.get("type")
 
     if user_id_str is None or token_type != "access":  # nosec
-        raise credentials_exception
+        raise InvalidTokenError(reason="Invalid token payload")
 
     # Convert string UUID to UUID object
     try:
         user_id = UUID(user_id_str)
     except (ValueError, AttributeError) as e:
-        raise credentials_exception from e
+        raise InvalidTokenError(reason="Invalid user ID in token") from e
 
-    user = db.query(User).filter(User.id == user_id, User.is_deleted is False).first()
+    # Query user - use == instead of 'is' for SQLAlchemy compatibility
+    # Ensure we flush any pending changes first to make them visible
+    db.flush()
+    user = (
+        db.query(User).filter(User.id == user_id, User.is_deleted.is_(False)).first()
+    )  # noqa: E712
 
     if user is None:
-        raise credentials_exception
+        # Additional debug: check if user exists without is_deleted filter
+        logger.warning(f"User not found for ID: {user_id}")
+        raise InvalidTokenError(reason="User not found")
 
     return user
 
@@ -56,9 +62,7 @@ async def get_current_active_user(
 ) -> User:
     """Get the current active user."""
     if not current_user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
-        )
+        raise InactiveUserError(user_id=str(current_user.id))
     return current_user
 
 
@@ -67,9 +71,7 @@ async def get_current_superuser(
 ) -> User:
     """Get the current superuser."""
     if not current_user.is_superuser:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions"
-        )
+        raise PermissionDeniedError(permission="superuser", resource="admin endpoints")
     return current_user
 
 
@@ -80,10 +82,7 @@ def require_permission(permission_name: str):
         current_user: User = Depends(get_current_active_user),
     ) -> User:
         if not current_user.has_permission(permission_name):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Permission denied: {permission_name} required",
-            )
+            raise PermissionDeniedError(permission=permission_name, resource=None)
         return current_user
 
     return permission_checker
@@ -96,25 +95,9 @@ def require_any_permission(*permission_names: str):
         current_user: User = Depends(get_current_active_user),
     ) -> User:
         if not current_user.has_any_permission(*permission_names):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Permission denied: one of {permission_names} required",
-            )
-        return current_user
-
-    return permission_checker
-
-
-def require_all_permissions(*permission_names: str):
-    """Dependency factory to require all of the specified permissions."""
-
-    async def permission_checker(
-        current_user: User = Depends(get_current_active_user),
-    ) -> User:
-        if not current_user.has_all_permissions(*permission_names):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Permission denied: all of {permission_names} required",
+            permissions_str = ", ".join(permission_names)
+            raise PermissionDeniedError(
+                permission=f"one of: {permissions_str}", resource=None
             )
         return current_user
 

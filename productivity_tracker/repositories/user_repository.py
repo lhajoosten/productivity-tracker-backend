@@ -21,30 +21,46 @@ class UserRepository(BaseRepository[User]):
     def get_by_username(self, username: str) -> User | None:
         """Get user by username."""
         logger.debug(f"Querying user by username: {username}")
-        user = self.db.query(User).filter(User.username == username).first()
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
+        user = (
+            self.db.query(User)
+            .filter(User.username == username, User.is_deleted == False)  # noqa: E712
+            .first()
+        )
         logger.debug(f"Query result for {username}: {user}")
         return user
 
     def get_by_email(self, email: str) -> User | None:
         """Get user by email."""
-        return self.db.query(User).filter(User.email == email).first()
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
+        return (
+            self.db.query(User)
+            .filter(User.email == email, User.is_deleted == False)  # noqa: E712
+            .first()
+        )
 
     def get_by_email_or_username(self, email: EmailStr, username: str) -> User | None:
         """Get user by email or username."""
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
         return (
             self.db.query(User)
             .filter(
                 (User.email == email) | (User.username == username),
-                User.is_deleted is False,
+                User.is_deleted == False,  # noqa: E712
             )
             .first()
         )
 
     def get_active_users(self, skip: int = 0, limit: int = 100) -> list[type[User]]:
         """Get all active users."""
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
         return (
             self.db.query(User)
-            .filter(User.is_active is True, User.is_deleted is False)
+            .filter(User.is_active == True, User.is_deleted == False)  # noqa: E712
             .offset(skip)
             .limit(limit)
             .all()
@@ -54,7 +70,7 @@ class UserRepository(BaseRepository[User]):
         """Get all superusers."""
         return (
             self.db.query(User)
-            .filter(User.is_superuser is True, User.is_deleted is False)
+            .filter(User.is_superuser, User.is_deleted.is_(False))
             .all()
         )
 

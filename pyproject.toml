@@ -132,7 +132,7 @@ exclude = [
 
 # Bandit configuration
 [tool.bandit]
-exclude_dirs = ["/tests", "/migrations", "/.venv"]
+exclude_dirs = ["tests/", "migrations/", ".venv/"]
 skips = ["B101", "B601"]
 
 # Pytest configuration

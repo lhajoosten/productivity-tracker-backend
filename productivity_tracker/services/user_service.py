@@ -2,9 +2,15 @@
 
 from uuid import UUID
 
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from productivity_tracker.core.exceptions import (
+    DatabaseError,
+    EmailAlreadyExistsError,
+    PasswordMismatchError,
+    ResourceNotFoundError,
+    UsernameAlreadyExistsError,
+)
 from productivity_tracker.core.logging_config import get_logger
 from productivity_tracker.core.security import hash_password, verify_password
 from productivity_tracker.database import User
@@ -25,42 +31,53 @@ class UserService:
         """Create a new user."""
         logger.info(f"Creating new user: {user_data.username}")
 
-        # Check if user already exists
-        existing_user = self.repository.get_by_email_or_username(
-            user_data.email, user_data.username
-        )
-        if existing_user:
+        # Check if email already exists
+        existing_user_by_email = self.repository.get_by_email(str(user_data.email))
+        if existing_user_by_email:
             logger.warning(
-                f"User creation failed: User {user_data.username} already exists"
+                f"User creation failed: Email {user_data.email} already exists"
             )
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User with this email or username already exists",
+            raise EmailAlreadyExistsError(str(user_data.email))
+
+        # Check if username already exists
+        existing_user_by_username = self.repository.get_by_username(user_data.username)
+        if existing_user_by_username:
+            logger.warning(
+                f"User creation failed: Username {user_data.username} already exists"
             )
+            raise UsernameAlreadyExistsError(user_data.username)
 
         # Create new user
         new_user = User(
             username=user_data.username,
-            email=user_data.email,
+            email=str(user_data.email),
             hashed_password=hash_password(user_data.password),
             is_active=True,
             is_superuser=is_superuser,
         )
 
-        created_user = self.repository.create(new_user)
-        logger.info(
-            f"User created successfully: {created_user.username} (ID: {created_user.id})"
-        )
-        return created_user
+        try:
+            created_user = self.repository.create(new_user)
+            logger.info(
+                f"User created successfully: {created_user.username} (ID: {created_user.id})"
+            )
+            return created_user
+        except DatabaseError as e:
+            # Handle database integrity errors that weren't caught by the pre-check
+            error_msg = str(e.context.get("original_error", ""))
+            if "email" in error_msg.lower():
+                raise EmailAlreadyExistsError(str(user_data.email)) from e
+            elif "username" in error_msg.lower():
+                raise UsernameAlreadyExistsError(user_data.username) from e
+            else:
+                # Re-raise if it's not a duplicate error
+                raise
 
     def get_user(self, user_id: UUID) -> User:
         """Get user by ID."""
         user = self.repository.get_by_id(user_id)
         if not user:
-            logger.warning(f"User not found: {user_id}")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-            )
+            raise ResourceNotFoundError(resource_type="User", resource_id=str(user_id))
         return user
 
     def get_user_by_username(self, username: str) -> User | None:
@@ -81,66 +98,43 @@ class UserService:
 
     def update_user(self, user_id: UUID, user_data: UserUpdate) -> User:
         """Update user information."""
-        logger.info(f"Updating user: {user_id}")
         user = self.get_user(user_id)
 
         # Check if new email/username already exists
         if user_data.email and user_data.email != user.email:
-            existing = self.repository.get_by_email(user_data.email)
+            existing = self.repository.get_by_email(str(user_data.email))
             if existing:
-                logger.warning(f"Email already in use: {user_data.email}")
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Email already in use",
-                )
-            user.email = user_data.email
+                raise EmailAlreadyExistsError(str(user_data.email))
+            user.email = str(user_data.email)
 
         if user_data.username and user_data.username != user.username:
             existing = self.repository.get_by_username(user_data.username)
             if existing:
-                logger.warning(f"Username already in use: {user_data.username}")
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Username already in use",
-                )
+                raise UsernameAlreadyExistsError(user_data.username)
             user.username = user_data.username
 
         if user_data.is_active is not None:
             user.is_active = user_data.is_active
 
         updated_user = self.repository.update(user)
-        logger.info(f"User updated successfully: {updated_user.username}")
         return updated_user
 
     def update_password(self, user_id: UUID, password_data: UserPasswordUpdate) -> User:
         """Update user password."""
-        logger.info(f"Updating password for user: {user_id}")
         user = self.get_user(user_id)
 
         # Verify current password
         if not verify_password(password_data.current_password, user.hashed_password):
-            logger.warning(
-                f"Password update failed: Incorrect current password for user {user_id}"
-            )
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Incorrect current password",
-            )
+            raise PasswordMismatchError()
 
         # Update password
         user.hashed_password = hash_password(password_data.new_password)
         updated_user = self.repository.update(user)
-        logger.info(f"Password updated successfully for user: {user.username}")
         return updated_user
 
     def delete_user(self, user_id: UUID, soft: bool = True) -> bool:
         """Delete a user."""
-        logger.info(f"Deleting user: {user_id} (soft={soft})")
         result = self.repository.delete(user_id, soft=soft)
-        if result:
-            logger.info(f"User deleted successfully: {user_id}")
-        else:
-            logger.warning(f"User deletion failed: {user_id}")
         return result
 
     def activate_user(self, user_id: UUID) -> User:
@@ -178,13 +172,9 @@ class UserService:
 
     def authenticate_user(self, username: str, password: str) -> User | None:
         """Authenticate a user by username and password."""
-        logger.debug(f"Authenticating user: {username}")
         user = self.repository.get_by_username(username)
         if not user:
-            logger.warning(f"Authentication failed: User not found - {username}")
             return None
         if not verify_password(password, user.hashed_password):
-            logger.warning(f"Authentication failed: Invalid password - {username}")
             return None
-        logger.info(f"User authenticated successfully: {username}")
         return user

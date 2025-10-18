@@ -1,12 +1,17 @@
 from datetime import timedelta
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 from productivity_tracker.core.dependencies import (
     get_current_active_user,
     get_current_superuser,
+)
+from productivity_tracker.core.exceptions import (
+    InactiveUserError,
+    InvalidCredentialsError,
+    InvalidTokenError,
 )
 from productivity_tracker.core.security import (
     create_access_token,
@@ -54,16 +59,10 @@ def login(
 
     user = user_service.authenticate_user(form_data.username, form_data.password)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise InvalidCredentialsError(username=form_data.username)
 
     if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
-        )
+        raise InactiveUserError(user_id=str(user.id))
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
@@ -110,15 +109,11 @@ def refresh_token(
     try:
         payload = decode_token(refresh_data.refresh_token)
         if payload.get("type") != "refresh":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token type"
-            )
+            raise InvalidTokenError(reason="Not a refresh token")
 
         user_id = payload.get("sub")
         if not user_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload"
-            )
+            raise InvalidTokenError(reason="Missing user ID in token")
 
         # Create new access token
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -138,11 +133,10 @@ def refresh_token(
 
         return Token(access_token=access_token, token_type="bearer")  # nosec
 
+    except InvalidTokenError:
+        raise
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired refresh token",
-        ) from e
+        raise InvalidTokenError(reason="Token verification failed") from e
 
 
 @router.get("/me", response_model=UserResponse)

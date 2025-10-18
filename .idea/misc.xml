@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.12.3 WSL (Ubuntu): (/home/lhajoosten/.virtualenvs/productivity-tracker-backend/bin/python)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12.3 WSL (Ubuntu): (/home/lhajoosten/projects/productivity-tracker-backend/.venv/bin/bin/python)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12.3 WSL (Ubuntu): (/home/lhajoosten/projects/productivity-tracker-backend/.venv/bin/python3)" project-jdk-type="Python SDK" />
 </project>

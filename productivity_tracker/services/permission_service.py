@@ -2,9 +2,13 @@
 
 from uuid import UUID
 
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from productivity_tracker.core.exceptions import (
+    BusinessLogicError,
+    ResourceAlreadyExistsError,
+    ResourceNotFoundError,
+)
 from productivity_tracker.database.entities.role import Permission
 from productivity_tracker.models.auth import PermissionCreate, PermissionUpdate
 from productivity_tracker.repositories.permission_repository import PermissionRepository
@@ -22,9 +26,10 @@ class PermissionService:
         # Check if permission already exists
         existing_permission = self.repository.get_by_name(permission_data.name)
         if existing_permission:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Permission with name '{permission_data.name}' already exists",
+            raise ResourceAlreadyExistsError(
+                resource_type="Permission",
+                field="name",
+                value=permission_data.name,
             )
 
         # Check if resource+action combination already exists
@@ -32,10 +37,14 @@ class PermissionService:
             permission_data.resource, permission_data.action
         )
         if existing_combination:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Permission for resource '{permission_data.resource}' "
+            raise BusinessLogicError(
+                message=f"Permission for resource '{permission_data.resource}' "
                 f"and action '{permission_data.action}' already exists",
+                user_message="A permission for this resource and action combination already exists.",
+                context={
+                    "resource": permission_data.resource,
+                    "action": permission_data.action,
+                },
             )
 
         # Create new permission
@@ -52,8 +61,8 @@ class PermissionService:
         """Get permission by ID."""
         permission = self.repository.get_by_id(permission_id)
         if not permission:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Permission not found"
+            raise ResourceNotFoundError(
+                resource_type="Permission", resource_id=str(permission_id)
             )
         return permission
 
@@ -61,10 +70,7 @@ class PermissionService:
         """Get permission by name."""
         permission = self.repository.get_by_name(name)
         if not permission:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Permission '{name}' not found",
-            )
+            raise ResourceNotFoundError(resource_type="Permission", resource_id=name)
         return permission
 
     def get_all_permissions(self, skip: int = 0, limit: int = 100) -> list[Permission]:
@@ -85,9 +91,10 @@ class PermissionService:
         if permission_data.name and permission_data.name != permission.name:
             existing = self.repository.get_by_name(permission_data.name)
             if existing:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Permission with name '{permission_data.name}' already exists",
+                raise ResourceAlreadyExistsError(
+                    resource_type="Permission",
+                    field="name",
+                    value=permission_data.name,
                 )
             permission.name = permission_data.name
 

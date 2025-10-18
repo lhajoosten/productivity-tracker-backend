@@ -16,14 +16,18 @@ class RoleRepository(BaseRepository[Role]):
 
     def get_by_name(self, name: str) -> Role | None:
         """Get role by name."""
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
         return (
             self.db.query(Role)
-            .filter(Role.name == name, Role.is_deleted is False)
+            .filter(Role.name == name, Role.is_deleted.is_(False))  # noqa: E712
             .first()
         )
 
     def assign_permissions(self, role: Role, permission_ids: list[UUID]) -> Role:
         """Assign permissions to a role."""
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
         permissions = (
             self.db.query(Permission).filter(Permission.id.in_(permission_ids)).all()
         )
@@ -34,6 +38,8 @@ class RoleRepository(BaseRepository[Role]):
 
     def add_permission(self, role: Role, permission_id: UUID) -> Role:
         """Add a single permission to a role."""
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
         permission = (
             self.db.query(Permission).filter(Permission.id == permission_id).first()
         )
@@ -45,6 +51,8 @@ class RoleRepository(BaseRepository[Role]):
 
     def remove_permission(self, role: Role, permission_id: UUID) -> Role:
         """Remove a permission from a role."""
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
         permission = (
             self.db.query(Permission).filter(Permission.id == permission_id).first()
         )
@@ -56,9 +64,13 @@ class RoleRepository(BaseRepository[Role]):
 
     def get_roles_with_permission(self, permission_name: str) -> list[Role]:
         """Get all roles that have a specific permission."""
+        # Ensure any pending changes are flushed before querying
+        self.db.flush()
         return (
             self.db.query(Role)
             .join(Role.permissions)
-            .filter(Permission.name == permission_name, Role.is_deleted is False)
+            .filter(
+                Permission.name == permission_name, Role.is_deleted.is_(False)
+            )  # noqa: E712
             .all()
         )

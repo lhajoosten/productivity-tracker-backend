@@ -27,11 +27,43 @@ lint: ## Run linters (Ruff, mypy, bandit)
 	poetry run mypy productivity_tracker
 	poetry run bandit -r productivity_tracker -c pyproject.toml
 
-test: ## Run tests
+test: ## Run all tests
 	poetry run pytest
 
+test-unit: ## Run unit tests only
+	poetry run pytest tests/unit -m unit
+
+test-integration: ## Run integration tests only
+	poetry run pytest tests/integration -m integration
+
 test-cov: ## Run tests with coverage report
-	poetry run pytest --cov --cov-report=html --cov-report=term
+	poetry run pytest --cov=productivity_tracker --cov-report=html --cov-report=term-missing --cov-report=xml
+
+test-cov-unit: ## Run unit tests with coverage
+	poetry run pytest tests/unit --cov=productivity_tracker --cov-report=term-missing
+
+test-watch: ## Run tests in watch mode
+	poetry run pytest-watch
+
+test-db-up: ## Start test database
+	docker-compose -f .devcontainer/docker-compose.test.yml up -d
+	@echo "Waiting for test database to be ready..."
+	@sleep 3
+
+test-db-down: ## Stop test database
+	docker-compose -f .devcontainer/docker-compose.test.yml down
+
+test-db-clean: ## Stop and remove test database volumes
+	docker-compose -f .devcontainer/docker-compose.test.yml down -v
+
+test-integration-full: ## Run integration tests with test database
+	@echo "Cleaning up old test database..."
+	@$(MAKE) test-db-clean
+	@echo "Starting fresh test database..."
+	@$(MAKE) test-db-up
+	@echo "Running integration tests..."
+	TEST_DATABASE_URL=postgresql://test_user:test_password@localhost:5433/test_productivity_tracker poetry run pytest tests/integration -m integration
+	@$(MAKE) test-db-clean
 
 run: ## Run the development server
 	poetry run uvicorn productivity_tracker.main:app --reload --host 0.0.0.0 --port 8000
