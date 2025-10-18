@@ -7,8 +7,58 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  quality:
+    name: Code Quality
     runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.8.0
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --with dev
+
+    - name: Run Ruff (linting)
+      run: poetry run ruff check .
+
+    - name: Run Ruff (formatting)
+      run: poetry run ruff format --check .
+
+    - name: Run isort (import sorting)
+      run: poetry run isort . --check-only --diff
+
+    - name: Run mypy (type checking)
+      run: poetry run mypy productivity_tracker
+
+    - name: Run bandit (security)
+      run: poetry run bandit -r productivity_tracker -ll
+
+    - name: Check dependencies (safety)
+      run: poetry run safety check
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: quality  # Only run tests if quality checks pass
 
     services:
       postgres:
@@ -55,7 +105,7 @@ jobs:
       env:
         TEST_DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_productivity_tracker
       run: |
-        poetry run pytest
+        poetry run pytest --cov=productivity_tracker --cov-report=xml --cov-report=term-missing
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4

@@ -25,16 +25,16 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.12"
-fastapi = "^0.109.0"
-uvicorn = {extras = ["standard"], version = "^0.27.0"}
+fastapi = "^0.119.0"
+uvicorn = {extras = ["standard"], version = "^0.38.0"}
 sqlalchemy = "^2.0.25"
 psycopg2-binary = "^2.9.9"
 alembic = "^1.13.1"
 pydantic = "^2.5.3"
 pydantic-settings = "^2.1.0"
-python-multipart = "0.0.19"
+python-multipart = "^0.0.20"
 pyjwt = "^2.8.0"
-argon2-cffi = "^23.1.0"
+argon2-cffi = "^25.1.0"
 python-dotenv = "^1.0.0"
 redis = "^6.4.0"
 minio = "^7.2.18"
@@ -43,15 +43,16 @@ email-validator = "^2.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.0"
-pytest-cov = "^7.0.0"
-coverage = "^7.11.0"
-pytest-asyncio = "^0.23.3"
-httpx = "^0.26.0"
-black = "^24.1.1"
-isort = "^5.13.2"
-ruff = "^0.1.15"
+pytest-cov = "^6.0.0"
+pytest-asyncio = "^1.2.0"
+httpx = "^0.28.0"
+black = "^25.9.0"
+isort = "^7.0.0"
+ruff = "^0.14.0"
 mypy = "^1.8.0"
-pre-commit = "^3.6.0"
+pre-commit = "^4.3.0"
+bandit = "^1.8.6"
+safety = "^3.6.2"
 
 [tool.poetry.scripts]
 prd_tracker = "productivity_tracker.cli:app"
@@ -89,7 +90,7 @@ skip_glob = ["*/migrations/*"]
 
 # Ruff configuration
 [tool.ruff]
-line-length = 88
+line-length = 100
 target-version = "py312"
 exclude = [
     ".git",
@@ -109,6 +110,8 @@ select = [
     "C",  # flake8-comprehensions
     "B",  # flake8-bugbear
     "UP", # pyupgrade
+    "C4", # flake8-coding
+    "N",  # naming conventions
 ]
 ignore = [
     "E501",  # line too long (handled by black)
