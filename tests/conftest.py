@@ -1,6 +1,9 @@
 """Pytest configuration and fixtures for testing."""
 
 import os
+
+os.environ["TESTING"] = "1"
+
 import threading
 from collections.abc import Generator
 from uuid import uuid4
@@ -68,10 +71,8 @@ def engine_integration():
 @pytest.fixture
 def db_session_unit(engine_unit) -> Generator[Session, None, None]:
     """Create a new database session for a unit test."""
-    TestingSessionLocal = sessionmaker(
-        autocommit=False, autoflush=False, bind=engine_unit
-    )
-    session = TestingSessionLocal()
+    testing_session_local = sessionmaker(autocommit=False, autoflush=False, bind=engine_unit)
+    session = testing_session_local()
 
     try:
         yield session
@@ -96,10 +97,10 @@ def db_session_integration(engine_integration) -> Generator[Session, None, None]
     transaction = connection.begin()
 
     # Create session bound to the connection
-    TestingSessionLocal = sessionmaker(
+    testing_session_local = sessionmaker(
         autocommit=False, autoflush=False, bind=connection, expire_on_commit=False
     )
-    session = TestingSessionLocal()
+    session = testing_session_local()
 
     # Begin a nested transaction (savepoint)
     session.begin_nested()
@@ -356,9 +357,7 @@ def sample_role(db_session_unit: Session, sample_permissions: list[Permission]) 
 
 
 @pytest.fixture
-def sample_admin_role(
-    db_session_unit: Session, sample_permissions: list[Permission]
-) -> Role:
+def sample_admin_role(db_session_unit: Session, sample_permissions: list[Permission]) -> Role:
     """Create an admin role with all permissions for testing."""
     role = Role(
         name="admin",
@@ -409,9 +408,7 @@ def auth_headers(client_unit: TestClient, sample_user: User) -> dict[str, str]:
 
 
 @pytest.fixture
-def superuser_auth_headers(
-    client_unit: TestClient, sample_superuser: User
-) -> dict[str, str]:
+def superuser_auth_headers(client_unit: TestClient, sample_superuser: User) -> dict[str, str]:
     """Get authentication headers for a superuser."""
     response = client_unit.post(
         "/api/v1/auth/login",

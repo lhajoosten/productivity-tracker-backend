@@ -64,9 +64,7 @@ def setup_logging():
         # Use colored output in debug mode
         console_handler.setFormatter(ColoredFormatter(console_format))
     else:
-        console_handler.setFormatter(
-            logging.Formatter(console_format, datefmt="%Y-%m-%d %H:%M:%S")
-        )
+        console_handler.setFormatter(logging.Formatter(console_format, datefmt="%Y-%m-%d %H:%M:%S"))
 
     root_logger.addHandler(console_handler)
 
@@ -114,9 +112,7 @@ def setup_logging():
             root_logger.addHandler(error_file_handler)
         except (PermissionError, OSError) as e:
             # If we can't create file handlers, just log to console
-            root_logger.warning(
-                f"Could not set up file logging: {e}. Using console only."
-            )
+            root_logger.warning(f"Could not set up file logging: {e}. Using console only.")
 
     # Configure third-party loggers
     configure_third_party_loggers()

@@ -1,13 +1,15 @@
-from fastapi import FastAPI, HTTPException
+from typing import cast
+
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from sqlalchemy.exc import SQLAlchemyError
+from starlette.requests import Request
 
 from productivity_tracker.api import auth, health, permissions, roles
 from productivity_tracker.core.database import Base, engine
-from productivity_tracker.core.exceptions import AppException
+from productivity_tracker.core.exceptions import AppError
 from productivity_tracker.core.logging_config import get_logger, setup_logging
 from productivity_tracker.core.middleware import (
     RequestLoggingMiddleware,
@@ -33,12 +35,31 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+
+# Type-safe exception handler wrappers
+async def _app_exception_wrapper(request: Request, exc: Exception) -> Response:
+    return cast(Response, await app_exception_handler(request, exc))  # type: ignore[arg-type]
+
+
+async def _http_exception_wrapper(request: Request, exc: Exception) -> Response:
+    return cast(Response, await http_exception_handler(request, exc))  # type: ignore[arg-type]
+
+
+async def _validation_exception_wrapper(request: Request, exc: Exception) -> Response:
+    return cast(Response, await validation_exception_handler(request, exc))  # type: ignore[arg-type]
+
+
+async def _sqlalchemy_exception_wrapper(request: Request, exc: Exception) -> Response:
+    return cast(Response, await sqlalchemy_exception_handler(request, exc))  # type: ignore[arg-type]
+
+
 # Register handlers in this order (more specific first)
-app.add_exception_handler(AppException, app_exception_handler)
-app.add_exception_handler(HTTPException, http_exception_handler)
-app.add_exception_handler(RequestValidationError, validation_exception_handler)
-app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
+app.add_exception_handler(AppError, _app_exception_wrapper)  # type: ignore[arg-type]
+app.add_exception_handler(HTTPException, _http_exception_wrapper)  # type: ignore[arg-type]
+app.add_exception_handler(RequestValidationError, _validation_exception_wrapper)  # type: ignore[arg-type]
+app.add_exception_handler(SQLAlchemyError, _sqlalchemy_exception_wrapper)  # type: ignore[arg-type]
 app.add_exception_handler(Exception, general_exception_handler)
+
 
 # Add CORS middleware
 app.add_middleware(
@@ -58,15 +79,18 @@ app.add_middleware(SecurityHeadersMiddleware)
 # Add request logging middleware
 app.add_middleware(RequestLoggingMiddleware)
 
-# Add trusted host middleware (only in production)
-if not settings.DEBUG:
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=[".com", "*.localhost.com"])
-
 # Include routers with `/api/v1` prefix for versioning
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(roles.router, prefix="/api/v1")
 app.include_router(permissions.router, prefix="/api/v1")
+
+
+@app.get("/health")
+@app.head("/health")  # Support HEAD requests
+async def root_health():
+    """Root-level health check for infrastructure."""
+    return {"status": "healthy"}
 
 
 @app.on_event("startup")

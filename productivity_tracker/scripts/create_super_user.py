@@ -40,9 +40,7 @@ def create_super_user():
     try:
         # Get username
         while True:
-            username = input(
-                "Username (3-50 chars, alphanumeric + underscore): "
-            ).strip()
+            username = input("Username (3-50 chars, alphanumeric + underscore): ").strip()
             if not username:
                 print("❌ Username cannot be empty.")
                 continue

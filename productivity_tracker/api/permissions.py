@@ -18,9 +18,7 @@ from productivity_tracker.services.permission_service import PermissionService
 router = APIRouter(prefix="/permissions", tags=["Permissions"])
 
 
-@router.post(
-    "/", response_model=PermissionResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("/", response_model=PermissionResponse, status_code=status.HTTP_201_CREATED)
 def create_permission(
     permission_data: PermissionCreate,
     current_user: User = Depends(get_current_superuser),
@@ -90,9 +88,7 @@ def update_permission(
 ):
     """Update permission (admin only)."""
     permission_service = PermissionService(db)
-    updated_permission = permission_service.update_permission(
-        permission_id, permission_data
-    )
+    updated_permission = permission_service.update_permission(permission_id, permission_data)
     return updated_permission
 
 

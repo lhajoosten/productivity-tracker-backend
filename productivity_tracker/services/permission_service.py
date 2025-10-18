@@ -61,9 +61,7 @@ class PermissionService:
         """Get permission by ID."""
         permission = self.repository.get_by_id(permission_id)
         if not permission:
-            raise ResourceNotFoundError(
-                resource_type="Permission", resource_id=str(permission_id)
-            )
+            raise ResourceNotFoundError(resource_type="Permission", resource_id=str(permission_id))
         return permission
 
     def get_permission_by_name(self, name: str) -> Permission:
@@ -84,28 +82,22 @@ class PermissionService:
     def update_permission(
         self, permission_id: UUID, permission_data: PermissionUpdate
     ) -> Permission:
-        """Update permission information."""
-        permission = self.get_permission(permission_id)
+        """Update a permission."""
+        permission = self.repository.get_by_id(permission_id)
+        if not permission:
+            raise ResourceNotFoundError(resource_type="Permission", resource_id=str(permission_id))
 
-        # Check if new name already exists
-        if permission_data.name and permission_data.name != permission.name:
-            existing = self.repository.get_by_name(permission_data.name)
-            if existing:
-                raise ResourceAlreadyExistsError(
-                    resource_type="Permission",
-                    field="name",
-                    value=permission_data.name,
-                )
-            permission.name = permission_data.name
-
-        if permission_data.resource:
-            permission.resource = permission_data.resource
-
-        if permission_data.action:
-            permission.action = permission_data.action
+        if permission_data.name is not None:
+            permission.name = permission_data.name  # type: ignore[assignment]
 
         if permission_data.description is not None:
-            permission.description = permission_data.description
+            permission.description = permission_data.description  # type: ignore[assignment]
+
+        if permission_data.resource is not None:
+            permission.resource = permission_data.resource  # type: ignore[assignment]
+
+        if permission_data.action is not None:
+            permission.action = permission_data.action  # type: ignore[assignment]
 
         return self.repository.update(permission)
 

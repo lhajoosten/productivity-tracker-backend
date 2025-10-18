@@ -65,9 +65,7 @@ class TestUserService:
 
         # Assert
         assert result == mock_user
-        user_service.repository.get_by_email.assert_called_once_with(
-            "newuser@example.com"
-        )
+        user_service.repository.get_by_email.assert_called_once_with("newuser@example.com")
         user_service.repository.get_by_username.assert_called_once_with("newuser")
         user_service.repository.create.assert_called_once()
 
@@ -212,9 +210,7 @@ class TestUserService:
 
     @patch("productivity_tracker.services.user_service.verify_password")
     @patch("productivity_tracker.services.user_service.hash_password")
-    def test_update_password_success(
-        self, mock_hash, mock_verify, user_service, mock_user
-    ):
+    def test_update_password_success(self, mock_hash, mock_verify, user_service, mock_user):
         """Test successful password update."""
         # Arrange
         user_id = mock_user.id
@@ -287,9 +283,7 @@ class TestUserService:
         assert result is None
 
     @patch("productivity_tracker.services.user_service.verify_password")
-    def test_authenticate_user_wrong_password(
-        self, mock_verify, user_service, mock_user
-    ):
+    def test_authenticate_user_wrong_password(self, mock_verify, user_service, mock_user):
         """Test authentication fails with wrong password."""
         # Arrange
         mock_verify.return_value = False
@@ -382,9 +376,7 @@ class TestUserService:
 
         # Assert
         assert result == mock_user
-        user_service.repository.assign_roles.assert_called_once_with(
-            mock_user, role_ids
-        )
+        user_service.repository.assign_roles.assert_called_once_with(mock_user, role_ids)
 
     def test_add_role(self, user_service, mock_user):
         """Test adding a single role to user."""

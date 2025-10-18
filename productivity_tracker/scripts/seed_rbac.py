@@ -90,9 +90,7 @@ def create_permissions(db: Session):
     permissions = []
     for perm_data in permissions_data:
         # Check if permission already exists
-        existing = (
-            db.query(Permission).filter(Permission.name == perm_data["name"]).first()
-        )
+        existing = db.query(Permission).filter(Permission.name == perm_data["name"]).first()
         if not existing:
             permission = Permission(**perm_data)
             db.add(permission)
@@ -119,8 +117,7 @@ def create_roles(db: Session, permissions: list):
         user_permissions = [
             p
             for p in permissions
-            if p.resource in ["task", "project"]
-            and p.action in ["create", "read", "update"]
+            if p.resource in ["task", "project"] and p.action in ["create", "read", "update"]
         ]
         user_role = Role(name="user", description="Regular user with limited access")
         user_role.permissions = user_permissions

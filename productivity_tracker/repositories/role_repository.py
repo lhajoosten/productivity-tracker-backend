@@ -1,5 +1,6 @@
 """Repository for Role entity operations."""
 
+from typing import cast
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -18,19 +19,18 @@ class RoleRepository(BaseRepository[Role]):
         """Get role by name."""
         # Ensure any pending changes are flushed before querying
         self.db.flush()
-        return (
+        return cast(
+            Role | None,
             self.db.query(Role)
             .filter(Role.name == name, Role.is_deleted.is_(False))  # noqa: E712
-            .first()
+            .first(),
         )
 
     def assign_permissions(self, role: Role, permission_ids: list[UUID]) -> Role:
         """Assign permissions to a role."""
         # Ensure any pending changes are flushed before querying
         self.db.flush()
-        permissions = (
-            self.db.query(Permission).filter(Permission.id.in_(permission_ids)).all()
-        )
+        permissions = self.db.query(Permission).filter(Permission.id.in_(permission_ids)).all()
         role.permissions = permissions
         self.db.commit()
         self.db.refresh(role)
@@ -40,9 +40,7 @@ class RoleRepository(BaseRepository[Role]):
         """Add a single permission to a role."""
         # Ensure any pending changes are flushed before querying
         self.db.flush()
-        permission = (
-            self.db.query(Permission).filter(Permission.id == permission_id).first()
-        )
+        permission = self.db.query(Permission).filter(Permission.id == permission_id).first()
         if permission and permission not in role.permissions:
             role.permissions.append(permission)
             self.db.commit()
@@ -53,9 +51,7 @@ class RoleRepository(BaseRepository[Role]):
         """Remove a permission from a role."""
         # Ensure any pending changes are flushed before querying
         self.db.flush()
-        permission = (
-            self.db.query(Permission).filter(Permission.id == permission_id).first()
-        )
+        permission = self.db.query(Permission).filter(Permission.id == permission_id).first()
         if permission and permission in role.permissions:
             role.permissions.remove(permission)
             self.db.commit()
@@ -66,11 +62,10 @@ class RoleRepository(BaseRepository[Role]):
         """Get all roles that have a specific permission."""
         # Ensure any pending changes are flushed before querying
         self.db.flush()
-        return (
+        return cast(
+            list[Role],
             self.db.query(Role)
             .join(Role.permissions)
-            .filter(
-                Permission.name == permission_name, Role.is_deleted.is_(False)
-            )  # noqa: E712
-            .all()
+            .filter(Permission.name == permission_name, Role.is_deleted.is_(False))  # noqa: E712
+            .all(),
         )

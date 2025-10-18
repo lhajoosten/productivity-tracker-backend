@@ -10,7 +10,7 @@ from starlette import status
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
 
-from productivity_tracker.core.exceptions import AppException
+from productivity_tracker.core.exceptions import AppError
 
 logger = logging.getLogger(__name__)
 
@@ -27,10 +27,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
         if user:
             # Authenticated user
-            return (
-                f"{client_host} | "
-                f"User(id={user.id}, name={user.name}, email={user.email})"
-            )
+            return f"{client_host} | User(id={user.id}, name={user.name}, email={user.email})"
         else:
             # Unauthenticated user
             return f"{client_host} | Unknown"
@@ -91,15 +88,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Middleware to add security headers to all responses."""
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
-        response = await call_next(request)
+        response: Response = await call_next(request)
 
         # Add security headers
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
-        response.headers["Strict-Transport-Security"] = (
-            "max-age=31536000; includeSubDomains"
-        )
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 
         return response
 
@@ -113,9 +108,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         error_type = error["type"]
 
         # Convert technical validation messages to user-friendly ones
-        user_friendly_msg = _get_user_friendly_validation_message(
-            field_name, error_msg, error_type
-        )
+        user_friendly_msg = _get_user_friendly_validation_message(field_name, error_msg, error_type)
 
         errors.append(
             {
@@ -137,9 +130,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 
-def _get_user_friendly_validation_message(
-    field_name: str, error_msg: str, error_type: str
-) -> str:
+def _get_user_friendly_validation_message(field_name: str, error_msg: str, error_type: str) -> str:
     """Convert technical validation messages to user-friendly ones."""
     # Remove technical prefixes like "body -> " or "query -> "
     display_field = field_name.split(" -> ")[-1].replace("_", " ").title()
@@ -188,15 +179,17 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
 
     # Check for specific database errors
     if "duplicate key" in error_str.lower() or "unique constraint" in error_str.lower():
-        user_message = "This information already exists in our system. Please use different details."
+        user_message = (
+            "This information already exists in our system. Please use different details."
+        )
         error_code = "DUPLICATE_ENTRY"
     elif "foreign key" in error_str.lower():
-        user_message = "This operation cannot be completed due to related data. Please contact support."
+        user_message = (
+            "This operation cannot be completed due to related data. Please contact support."
+        )
         error_code = "FOREIGN_KEY_VIOLATION"
     elif "connection" in error_str.lower() or "timeout" in error_str.lower():
-        user_message = (
-            "Unable to connect to the database. Please try again in a moment."
-        )
+        user_message = "Unable to connect to the database. Please try again in a moment."
         error_code = "DATABASE_CONNECTION_ERROR"
 
     return JSONResponse(
@@ -208,12 +201,10 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
     )
 
 
-async def app_exception_handler(request: Request, exc: AppException):
+async def app_exception_handler(request: Request, exc: AppError):
     """Handle custom application exceptions with context and user-friendly messages."""
     # Log with full context
-    log_message = (
-        f"Application error on {request.url.path}: " f"[{exc.error_code}] {exc.message}"
-    )
+    log_message = f"Application error on {request.url.path}: [{exc.error_code}] {exc.message}"
 
     if exc.context:
         log_message += f" | Context: {exc.context}"

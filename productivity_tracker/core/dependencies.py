@@ -1,4 +1,5 @@
 import logging
+from typing import cast
 from uuid import UUID
 
 from fastapi import Cookie, Depends
@@ -30,24 +31,24 @@ async def get_current_user(
     if payload is None:
         raise InvalidTokenError(reason="Token validation failed")
 
-    user_id_str: str = payload.get("sub")
-    token_type: str = payload.get("type")
+    user_id_str = payload.get("sub")
+    token_type = payload.get("type")
 
     if user_id_str is None or token_type != "access":  # nosec
         raise InvalidTokenError(reason="Invalid token payload")
 
     # Convert string UUID to UUID object
     try:
-        user_id = UUID(user_id_str)
+        user_id = UUID(str(user_id_str))
     except (ValueError, AttributeError) as e:
         raise InvalidTokenError(reason="Invalid user ID in token") from e
 
-    # Query user - use == instead of 'is' for SQLAlchemy compatibility
     # Ensure we flush any pending changes first to make them visible
     db.flush()
-    user = (
-        db.query(User).filter(User.id == user_id, User.is_deleted.is_(False)).first()
-    )  # noqa: E712
+    user = cast(
+        User | None,
+        db.query(User).filter(User.id == user_id, User.is_deleted.is_(False)).first(),  # noqa: E712
+    )
 
     if user is None:
         # Additional debug: check if user exists without is_deleted filter
@@ -96,9 +97,7 @@ def require_any_permission(*permission_names: str):
     ) -> User:
         if not current_user.has_any_permission(*permission_names):
             permissions_str = ", ".join(permission_names)
-            raise PermissionDeniedError(
-                permission=f"one of: {permissions_str}", resource=None
-            )
+            raise PermissionDeniedError(permission=f"one of: {permissions_str}", resource=None)
         return current_user
 
     return permission_checker

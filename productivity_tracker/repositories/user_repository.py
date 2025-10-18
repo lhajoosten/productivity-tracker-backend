@@ -1,5 +1,6 @@
 """Repository for User entity operations."""
 
+from typing import cast
 from uuid import UUID
 
 from pydantic import EmailStr
@@ -23,10 +24,11 @@ class UserRepository(BaseRepository[User]):
         logger.debug(f"Querying user by username: {username}")
         # Ensure any pending changes are flushed before querying
         self.db.flush()
-        user = (
+        user = cast(
+            User | None,
             self.db.query(User)
             .filter(User.username == username, User.is_deleted == False)  # noqa: E712
-            .first()
+            .first(),
         )
         logger.debug(f"Query result for {username}: {user}")
         return user
@@ -35,43 +37,45 @@ class UserRepository(BaseRepository[User]):
         """Get user by email."""
         # Ensure any pending changes are flushed before querying
         self.db.flush()
-        return (
+        return cast(
+            User | None,
             self.db.query(User)
             .filter(User.email == email, User.is_deleted == False)  # noqa: E712
-            .first()
+            .first(),
         )
 
     def get_by_email_or_username(self, email: EmailStr, username: str) -> User | None:
         """Get user by email or username."""
         # Ensure any pending changes are flushed before querying
         self.db.flush()
-        return (
+        return cast(
+            User | None,
             self.db.query(User)
             .filter(
                 (User.email == email) | (User.username == username),
                 User.is_deleted == False,  # noqa: E712
             )
-            .first()
+            .first(),
         )
 
-    def get_active_users(self, skip: int = 0, limit: int = 100) -> list[type[User]]:
+    def get_active_users(self, skip: int = 0, limit: int = 100) -> list[User]:
         """Get all active users."""
         # Ensure any pending changes are flushed before querying
         self.db.flush()
-        return (
+        return cast(
+            list[User],
             self.db.query(User)
             .filter(User.is_active == True, User.is_deleted == False)  # noqa: E712
             .offset(skip)
             .limit(limit)
-            .all()
+            .all(),
         )
 
-    def get_superusers(self) -> list[type[User]]:
+    def get_superusers(self) -> list[User]:
         """Get all superusers."""
-        return (
-            self.db.query(User)
-            .filter(User.is_superuser, User.is_deleted.is_(False))
-            .all()
+        return cast(
+            list[User],
+            self.db.query(User).filter(User.is_superuser, User.is_deleted.is_(False)).all(),
         )
 
     def assign_roles(self, user: User, role_ids: list[UUID]) -> User:
@@ -100,30 +104,27 @@ class UserRepository(BaseRepository[User]):
             self.db.refresh(user)
         return user
 
-    def get_users_by_role(self, role_name: str) -> list[type[User]]:
+    def get_users_by_role(self, role_name: str) -> list[User]:
         """Get all users with a specific role."""
-        return (
+        return cast(
+            list[User],
             self.db.query(User)
             .join(User.roles)
-            .filter(Role.name == role_name, User.is_deleted is False)
-            .all()
+            .filter(Role.name == role_name, User.is_deleted == False)  # noqa: E712
+            .all(),
         )
 
-    def search_users(
-        self, query: str, skip: int = 0, limit: int = 100
-    ) -> list[type[User]]:
+    def search_users(self, query: str, skip: int = 0, limit: int = 100) -> list[User]:
         """Search users by username or email."""
         search_pattern = f"%{query}%"
-        return (
+        return cast(
+            list[User],
             self.db.query(User)
             .filter(
-                (
-                    User.username.ilike(search_pattern)
-                    | User.email.ilike(search_pattern)
-                ),
-                User.is_deleted is False,
+                (User.username.ilike(search_pattern) | User.email.ilike(search_pattern)),
+                User.is_deleted == False,  # noqa: E712
             )
             .offset(skip)
             .limit(limit)
-            .all()
+            .all(),
         )

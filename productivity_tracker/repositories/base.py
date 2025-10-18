@@ -1,6 +1,6 @@
 """Base repository class with common CRUD operations."""
 
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, cast
 from uuid import UUID
 
 from sqlalchemy.exc import IntegrityError
@@ -26,7 +26,7 @@ class BaseRepository(Generic[ModelType]):
         query = self.db.query(self.model).filter(self.model.id == id)
         if not include_deleted:
             query = query.filter(self.model.is_deleted == False)  # noqa: E712
-        return query.first()
+        return cast(ModelType | None, query.first())
 
     def get_all(
         self, skip: int = 0, limit: int = 100, include_deleted: bool = False
@@ -37,7 +37,7 @@ class BaseRepository(Generic[ModelType]):
         query = self.db.query(self.model)
         if not include_deleted:
             query = query.filter(self.model.is_deleted == False)  # noqa: E712
-        return query.offset(skip).limit(limit).all()
+        return cast(list[ModelType], query.offset(skip).limit(limit).all())
 
     def create(self, obj: ModelType) -> ModelType:
         """Create a new record."""
@@ -97,4 +97,4 @@ class BaseRepository(Generic[ModelType]):
         query = self.db.query(self.model)
         if not include_deleted:
             query = query.filter(self.model.is_deleted == False)  # noqa: E712
-        return query.count()
+        return cast(int, query.count())

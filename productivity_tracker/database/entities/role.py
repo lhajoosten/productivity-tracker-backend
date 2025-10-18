@@ -39,9 +39,7 @@ class Role(BaseEntity):
         back_populates="roles",
         lazy="selectin",
     )
-    users = relationship(
-        "User", secondary="user_roles", back_populates="roles", lazy="dynamic"
-    )
+    users = relationship("User", secondary="user_roles", back_populates="roles", lazy="dynamic")
 
     def __repr__(self):
         return f"<Role(id={self.id}, name='{self.name}')>"
@@ -57,12 +55,8 @@ class Permission(BaseEntity):
     __tablename__ = "permissions"
 
     name = Column(String(100), unique=True, nullable=False, index=True)
-    resource = Column(
-        String(50), nullable=False, index=True
-    )  # e.g., "user", "task", "project"
-    action = Column(
-        String(50), nullable=False
-    )  # e.g., "create", "read", "update", "delete"
+    resource = Column(String(50), nullable=False, index=True)  # e.g., "user", "task", "project"
+    action = Column(String(50), nullable=False)  # e.g., "create", "read", "update", "delete"
     description = Column(String(255))
 
     # Relationships

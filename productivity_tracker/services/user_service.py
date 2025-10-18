@@ -34,17 +34,13 @@ class UserService:
         # Check if email already exists
         existing_user_by_email = self.repository.get_by_email(str(user_data.email))
         if existing_user_by_email:
-            logger.warning(
-                f"User creation failed: Email {user_data.email} already exists"
-            )
+            logger.warning(f"User creation failed: Email {user_data.email} already exists")
             raise EmailAlreadyExistsError(str(user_data.email))
 
         # Check if username already exists
         existing_user_by_username = self.repository.get_by_username(user_data.username)
         if existing_user_by_username:
-            logger.warning(
-                f"User creation failed: Username {user_data.username} already exists"
-            )
+            logger.warning(f"User creation failed: Username {user_data.username} already exists")
             raise UsernameAlreadyExistsError(user_data.username)
 
         # Create new user
@@ -90,7 +86,7 @@ class UserService:
 
     def get_all_users(
         self, skip: int = 0, limit: int = 100, active_only: bool = True
-    ) -> list[type[User]] | list[User]:
+    ) -> list[User]:
         """Get all users with pagination."""
         if active_only:
             return self.repository.get_active_users(skip, limit)
@@ -105,16 +101,16 @@ class UserService:
             existing = self.repository.get_by_email(str(user_data.email))
             if existing:
                 raise EmailAlreadyExistsError(str(user_data.email))
-            user.email = str(user_data.email)
+            user.email = str(user_data.email)  # type: ignore[assignment]
 
         if user_data.username and user_data.username != user.username:
             existing = self.repository.get_by_username(user_data.username)
             if existing:
                 raise UsernameAlreadyExistsError(user_data.username)
-            user.username = user_data.username
+            user.username = user_data.username  # type: ignore[assignment]
 
         if user_data.is_active is not None:
-            user.is_active = user_data.is_active
+            user.is_active = user_data.is_active  # type: ignore[assignment]
 
         updated_user = self.repository.update(user)
         return updated_user
@@ -124,11 +120,11 @@ class UserService:
         user = self.get_user(user_id)
 
         # Verify current password
-        if not verify_password(password_data.current_password, user.hashed_password):
+        if not verify_password(password_data.current_password, str(user.hashed_password)):
             raise PasswordMismatchError()
 
         # Update password
-        user.hashed_password = hash_password(password_data.new_password)
+        user.hashed_password = hash_password(password_data.new_password)  # type: ignore[assignment]
         updated_user = self.repository.update(user)
         return updated_user
 
@@ -140,13 +136,13 @@ class UserService:
     def activate_user(self, user_id: UUID) -> User:
         """Activate a user."""
         user = self.get_user(user_id)
-        user.is_active = True
+        user.is_active = True  # type: ignore[assignment]
         return self.repository.update(user)
 
     def deactivate_user(self, user_id: UUID) -> User:
         """Deactivate a user."""
         user = self.get_user(user_id)
-        user.is_active = False
+        user.is_active = False  # type: ignore[assignment]
         return self.repository.update(user)
 
     def assign_roles(self, user_id: UUID, role_ids: list[UUID]) -> User:
@@ -164,9 +160,7 @@ class UserService:
         user = self.get_user(user_id)
         return self.repository.remove_role(user, role_id)
 
-    def search_users(
-        self, query: str, skip: int = 0, limit: int = 100
-    ) -> list[type[User]]:
+    def search_users(self, query: str, skip: int = 0, limit: int = 100) -> list[User]:
         """Search users by username or email."""
         return self.repository.search_users(query, skip, limit)
 
@@ -175,6 +169,6 @@ class UserService:
         user = self.repository.get_by_username(username)
         if not user:
             return None
-        if not verify_password(password, user.hashed_password):
+        if not verify_password(password, str(user.hashed_password)):
             return None
         return user

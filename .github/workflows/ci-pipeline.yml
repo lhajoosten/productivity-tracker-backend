@@ -33,6 +33,10 @@ jobs:
         path: .venv
         key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
+    - name: Write lock file
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry lock
+
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install --no-interaction --with dev
@@ -104,11 +108,11 @@ jobs:
     - name: Run tests with coverage
       env:
         TEST_DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_productivity_tracker
-      run: |
-        poetry run pytest --cov=productivity_tracker --cov-report=xml --cov-report=term-missing
+      run: make test-ci-full
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.xml
         fail_ci_if_error: false

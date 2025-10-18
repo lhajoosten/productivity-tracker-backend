@@ -1,7 +1,7 @@
 """Unit tests for custom exceptions."""
 
 from productivity_tracker.core.exceptions import (
-    AppException,
+    AppError,
     BusinessLogicError,
     DatabaseError,
     EmailAlreadyExistsError,
@@ -23,8 +23,8 @@ class TestCustomExceptions:
     """Test custom exception classes."""
 
     def test_app_exception_base(self):
-        """Test base AppException."""
-        exc = AppException(
+        """Test base AppError."""
+        exc = AppError(
             message="Technical error",
             user_message="User-friendly error",
             status_code=400,
@@ -40,12 +40,12 @@ class TestCustomExceptions:
         assert str(exc) == "[TEST_ERROR] Technical error"
 
     def test_app_exception_defaults(self):
-        """Test AppException with default values."""
-        exc = AppException(message="Error message")
+        """Test AppError with default values."""
+        exc = AppError(message="Error message")
 
         assert exc.user_message == "Error message"  # Defaults to message
         assert exc.status_code == 500  # Default status
-        assert exc.error_code == "AppException"  # Defaults to class name
+        assert exc.error_code == "AppError"  # Defaults to class name
         assert exc.context == {}
 
     def test_invalid_credentials_error(self):

@@ -115,9 +115,7 @@ def assert_error_response(
     # The status is checked separately in the test
 
 
-def assert_user_response(
-    response_data: dict, expected_username: str | None = None
-) -> None:
+def assert_user_response(response_data: dict, expected_username: str | None = None) -> None:
     """Assert that a user response has the expected format."""
     assert "id" in response_data
     assert "username" in response_data
@@ -143,9 +141,7 @@ def assert_role_response(response_data: dict, expected_name: str | None = None) 
         assert response_data["name"] == expected_name
 
 
-def assert_permission_response(
-    response_data: dict, expected_name: str | None = None
-) -> None:
+def assert_permission_response(response_data: dict, expected_name: str | None = None) -> None:
     """Assert that a permission response has the expected format."""
     assert "id" in response_data
     assert "name" in response_data

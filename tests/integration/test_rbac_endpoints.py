@@ -205,9 +205,7 @@ class TestRoleEndpoints:
         )
 
         # Act
-        response = client_integration.get(
-            "/api/v1/roles/00000000-0000-0000-0000-000000000000"
-        )
+        response = client_integration.get("/api/v1/roles/00000000-0000-0000-0000-000000000000")
 
         # Assert
         assert response.status_code == 404
@@ -580,9 +578,7 @@ class TestPermissionEndpoints:
         )
 
         # Act
-        response = client_integration.get(
-            f"/api/v1/permissions/resource/{unique_resource}"
-        )
+        response = client_integration.get(f"/api/v1/permissions/resource/{unique_resource}")
 
         # Assert
         assert response.status_code == 200

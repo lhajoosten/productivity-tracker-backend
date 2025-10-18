@@ -45,24 +45,28 @@ test-cov-unit: ## Run unit tests with coverage
 test-watch: ## Run tests in watch mode
 	poetry run pytest-watch
 
-test-db-up: ## Start test database
-	docker-compose -f .devcontainer/docker-compose.test.yml up -d
+test-db-up: ## Start the test database
+	@echo "Starting test database..."
+	docker compose -f .devcontainer/docker-compose.test.yml up -d
 	@echo "Waiting for test database to be ready..."
-	@sleep 3
+	@sleep 5
 
 test-db-down: ## Stop test database
 	docker-compose -f .devcontainer/docker-compose.test.yml down
 
-test-db-clean: ## Stop and remove test database volumes
-	docker-compose -f .devcontainer/docker-compose.test.yml down -v
+test-db-clean: ## Clean up test database
+	@echo "Cleaning up test database..."
+	docker compose -f .devcontainer/docker-compose.test.yml down -v
 
-test-integration-full: ## Run integration tests with test database
+
+test-ci-full: ## Run all tests with coverage for CI environment
+	@echo "Running all tests in CI mode with coverage..."
 	@echo "Cleaning up old test database..."
 	@$(MAKE) test-db-clean
 	@echo "Starting fresh test database..."
 	@$(MAKE) test-db-up
-	@echo "Running integration tests..."
-	TEST_DATABASE_URL=postgresql://test_user:test_password@localhost:5433/test_productivity_tracker poetry run pytest tests/integration -m integration
+	@echo "Running tests with coverage..."
+	TESTING=1 TEST_DATABASE_URL=postgresql://test_user:test_password@localhost:5433/test_productivity_tracker poetry run pytest --cov=productivity_tracker --cov-report=xml --cov-report=term-missing
 	@$(MAKE) test-db-clean
 
 run: ## Run the development server

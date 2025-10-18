@@ -45,12 +45,12 @@ For validation errors:
 
 ### Base Exception
 
-**`AppException`** - Base class for all custom exceptions
+**`AppError`** - Base class for all custom exceptions
 
 ```python
-from productivity_tracker.core.exceptions import AppException
+from productivity_tracker.core.exceptions import AppError
 
-raise AppException(
+raise AppError(
     message="Technical message for logging",
     user_message="User-friendly message",
     status_code=400,
@@ -216,7 +216,7 @@ def get_user(self, user_id: UUID) -> User:
 
 Exception handlers are registered in order of specificity (most specific first):
 
-1. `AppException` - Custom application exceptions
+1. `AppError` - Custom application exceptions
 2. `HTTPException` - FastAPI HTTP exceptions
 3. `RequestValidationError` - Pydantic validation errors
 4. `SQLAlchemyError` - Database errors

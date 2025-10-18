@@ -65,10 +65,11 @@ class RoleService:
         return self.repository.get_all(skip, limit)
 
     def update_role(self, role_id: UUID, role_data: RoleUpdate) -> Role:
-        """Update role information."""
-        role = self.get_role(role_id)
+        """Update a role."""
+        role = self.repository.get_by_id(role_id)
+        if not role:
+            raise ResourceNotFoundError(resource_type="Role", resource_id=str(role_id))
 
-        # Check if new name already exists
         if role_data.name and role_data.name != role.name:
             existing = self.repository.get_by_name(role_data.name)
             if existing:
@@ -77,20 +78,12 @@ class RoleService:
                     field="name",
                     value=role_data.name,
                 )
-            role.name = role_data.name
+            role.name = role_data.name  # type: ignore[assignment]
 
         if role_data.description is not None:
-            role.description = role_data.description
+            role.description = role_data.description  # type: ignore[assignment]
 
-        updated_role = self.repository.update(role)
-
-        # Update permissions if provided
-        if role_data.permission_ids is not None:
-            updated_role = self.repository.assign_permissions(
-                updated_role, role_data.permission_ids
-            )
-
-        return updated_role
+        return self.repository.update(role)
 
     def delete_role(self, role_id: UUID, soft: bool = True) -> bool:
         """Delete a role."""

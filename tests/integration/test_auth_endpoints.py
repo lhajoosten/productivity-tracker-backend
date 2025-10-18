@@ -97,14 +97,9 @@ class TestAuthenticationEndpoints:
         data = response.json()
         assert data["error"] == "VALIDATION_ERROR"
         # The validation error is generic, not field-specific in user message
-        assert (
-            "invalid" in data["message"].lower()
-            or "validation" in data["message"].lower()
-        )
+        assert "invalid" in data["message"].lower() or "validation" in data["message"].lower()
 
-    def test_register_user_missing_required_fields(
-        self, client_integration: TestClient
-    ):
+    def test_register_user_missing_required_fields(self, client_integration: TestClient):
         """Test registration fails with missing required fields."""
         # Arrange
         user_data = {
@@ -125,9 +120,7 @@ class TestAuthenticationEndpoints:
     # Login Tests
     # ============================================================================
 
-    def test_login_success(
-        self, client_integration: TestClient, sample_user_integration: User
-    ):
+    def test_login_success(self, client_integration: TestClient, sample_user_integration: User):
         """Test successful login."""
         # Arrange
         login_data = {
@@ -245,9 +238,7 @@ class TestAuthenticationEndpoints:
     # Logout Tests
     # ============================================================================
 
-    def test_logout_success(
-        self, client_integration: TestClient, sample_user_integration: User
-    ):
+    def test_logout_success(self, client_integration: TestClient, sample_user_integration: User):
         """Test successful logout."""
         # Arrange - Login first
         client_integration.post(

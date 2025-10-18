@@ -47,7 +47,6 @@ pytest = "^8.3.0"
 pytest-cov = "^7.0.0"
 pytest-asyncio = "^1.2.0"
 httpx = "^0.28.0"
-black = "^25.9.0"
 isort = "^7.0.0"
 ruff = "^0.14.0"
 mypy = "^1.8.0"
@@ -118,6 +117,8 @@ ignore = [
     "E501",  # line too long (handled by black)
     "B008",  # do not perform function calls in argument defaults
     "C901",  # too complex
+    "N818",  # Exception name should end with Error
+    "UP046", # Use type parameters (mypy doesn't support PEP 695 yet)
 ]
 
 [tool.ruff.lint.per-file-ignores]

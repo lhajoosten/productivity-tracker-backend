@@ -3,7 +3,7 @@
 from typing import Any
 
 
-class AppException(Exception):
+class AppError(Exception):
     """Base exception for all application errors."""
 
     def __init__(
@@ -36,7 +36,7 @@ class AppException(Exception):
 
 
 # Authentication & Authorization Exceptions
-class AuthenticationError(AppException):
+class AuthenticationError(AppError):
     """Raised when authentication fails."""
 
     def __init__(
@@ -89,7 +89,7 @@ class InvalidTokenError(AuthenticationError):
         self.error_code = "INVALID_TOKEN"
 
 
-class InactiveUserError(AppException):
+class InactiveUserError(AppError):
     """Raised when trying to authenticate an inactive user."""
 
     def __init__(self, user_id: str | None = None):
@@ -103,7 +103,7 @@ class InactiveUserError(AppException):
         )
 
 
-class PermissionDeniedError(AppException):
+class PermissionDeniedError(AppError):
     """Raised when user doesn't have required permissions."""
 
     def __init__(self, permission: str | None = None, resource: str | None = None):
@@ -127,7 +127,7 @@ class PermissionDeniedError(AppException):
 
 
 # Resource Exceptions
-class ResourceNotFoundError(AppException):
+class ResourceNotFoundError(AppError):
     """Raised when a requested resource is not found."""
 
     def __init__(self, resource_type: str, resource_id: str | None = None):
@@ -148,7 +148,7 @@ class ResourceNotFoundError(AppException):
         )
 
 
-class ResourceAlreadyExistsError(AppException):
+class ResourceAlreadyExistsError(AppError):
     """Raised when trying to create a resource that already exists."""
 
     def __init__(
@@ -167,7 +167,9 @@ class ResourceAlreadyExistsError(AppException):
         if field and value:
             message += f": {field}='{value}'"
 
-        user_message = f"A {resource_type.lower()} with this {field or 'information'} already exists."
+        user_message = (
+            f"A {resource_type.lower()} with this {field or 'information'} already exists."
+        )
 
         super().__init__(
             message=message,
@@ -179,7 +181,7 @@ class ResourceAlreadyExistsError(AppException):
 
 
 # Validation Exceptions
-class ValidationError(AppException):
+class ValidationError(AppError):
     """Raised when input validation fails."""
 
     def __init__(
@@ -228,12 +230,10 @@ class PasswordMismatchError(ValidationError):
 
 
 # Business Logic Exceptions
-class BusinessLogicError(AppException):
+class BusinessLogicError(AppError):
     """Raised when business logic validation fails."""
 
-    def __init__(
-        self, message: str, user_message: str, context: dict[str, Any] | None = None
-    ):
+    def __init__(self, message: str, user_message: str, context: dict[str, Any] | None = None):
         super().__init__(
             message=message,
             user_message=user_message,
@@ -265,14 +265,12 @@ class UsernameAlreadyExistsError(ResourceAlreadyExistsError):
             field="username",
             value=username,
         )
-        self.user_message = (
-            "This username is already taken. Please choose a different username."
-        )
+        self.user_message = "This username is already taken. Please choose a different username."
         self.error_code = "USERNAME_ALREADY_EXISTS"
 
 
 # Database Exceptions
-class DatabaseError(AppException):
+class DatabaseError(AppError):
     """Raised when a database operation fails."""
 
     def __init__(self, message: str, original_error: Exception | None = None):
@@ -303,7 +301,7 @@ class DatabaseConnectionError(DatabaseError):
 
 
 # Rate Limiting
-class RateLimitError(AppException):
+class RateLimitError(AppError):
     """Raised when rate limit is exceeded."""
 
     def __init__(self, retry_after: int | None = None):
@@ -321,7 +319,7 @@ class RateLimitError(AppException):
 
 
 # External Service Exceptions
-class ExternalServiceError(AppException):
+class ExternalServiceError(AppError):
     """Raised when an external service fails."""
 
     def __init__(self, service_name: str, message: str):

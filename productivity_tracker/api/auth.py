@@ -38,9 +38,7 @@ from productivity_tracker.services.user_service import UserService
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@router.post(
-    "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
     """Register a new user."""
     user_service = UserService(db)
@@ -79,7 +77,7 @@ def login(
         value=access_token,
         httponly=settings.COOKIE_HTTPONLY,
         secure=settings.COOKIE_SECURE,
-        samesite=settings.COOKIE_SAMESITE,
+        samesite=settings.COOKIE_SAMESITE,  # type: ignore[arg-type]
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
@@ -108,6 +106,9 @@ def refresh_token(
     """Refresh access token using refresh token."""
     try:
         payload = decode_token(refresh_data.refresh_token)
+        if payload is None:
+            raise InvalidTokenError(reason="Invalid refresh token")
+
         if payload.get("type") != "refresh":
             raise InvalidTokenError(reason="Not a refresh token")
 
@@ -127,7 +128,7 @@ def refresh_token(
             value=access_token,
             httponly=settings.COOKIE_HTTPONLY,
             secure=settings.COOKIE_SECURE,
-            samesite=settings.COOKIE_SAMESITE,
+            samesite=settings.COOKIE_SAMESITE,  # type: ignore[arg-type]
             max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         )
 
@@ -153,7 +154,7 @@ def update_me(
 ):
     """Update current user information."""
     user_service = UserService(db)
-    updated_user = user_service.update_user(current_user.id, user_data)
+    updated_user = user_service.update_user(current_user.id, user_data)  # type: ignore[arg-type]
     return updated_user
 
 
@@ -165,7 +166,7 @@ def change_password(
 ):
     """Change current user's password."""
     user_service = UserService(db)
-    updated_user = user_service.update_password(current_user.id, password_data)
+    updated_user = user_service.update_password(current_user.id, password_data)  # type: ignore[arg-type]
     return updated_user
 
 
