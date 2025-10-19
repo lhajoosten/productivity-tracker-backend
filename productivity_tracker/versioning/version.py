@@ -14,7 +14,7 @@ VERSION_INFO = {
     "major": MAJOR,
     "minor": MINOR,
     "patch": PATCH,
-    "release_date": "19-10-2025",  # DD-MM-YYYY
+    "release_date": "2025-10-19",  # YYYY-MM-DD
     "git_commit": None,  # Populated at build time
 }
 
