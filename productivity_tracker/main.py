@@ -65,7 +65,7 @@ app.include_router(permissions.router, prefix=APIVersion.V1.prefix, tags=["permi
 @app.on_event("startup")
 async def startup_event():
     """Run on application startup."""
-    logger.info(f"Starting {settings.APP_NAME} v{settings.VERSION}")
+    logger.info(f"Starting {settings.APP_NAME} v{__version__}")
     logger.info(f"Environment: {settings.ENVIRONMENT}")
 
     # Create database tables
