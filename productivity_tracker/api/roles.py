@@ -17,10 +17,10 @@ from productivity_tracker.models.auth import (
 )
 from productivity_tracker.services.role_service import RoleService
 
-router = APIRouter(prefix="/roles", tags=["Roles"])
+router = APIRouter()
 
 
-@router.post("/", response_model=RoleResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/roles", response_model=RoleResponse, status_code=status.HTTP_201_CREATED)
 def create_role(
     role_data: RoleCreate,
     current_user: User = Depends(get_current_superuser),
@@ -32,7 +32,7 @@ def create_role(
     return new_role
 
 
-@router.get("/", response_model=list[RoleListResponse])
+@router.get("/roles", response_model=list[RoleListResponse])
 def get_all_roles(
     skip: int = 0,
     limit: int = 100,
@@ -45,7 +45,7 @@ def get_all_roles(
     return roles
 
 
-@router.get("/{role_id}", response_model=RoleResponse)
+@router.get("/roles/{role_id}", response_model=RoleResponse)
 def get_role(
     role_id: UUID,
     current_user: User = Depends(get_current_superuser),
@@ -57,7 +57,7 @@ def get_role(
     return role
 
 
-@router.get("/name/{role_name}", response_model=RoleResponse)
+@router.get("/roles/name/{role_name}", response_model=RoleResponse)
 def get_role_by_name(
     role_name: str,
     current_user: User = Depends(get_current_superuser),
@@ -69,7 +69,7 @@ def get_role_by_name(
     return role
 
 
-@router.put("/{role_id}", response_model=RoleResponse)
+@router.put("/roles/{role_id}", response_model=RoleResponse)
 def update_role(
     role_id: UUID,
     role_data: RoleUpdate,
@@ -82,7 +82,7 @@ def update_role(
     return updated_role
 
 
-@router.delete("/{role_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/roles/{role_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_role(
     role_id: UUID,
     current_user: User = Depends(get_current_superuser),
@@ -94,7 +94,7 @@ def delete_role(
     return None
 
 
-@router.post("/{role_id}/permissions", response_model=RoleResponse)
+@router.post("/roles/{role_id}/permissions", response_model=RoleResponse)
 def assign_permissions_to_role(
     role_id: UUID,
     permission_data: AssignPermissionsToRole,
@@ -107,7 +107,7 @@ def assign_permissions_to_role(
     return role
 
 
-@router.post("/{role_id}/permissions/{permission_id}", response_model=RoleResponse)
+@router.post("/roles/{role_id}/permissions/{permission_id}", response_model=RoleResponse)
 def add_permission_to_role(
     role_id: UUID,
     permission_id: UUID,
@@ -120,7 +120,7 @@ def add_permission_to_role(
     return role
 
 
-@router.delete("/{role_id}/permissions/{permission_id}", response_model=RoleResponse)
+@router.delete("/roles/{role_id}/permissions/{permission_id}", response_model=RoleResponse)
 def remove_permission_from_role(
     role_id: UUID,
     permission_id: UUID,

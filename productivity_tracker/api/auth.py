@@ -35,7 +35,7 @@ from productivity_tracker.models.auth import (
 )
 from productivity_tracker.services.user_service import UserService
 
-router = APIRouter(prefix="/auth", tags=["Authentication"])
+router = APIRouter()
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
