@@ -72,5 +72,25 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    ENVIRONMENT: str = Field(
+        default="development",
+        description="Application environment (development, testing, staging, production)",
+    )
+
+    @property
+    def is_production(self) -> bool:
+        """Check if running in production environment."""
+        return self.ENVIRONMENT.lower() == "production"
+
+    @property
+    def is_development(self) -> bool:
+        """Check if running in development environment."""
+        return self.ENVIRONMENT.lower() == "development"
+
+    @property
+    def is_testing(self) -> bool:
+        """Check if running in testing environment."""
+        return self.ENVIRONMENT.lower() == "testing"
+
 
 settings = Settings()  # type: ignore[call-arg]

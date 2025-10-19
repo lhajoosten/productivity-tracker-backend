@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from productivity_tracker.core.settings import settings
 from productivity_tracker.database import get_db
 
-router = APIRouter(tags=["Health"])
+router = APIRouter()
 
 
 class HealthResponse(BaseModel):

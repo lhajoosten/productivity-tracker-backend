@@ -15,10 +15,10 @@ from productivity_tracker.models.auth import (
 )
 from productivity_tracker.services.permission_service import PermissionService
 
-router = APIRouter(prefix="/permissions", tags=["Permissions"])
+router = APIRouter()
 
 
-@router.post("/", response_model=PermissionResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/permissions", response_model=PermissionResponse, status_code=status.HTTP_201_CREATED)
 def create_permission(
     permission_data: PermissionCreate,
     current_user: User = Depends(get_current_superuser),
@@ -30,7 +30,7 @@ def create_permission(
     return new_permission
 
 
-@router.get("/", response_model=list[PermissionResponse])
+@router.get("/permissions", response_model=list[PermissionResponse])
 def get_all_permissions(
     skip: int = 0,
     limit: int = 100,
@@ -43,7 +43,7 @@ def get_all_permissions(
     return permissions
 
 
-@router.get("/{permission_id}", response_model=PermissionResponse)
+@router.get("/permissions/{permission_id}", response_model=PermissionResponse)
 def get_permission(
     permission_id: UUID,
     current_user: User = Depends(get_current_superuser),
@@ -55,7 +55,7 @@ def get_permission(
     return permission
 
 
-@router.get("/name/{permission_name}", response_model=PermissionResponse)
+@router.get("/permissions/name/{permission_name}", response_model=PermissionResponse)
 def get_permission_by_name(
     permission_name: str,
     current_user: User = Depends(get_current_superuser),
@@ -67,7 +67,7 @@ def get_permission_by_name(
     return permission
 
 
-@router.get("/resource/{resource}", response_model=list[PermissionResponse])
+@router.get("/permissions/resource/{resource}", response_model=list[PermissionResponse])
 def get_permissions_by_resource(
     resource: str,
     current_user: User = Depends(get_current_superuser),
@@ -79,7 +79,7 @@ def get_permissions_by_resource(
     return permissions
 
 
-@router.put("/{permission_id}", response_model=PermissionResponse)
+@router.put("/permissions/{permission_id}", response_model=PermissionResponse)
 def update_permission(
     permission_id: UUID,
     permission_data: PermissionUpdate,
@@ -92,7 +92,7 @@ def update_permission(
     return updated_permission
 
 
-@router.delete("/{permission_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/permissions/{permission_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_permission(
     permission_id: UUID,
     current_user: User = Depends(get_current_superuser),
