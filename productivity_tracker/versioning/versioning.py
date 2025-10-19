@@ -149,6 +149,19 @@ def _build_version_features() -> dict[APIVersion, dict[str, bool]]:
 # Build the complete feature dictionary
 VERSION_FEATURES = _build_version_features()
 
+REGISTERED_VERSIONS: dict[str, APIVersion] = {
+    "v1.0": V1_0,
+    "v1.1": V1_1,
+    "v1.2": V1_2,
+    "v2.0": V2_0,
+    "v2.1": V2_1,
+    "v2.2": V2_2,
+    "v3.0": V3_0,
+    "v3.1": V3_1,
+    "v3.2": V3_2,
+    "v3.3": V3_3,
+}
+
 
 def is_feature_enabled(version: APIVersion, feature: str) -> bool:
     """Check if a feature is enabled for a specific version."""

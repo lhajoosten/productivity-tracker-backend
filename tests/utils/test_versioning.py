@@ -150,3 +150,120 @@ class TestIsFeatureEnabled:
         """Should return False for non-existent features."""
         assert is_feature_enabled(V1_0, "nonexistent") is False
         assert is_feature_enabled(V3_0, "invalid_feature") is False
+
+
+class TestVersioningUtils:
+    """Test versioning utility functions."""
+
+    def test_get_all_versions(self):
+        """Should return all registered versions."""
+        from productivity_tracker.versioning.utils import get_all_versions
+
+        versions = get_all_versions()
+        assert isinstance(versions, list)
+        assert len(versions) == 10  # V1.0-V3.3
+        assert all(hasattr(v, "version") for v in versions)
+
+    def test_get_latest_version(self):
+        """Should return the highest version number."""
+        from productivity_tracker.versioning.utils import get_latest_version
+
+        latest = get_latest_version()
+        assert latest == V3_3
+        assert latest.major == 3
+        assert latest.minor == 3
+        assert latest.patch == 0
+
+    def test_get_version_by_prefix(self):
+        """Should find version by its prefix."""
+        from productivity_tracker.versioning.utils import get_version_by_prefix
+
+        v1 = get_version_by_prefix("/api/v1.0")
+        assert v1 == V1_0
+
+        v2 = get_version_by_prefix("/api/v2.1")
+        assert v2 == V2_1
+
+        v3 = get_version_by_prefix("/api/v3.2")
+        assert v3 == V3_2
+
+    def test_get_version_by_invalid_prefix(self):
+        """Should return None for invalid prefix."""
+        from productivity_tracker.versioning.utils import get_version_by_prefix
+
+        result = get_version_by_prefix("/api/v99.0")
+        assert result is None
+
+    def test_iter_versions(self):
+        """Should iterate over all versions."""
+        from productivity_tracker.versioning.utils import iter_versions
+
+        versions = list(iter_versions())
+        assert len(versions) == 10
+        assert V1_0 in versions
+        assert V3_3 in versions
+
+    def test_add_version_headers(self):
+        """Should add version headers to response."""
+        from fastapi import Response
+
+        from productivity_tracker.versioning.utils import add_version_headers
+
+        response = Response()
+        result = add_version_headers(response, V2_0)
+
+        assert "X-API-Version" in result.headers
+        assert result.headers["X-API-Version"] == "2.0.0"
+
+    def test_add_version_headers_deprecated(self):
+        """Should add deprecation warning for deprecated versions."""
+        from fastapi import Response
+
+        from productivity_tracker.versioning.utils import add_version_headers
+        from productivity_tracker.versioning.versioning import DEPRECATED_VERSIONS
+
+        # Use first deprecated version
+        if DEPRECATED_VERSIONS:
+            deprecated_version = list(DEPRECATED_VERSIONS)[0]
+            response = Response()
+            result = add_version_headers(response, deprecated_version)
+
+            assert "Warning" in result.headers
+            assert "deprecated" in result.headers["Warning"].lower()
+
+    def test_get_api_version_from_request(self):
+        """Should extract version from request path."""
+        from fastapi import Request
+
+        from productivity_tracker.versioning.utils import get_api_version_from_request
+
+        # Create mock request
+        scope = {
+            "type": "http",
+            "method": "GET",
+            "path": "/api/v2.0/auth/login",
+            "query_string": b"",
+            "headers": [],
+        }
+        request = Request(scope)
+
+        version = get_api_version_from_request(request)
+        assert version == V2_0
+
+    def test_get_api_version_from_request_defaults_to_current(self):
+        """Should default to current version if no match."""
+        from fastapi import Request
+
+        from productivity_tracker.versioning.utils import get_api_version_from_request
+
+        scope = {
+            "type": "http",
+            "method": "GET",
+            "path": "/unknown/path",
+            "query_string": b"",
+            "headers": [],
+        }
+        request = Request(scope)
+
+        version = get_api_version_from_request(request)
+        assert version == CURRENT_VERSION

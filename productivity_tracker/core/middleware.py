@@ -11,6 +11,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
 
 from productivity_tracker.core.exceptions import AppError
+from productivity_tracker.versioning.utils import (
+    add_version_headers,
+    get_api_version_from_request,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +99,23 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
+        return response
+
+
+class VersionHeaderMiddleware(BaseHTTPMiddleware):
+    """Middleware to add version headers to all API responses."""
+
+    async def dispatch(self, request: Request, call_next):
+        """Add version headers to response."""
+        # Get version from request path
+        version = get_api_version_from_request(request)
+
+        # Process request
+        response: Response = await call_next(request)
+
+        # Add version headers
+        response = add_version_headers(response, version)
 
         return response
 
