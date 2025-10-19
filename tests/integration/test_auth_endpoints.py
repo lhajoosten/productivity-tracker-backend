@@ -4,12 +4,16 @@ import pytest
 from fastapi.testclient import TestClient
 
 from productivity_tracker.database.entities import User
+from productivity_tracker.versioning.versioning import CURRENT_VERSION
 
 pytestmark = pytest.mark.integration
 
+# Get the version prefix for all endpoints
+API_PREFIX = CURRENT_VERSION.prefix
+
 
 class TestAuthenticationEndpoints:
-    """Integration tests for /api/v1/auth endpoints."""
+    """Integration tests for /api/v1.0/auth endpoints."""
 
     pytestmark = pytest.mark.auth
 
@@ -27,7 +31,7 @@ class TestAuthenticationEndpoints:
         }
 
         # Act
-        response = client_integration.post("/api/v1/auth/register", json=user_data)
+        response = client_integration.post(f"{API_PREFIX}/auth/register", json=user_data)
 
         # Assert
         assert response.status_code == 201
@@ -35,7 +39,7 @@ class TestAuthenticationEndpoints:
         assert data["username"] == "newuser"
         assert data["email"] == "newuser@example.com"
         assert "id" in data
-        assert "hashed_password" not in data  # Password should not be returned
+        assert "hashed_password" not in data
 
     def test_register_user_duplicate_email(
         self, client_integration: TestClient, sample_user_integration: User
@@ -44,12 +48,12 @@ class TestAuthenticationEndpoints:
         # Arrange
         user_data = {
             "username": "differentuser",
-            "email": sample_user_integration.email,  # Duplicate email
+            "email": sample_user_integration.email,
             "password": "SecurePass123!",
         }
 
         # Act
-        response = client_integration.post("/api/v1/auth/register", json=user_data)
+        response = client_integration.post(f"{API_PREFIX}/auth/register", json=user_data)
 
         # Assert
         assert response.status_code == 409
@@ -64,15 +68,15 @@ class TestAuthenticationEndpoints:
         # Arrange
         from uuid import uuid4
 
-        unique_suffix = uuid4().hex  # Use UUID for guaranteed uniqueness
+        unique_suffix = uuid4().hex
         user_data = {
-            "username": sample_user_integration.username,  # Duplicate username
-            "email": f"unique_{unique_suffix}@example.com",  # Truly unique email
+            "username": sample_user_integration.username,
+            "email": f"unique_{unique_suffix}@example.com",
             "password": "SecurePass123!",
         }
 
         # Act
-        response = client_integration.post("/api/v1/auth/register", json=user_data)
+        response = client_integration.post(f"{API_PREFIX}/auth/register", json=user_data)
 
         # Assert
         assert response.status_code == 409
@@ -85,18 +89,17 @@ class TestAuthenticationEndpoints:
         # Arrange
         user_data = {
             "username": "newuser",
-            "email": "invalid-email",  # Invalid email
+            "email": "invalid-email",
             "password": "SecurePass123!",
         }
 
         # Act
-        response = client_integration.post("/api/v1/auth/register", json=user_data)
+        response = client_integration.post(f"{API_PREFIX}/auth/register", json=user_data)
 
         # Assert
         assert response.status_code == 422
         data = response.json()
         assert data["error"] == "VALIDATION_ERROR"
-        # The validation error is generic, not field-specific in user message
         assert "invalid" in data["message"].lower() or "validation" in data["message"].lower()
 
     def test_register_user_missing_required_fields(self, client_integration: TestClient):
@@ -104,11 +107,10 @@ class TestAuthenticationEndpoints:
         # Arrange
         user_data = {
             "username": "newuser",
-            # Missing email and password
         }
 
         # Act
-        response = client_integration.post("/api/v1/auth/register", json=user_data)
+        response = client_integration.post(f"{API_PREFIX}/auth/register", json=user_data)
 
         # Assert
         assert response.status_code == 422
@@ -129,7 +131,7 @@ class TestAuthenticationEndpoints:
         }
 
         # Act
-        response = client_integration.post("/api/v1/auth/login", json=login_data)
+        response = client_integration.post(f"{API_PREFIX}/auth/login", json=login_data)
 
         # Assert
         assert response.status_code == 200
@@ -139,8 +141,6 @@ class TestAuthenticationEndpoints:
         assert "refresh_token" in data
         assert data["token_type"] == "bearer"
         assert data["user"]["username"] == sample_user_integration.username
-
-        # Check cookie is set
         assert "access_token" in response.cookies or "Set-Cookie" in response.headers
 
     def test_login_invalid_username(self, client_integration: TestClient):
@@ -152,7 +152,7 @@ class TestAuthenticationEndpoints:
         }
 
         # Act
-        response = client_integration.post("/api/v1/auth/login", json=login_data)
+        response = client_integration.post(f"{API_PREFIX}/auth/login", json=login_data)
 
         # Assert
         assert response.status_code == 401
@@ -171,7 +171,7 @@ class TestAuthenticationEndpoints:
         }
 
         # Act
-        response = client_integration.post("/api/v1/auth/login", json=login_data)
+        response = client_integration.post(f"{API_PREFIX}/auth/login", json=login_data)
 
         # Assert
         assert response.status_code == 401
@@ -189,7 +189,7 @@ class TestAuthenticationEndpoints:
         }
 
         # Act
-        response = client_integration.post("/api/v1/auth/login", json=login_data)
+        response = client_integration.post(f"{API_PREFIX}/auth/login", json=login_data)
 
         # Assert
         assert response.status_code == 403
@@ -207,7 +207,7 @@ class TestAuthenticationEndpoints:
         """Test getting current authenticated user."""
         # Arrange - Login first
         login_response = client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_user_integration.username,
                 "password": "TestPassword123!",
@@ -216,7 +216,7 @@ class TestAuthenticationEndpoints:
         assert login_response.status_code == 200
 
         # Act
-        response = client_integration.get("/api/v1/auth/me")
+        response = client_integration.get(f"{API_PREFIX}/auth/me")
 
         # Assert
         assert response.status_code == 200
@@ -227,7 +227,7 @@ class TestAuthenticationEndpoints:
     def test_get_current_user_unauthorized(self, client_integration: TestClient):
         """Test getting current user fails without authentication."""
         # Act
-        response = client_integration.get("/api/v1/auth/me")
+        response = client_integration.get(f"{API_PREFIX}/auth/me")
 
         # Assert
         assert response.status_code == 401
@@ -242,7 +242,7 @@ class TestAuthenticationEndpoints:
         """Test successful logout."""
         # Arrange - Login first
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_user_integration.username,
                 "password": "TestPassword123!",
@@ -250,7 +250,7 @@ class TestAuthenticationEndpoints:
         )
 
         # Act
-        response = client_integration.post("/api/v1/auth/logout")
+        response = client_integration.post(f"{API_PREFIX}/auth/logout")
 
         # Assert
         assert response.status_code == 200
@@ -267,7 +267,7 @@ class TestAuthenticationEndpoints:
         """Test successful token refresh."""
         # Arrange - Login to get refresh token
         login_response = client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_user_integration.username,
                 "password": "TestPassword123!",
@@ -277,7 +277,7 @@ class TestAuthenticationEndpoints:
 
         # Act
         response = client_integration.post(
-            "/api/v1/auth/refresh",
+            f"{API_PREFIX}/auth/refresh",
             json={"refresh_token": refresh_token},
         )
 
@@ -291,7 +291,7 @@ class TestAuthenticationEndpoints:
         """Test token refresh fails with invalid token."""
         # Act
         response = client_integration.post(
-            "/api/v1/auth/refresh",
+            f"{API_PREFIX}/auth/refresh",
             json={"refresh_token": "invalid_token"},
         )
 
@@ -310,7 +310,7 @@ class TestAuthenticationEndpoints:
         """Test updating current user information."""
         # Arrange - Login first
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_user_integration.username,
                 "password": "TestPassword123!",
@@ -319,7 +319,7 @@ class TestAuthenticationEndpoints:
 
         # Act
         response = client_integration.put(
-            "/api/v1/auth/me",
+            f"{API_PREFIX}/auth/me",
             json={"username": "updatedusername"},
         )
 
@@ -332,7 +332,7 @@ class TestAuthenticationEndpoints:
         """Test updating user fails without authentication."""
         # Act
         response = client_integration.put(
-            "/api/v1/auth/me",
+            f"{API_PREFIX}/auth/me",
             json={"username": "newname"},
         )
 
@@ -349,7 +349,7 @@ class TestAuthenticationEndpoints:
         """Test successful password change."""
         # Arrange - Login first
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_user_integration.username,
                 "password": "TestPassword123!",
@@ -358,7 +358,7 @@ class TestAuthenticationEndpoints:
 
         # Act
         response = client_integration.put(
-            "/api/v1/auth/me/password",
+            f"{API_PREFIX}/auth/me/password",
             json={
                 "current_password": "TestPassword123!",
                 "new_password": "NewSecurePass123!",
@@ -369,11 +369,11 @@ class TestAuthenticationEndpoints:
         assert response.status_code == 200
 
         # Verify can login with new password
-        logout_response = client_integration.post("/api/v1/auth/logout")
+        logout_response = client_integration.post(f"{API_PREFIX}/auth/logout")
         assert logout_response.status_code == 200
 
         new_login_response = client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_user_integration.username,
                 "password": "NewSecurePass123!",
@@ -387,7 +387,7 @@ class TestAuthenticationEndpoints:
         """Test password change fails with wrong current password."""
         # Arrange - Login first
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_user_integration.username,
                 "password": "TestPassword123!",
@@ -396,7 +396,7 @@ class TestAuthenticationEndpoints:
 
         # Act
         response = client_integration.put(
-            "/api/v1/auth/me/password",
+            f"{API_PREFIX}/auth/me/password",
             json={
                 "current_password": "WrongPassword123!",
                 "new_password": "NewSecurePass123!",
@@ -421,7 +421,7 @@ class TestAdminUserEndpoints:
         """Test superuser can get all users."""
         # Arrange - Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -429,13 +429,13 @@ class TestAdminUserEndpoints:
         )
 
         # Act
-        response = client_integration.get("/api/v1/auth/users")
+        response = client_integration.get(f"{API_PREFIX}/auth/users")
 
         # Assert
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
-        assert len(data) >= 2  # At least superuser and sample_user
+        assert len(data) >= 2
 
     def test_get_all_users_as_regular_user(
         self, client_integration: TestClient, sample_user_integration: User
@@ -443,7 +443,7 @@ class TestAdminUserEndpoints:
         """Test regular user cannot get all users."""
         # Arrange - Login as regular user
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_user_integration.username,
                 "password": "TestPassword123!",
@@ -451,7 +451,7 @@ class TestAdminUserEndpoints:
         )
 
         # Act
-        response = client_integration.get("/api/v1/auth/users")
+        response = client_integration.get(f"{API_PREFIX}/auth/users")
 
         # Assert
         assert response.status_code == 403
@@ -467,7 +467,7 @@ class TestAdminUserEndpoints:
         """Test superuser can activate a user."""
         # Arrange - Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -476,7 +476,7 @@ class TestAdminUserEndpoints:
 
         # Act
         response = client_integration.post(
-            f"/api/v1/auth/users/{sample_inactive_user_integration.id}/activate"
+            f"{API_PREFIX}/auth/users/{sample_inactive_user_integration.id}/activate"
         )
 
         # Assert
@@ -493,7 +493,7 @@ class TestAdminUserEndpoints:
         """Test superuser can deactivate a user."""
         # Arrange - Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -502,7 +502,7 @@ class TestAdminUserEndpoints:
 
         # Act
         response = client_integration.post(
-            f"/api/v1/auth/users/{sample_user_integration.id}/deactivate"
+            f"{API_PREFIX}/auth/users/{sample_user_integration.id}/deactivate"
         )
 
         # Assert

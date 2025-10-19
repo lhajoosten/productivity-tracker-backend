@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 
-from productivity_tracker.api import auth, health, permissions, roles
+from productivity_tracker.api.setup import setup_versioned_routers
 from productivity_tracker.core.database import Base, engine
 from productivity_tracker.core.logging_config import get_logger, setup_logging
 from productivity_tracker.core.settings import settings
 from productivity_tracker.core.setup import setup_exception_handling, setup_middleware
 from productivity_tracker.versioning.version import __version__, get_version_info
-from productivity_tracker.versioning.versioning import CURRENT_VERSION, APIVersion
+from productivity_tracker.versioning.versioning import CURRENT_VERSION
 
 # Setup logging based on environment
 # Development/Testing: Console only
@@ -47,19 +47,13 @@ async def root():
     return {
         "message": "Productivity Tracker API",
         "version": __version__,
-        "current_api_version": CURRENT_VERSION.value,
+        "current_api_version": CURRENT_VERSION,
         "docs": f"{CURRENT_VERSION.prefix}/docs",
     }
 
 
-# Include routers with versioned prefix
-app.include_router(health.router, prefix=APIVersion.V1.prefix, tags=["health"])
-
-app.include_router(auth.router, prefix=f"{APIVersion.V1.prefix}/auth", tags=["authentication"])
-
-app.include_router(roles.router, prefix=APIVersion.V1.prefix, tags=["roles"])
-
-app.include_router(permissions.router, prefix=APIVersion.V1.prefix, tags=["permissions"])
+# Setup routers
+setup_versioned_routers(app)
 
 
 @app.on_event("startup")

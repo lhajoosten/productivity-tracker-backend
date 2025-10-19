@@ -64,3 +64,5 @@ postgresql_data/
 
 # Scripts (if you don't want to commit them)
 productivity_tracker/scripts/**
+
+.copilot/

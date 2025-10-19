@@ -61,14 +61,3 @@ def detailed_health_check(db: Session = Depends(get_db)):
         "database": database_status,
         "database_version": database_version,
     }
-
-
-@router.get("/")
-def root():
-    """Root endpoint with API information."""
-    return {
-        "message": f"Welcome to {settings.APP_NAME} API",
-        "version": settings.VERSION,
-        "docs": "/docs",
-        "health": "/health",
-    }

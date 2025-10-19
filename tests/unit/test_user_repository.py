@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 from productivity_tracker.database.entities import User
 from productivity_tracker.repositories.user_repository import UserRepository
 
+pytestmark = [pytest.mark.unit]
+
 
 class TestUserRepository:
     """Test cases for UserRepository."""

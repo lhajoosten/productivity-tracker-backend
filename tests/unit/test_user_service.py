@@ -16,7 +16,7 @@ from productivity_tracker.database.entities import User
 from productivity_tracker.models.auth import UserCreate, UserPasswordUpdate, UserUpdate
 from productivity_tracker.services.user_service import UserService
 
-pytestmark = pytest.mark.unit
+pytestmark = [pytest.mark.unit]
 
 
 class TestUserService:
