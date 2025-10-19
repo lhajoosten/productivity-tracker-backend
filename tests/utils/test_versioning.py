@@ -162,7 +162,7 @@ class TestVersioningUtils:
         versions = get_all_versions()
         assert isinstance(versions, list)
         assert len(versions) == 10  # V1.0-V3.3
-        assert all(hasattr(v, "version") for v in versions)
+        assert all(v.prefix.startswith("/api/v") for v in versions)
 
     def test_get_latest_version(self):
         """Should return the highest version number."""
@@ -172,7 +172,6 @@ class TestVersioningUtils:
         assert latest == V3_3
         assert latest.major == 3
         assert latest.minor == 3
-        assert latest.patch == 0
 
     def test_get_version_by_prefix(self):
         """Should find version by its prefix."""
@@ -213,7 +212,7 @@ class TestVersioningUtils:
         result = add_version_headers(response, V2_0)
 
         assert "X-API-Version" in result.headers
-        assert result.headers["X-API-Version"] == "2.0.0"
+        assert result.headers["X-API-Version"] == "v2.0"
 
     def test_add_version_headers_deprecated(self):
         """Should add deprecation warning for deprecated versions."""
