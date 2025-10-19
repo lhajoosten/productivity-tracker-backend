@@ -16,6 +16,7 @@ from productivity_tracker.core.logging_config import get_logger
 from productivity_tracker.core.middleware import (
     RequestLoggingMiddleware,
     SecurityHeadersMiddleware,
+    VersionHeaderMiddleware,
     app_exception_handler,
     general_exception_handler,
     http_exception_handler,
@@ -70,6 +71,10 @@ def setup_middleware(app: FastAPI) -> None:
         allow_headers=settings.CORS_ALLOW_HEADERS,
     )
     logger.info(f"CORS configured for origins: {settings.CORS_ORIGINS}")
+
+    # Versioning middleware
+    app.add_middleware(VersionHeaderMiddleware)
+    logger.info("Version header middleware configured")
 
     # GZip compression for responses (minimum 1KB)
     app.add_middleware(GZipMiddleware, minimum_size=1000)

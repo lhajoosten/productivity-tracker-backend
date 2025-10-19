@@ -36,6 +36,9 @@ test-unit: ## Run unit tests only
 test-integration: ## Run integration tests only
 	poetry run pytest tests/integration -m integration
 
+test-utils: ## Run utility tests only
+	poetry run pytest tests/utils -m utils
+
 test-cov: ## Run tests with coverage report
 	poetry run pytest --cov=productivity_tracker --cov-report=html --cov-report=term-missing --cov-report=xml
 

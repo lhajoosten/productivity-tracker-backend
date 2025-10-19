@@ -12,28 +12,54 @@ from productivity_tracker.core.settings import settings
 class ColoredFormatter(logging.Formatter):
     """Custom formatter with colors for console output."""
 
-    grey = "\x1b[38;21m"
-    blue = "\x1b[38;5;39m"
-    yellow = "\x1b[38;5;226m"
-    red = "\x1b[38;5;196m"
-    bold_red = "\x1b[31;1m"
-    reset = "\x1b[0m"
+    # ANSI color codes
+    COLORS = {
+        "grey": "\x1b[38;21m",
+        "blue": "\x1b[38;5;39m",
+        "cyan": "\x1b[38;5;51m",
+        "yellow": "\x1b[38;5;226m",
+        "orange": "\x1b[38;5;208m",
+        "red": "\x1b[38;5;196m",
+        "bold_red": "\x1b[31;1m",
+        "magenta": "\x1b[38;5;213m",
+        "green": "\x1b[38;5;46m",
+        "reset": "\x1b[0m",
+    }
 
-    def __init__(self, fmt: str):
-        super().__init__()
-        self.fmt = fmt
-        self.FORMATS = {
-            logging.DEBUG: self.grey + self.fmt + self.reset,
-            logging.INFO: self.blue + self.fmt + self.reset,
-            logging.WARNING: self.yellow + self.fmt + self.reset,
-            logging.ERROR: self.red + self.fmt + self.reset,
-            logging.CRITICAL: self.bold_red + self.fmt + self.reset,
-        }
+    # Level-specific colors
+    LEVEL_COLORS = {
+        logging.DEBUG: "grey",
+        logging.INFO: "green",
+        logging.WARNING: "orange",
+        logging.ERROR: "red",
+        logging.CRITICAL: "bold_red",
+    }
+
+    def __init__(self, fmt: str, datefmt: str = "%Y-%m-%d %H:%M:%S"):
+        """Initialize formatter."""
+        super().__init__(fmt, datefmt)
 
     def format(self, record: logging.LogRecord) -> str:
-        log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
-        return formatter.format(record)
+        """Format the log record with component-specific colors."""
+        # Get level color
+        level_color = self.COLORS[self.LEVEL_COLORS.get(record.levelno, "grey")]
+
+        # Format timestamp (cyan)
+        timestamp = self.formatTime(record, self.datefmt)
+        colored_timestamp = f"{self.COLORS['cyan']}{timestamp}{self.COLORS['reset']}"
+
+        # Format level (level-specific color)
+        colored_level = f"{level_color}{record.levelname}{self.COLORS['reset']}"
+
+        # Format logger name (magenta)
+        colored_name = f"{self.COLORS['magenta']}{record.name}{self.COLORS['reset']}"
+
+        # Format message (blue for normal, yellow for warnings, red for errors)
+        message_color = level_color if record.levelno >= logging.WARNING else self.COLORS["blue"]
+        colored_message = f"{message_color}{record.getMessage()}{self.COLORS['reset']}"
+
+        # Assemble the final log line
+        return f"{colored_timestamp} | {colored_level:8s} | {colored_name} | {colored_message}"
 
 
 def setup_logging(
@@ -63,10 +89,10 @@ def setup_logging(
         level = getattr(logging, log_level.upper(), logging.INFO)
 
     # Console format (with colors in debug mode)
-    console_format = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+    console_format = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 
     # File format (more detailed)
-    file_format = "%(asctime)s | %(levelname)-8s | %(name)s:%(lineno)d | %(funcName)s | %(message)s"
+    file_format = "%(asctime)s | %(levelname)s | %(name)s:%(lineno)d | %(funcName)s | %(message)s"
 
     # Root logger configuration
     root_logger = logging.getLogger()
@@ -78,7 +104,7 @@ def setup_logging(
     console_handler.setLevel(level)
 
     if settings.DEBUG:
-        # Use colored output in debug mode
+        # Use colored output in debug mode (now optimized)
         console_handler.setFormatter(ColoredFormatter(console_format))
     else:
         console_handler.setFormatter(logging.Formatter(console_format, datefmt="%Y-%m-%d %H:%M:%S"))

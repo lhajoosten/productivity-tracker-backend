@@ -6,6 +6,30 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 # ============================================================================
+# Version Schemas
+# ============================================================================
+
+
+class VersionData(BaseModel):
+    """Version data model."""
+
+    version: str
+    prefix: str
+    is_latest: bool
+    is_deprecated: bool
+
+
+class VersionResponse(BaseModel):
+    """Version response model."""
+
+    version: list[VersionData]
+    latest: str
+    current: str
+    migration_url: str
+    deprecated: list[str]
+
+
+# ============================================================================
 # Token Schemas
 # ============================================================================
 

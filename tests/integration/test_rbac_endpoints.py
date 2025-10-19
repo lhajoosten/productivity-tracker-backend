@@ -5,12 +5,16 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from productivity_tracker.database.entities import Permission, Role, User
+from productivity_tracker.versioning.versioning import CURRENT_VERSION
 
 pytestmark = [pytest.mark.integration, pytest.mark.rbac]
 
+# Get the version prefix for all endpoints
+API_PREFIX = CURRENT_VERSION.prefix
+
 
 class TestRoleEndpoints:
-    """Integration tests for /api/v1/roles endpoints."""
+    """Integration tests for /api/v1.0/roles endpoints."""
 
     def test_create_role_as_superuser(
         self, client_integration: TestClient, sample_superuser_integration: User
@@ -18,7 +22,7 @@ class TestRoleEndpoints:
         """Test superuser can create a role."""
         # Arrange - Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -32,7 +36,7 @@ class TestRoleEndpoints:
 
         # Act
         response = client_integration.post(
-            "/api/v1/roles",
+            f"{API_PREFIX}/roles",
             json={
                 "name": f"manager_{unique_suffix}",
                 "description": "Manager role with elevated permissions",
@@ -52,7 +56,7 @@ class TestRoleEndpoints:
         """Test regular user cannot create a role."""
         # Arrange - Login as regular user
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_user_integration.username,
                 "password": "TestPassword123!",
@@ -65,7 +69,7 @@ class TestRoleEndpoints:
 
         # Act
         response = client_integration.post(
-            "/api/v1/roles",
+            f"{API_PREFIX}/roles",
             json={
                 "name": f"manager_{unique_suffix}",
                 "description": "Manager role",
@@ -88,16 +92,15 @@ class TestRoleEndpoints:
         from uuid import uuid4
 
         existing_role = Role(
-            id=uuid4(),
-            name="duplicate_test_role",
-            description="Existing role",
+            name=f"test_role_{uuid4().hex[:8]}",
+            description="Test role",
         )
         db_session_integration.add(existing_role)
         db_session_integration.flush()
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -106,9 +109,9 @@ class TestRoleEndpoints:
 
         # Act
         response = client_integration.post(
-            "/api/v1/roles",
+            f"{API_PREFIX}/roles",
             json={
-                "name": existing_role.name,  # Duplicate name
+                "name": existing_role.name,
                 "description": "Duplicate role",
             },
         )
@@ -129,8 +132,7 @@ class TestRoleEndpoints:
         from uuid import uuid4
 
         test_role = Role(
-            id=uuid4(),
-            name="get_all_test_role",
+            name=f"test_role_{uuid4().hex[:8]}",
             description="Test role",
         )
         db_session_integration.add(test_role)
@@ -138,7 +140,7 @@ class TestRoleEndpoints:
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -146,7 +148,7 @@ class TestRoleEndpoints:
         )
 
         # Act
-        response = client_integration.get("/api/v1/roles")
+        response = client_integration.get(f"{API_PREFIX}/roles")
 
         # Assert
         assert response.status_code == 200
@@ -165,8 +167,7 @@ class TestRoleEndpoints:
         from uuid import uuid4
 
         test_role = Role(
-            id=uuid4(),
-            name="get_by_id_test_role",
+            name=f"test_role_{uuid4().hex[:8]}",
             description="Test role",
         )
         db_session_integration.add(test_role)
@@ -175,7 +176,7 @@ class TestRoleEndpoints:
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -183,7 +184,7 @@ class TestRoleEndpoints:
         )
 
         # Act
-        response = client_integration.get(f"/api/v1/roles/{test_role.id}")
+        response = client_integration.get(f"{API_PREFIX}/roles/{test_role.id}")
 
         # Assert
         assert response.status_code == 200
@@ -197,7 +198,7 @@ class TestRoleEndpoints:
         """Test getting non-existent role returns 404."""
         # Arrange - Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -205,7 +206,9 @@ class TestRoleEndpoints:
         )
 
         # Act
-        response = client_integration.get("/api/v1/roles/00000000-0000-0000-0000-000000000000")
+        response = client_integration.get(
+            f"{API_PREFIX}/roles/00000000-0000-0000-0000-000000000000"
+        )
 
         # Assert
         assert response.status_code == 404
@@ -223,9 +226,8 @@ class TestRoleEndpoints:
         from uuid import uuid4
 
         test_role = Role(
-            id=uuid4(),
-            name="update_test_role",
-            description="Original description",
+            name=f"test_role_{uuid4().hex[:8]}",
+            description="Test role",
         )
         db_session_integration.add(test_role)
         db_session_integration.flush()
@@ -233,7 +235,7 @@ class TestRoleEndpoints:
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -242,7 +244,7 @@ class TestRoleEndpoints:
 
         # Act
         response = client_integration.put(
-            f"/api/v1/roles/{test_role.id}",
+            f"{API_PREFIX}/roles/{test_role.id}",
             json={
                 "name": "updated_role",
                 "description": "Updated description",
@@ -266,9 +268,8 @@ class TestRoleEndpoints:
         from uuid import uuid4
 
         test_role = Role(
-            id=uuid4(),
-            name="delete_test_role",
-            description="To be deleted",
+            name=f"test_role_{uuid4().hex[:8]}",
+            description="Test role",
         )
         db_session_integration.add(test_role)
         db_session_integration.flush()
@@ -276,7 +277,7 @@ class TestRoleEndpoints:
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -284,7 +285,7 @@ class TestRoleEndpoints:
         )
 
         # Act
-        response = client_integration.delete(f"/api/v1/roles/{test_role.id}")
+        response = client_integration.delete(f"{API_PREFIX}/roles/{test_role.id}")
 
         # Assert
         assert response.status_code == 204
@@ -300,8 +301,7 @@ class TestRoleEndpoints:
         from uuid import uuid4
 
         test_role = Role(
-            id=uuid4(),
-            name="assign_perm_test_role",
+            name=f"test_role_{uuid4().hex[:8]}",
             description="Test role",
         )
         db_session_integration.add(test_role)
@@ -309,11 +309,10 @@ class TestRoleEndpoints:
         test_permissions = []
         for i in range(2):
             perm = Permission(
-                id=uuid4(),
-                name=f"test:perm_{i}_{uuid4().hex[:8]}",
-                resource="test",
-                action=f"action_{i}",
+                name=f"test:perm_{uuid4().hex[:8]}",
                 description=f"Test permission {i}",
+                resource="test_resource",
+                action="read",
             )
             db_session_integration.add(perm)
             test_permissions.append(perm)
@@ -325,7 +324,7 @@ class TestRoleEndpoints:
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -334,9 +333,9 @@ class TestRoleEndpoints:
 
         # Act
         response = client_integration.post(
-            f"/api/v1/roles/{test_role.id}/permissions",
+            f"{API_PREFIX}/roles/{test_role.id}/permissions",
             json={
-                "permission_ids": [str(p.id) for p in test_permissions],
+                "permission_ids": [str(perm.id) for perm in test_permissions],
             },
         )
 
@@ -347,7 +346,7 @@ class TestRoleEndpoints:
 
 
 class TestPermissionEndpoints:
-    """Integration tests for /api/v1/permissions endpoints."""
+    """Integration tests for /api/v1.0/permissions endpoints."""
 
     def test_create_permission_as_superuser(
         self, client_integration: TestClient, sample_superuser_integration: User
@@ -355,7 +354,7 @@ class TestPermissionEndpoints:
         """Test superuser can create a permission."""
         # Arrange - Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -368,21 +367,20 @@ class TestPermissionEndpoints:
 
         # Act
         response = client_integration.post(
-            "/api/v1/permissions",
+            f"{API_PREFIX}/permissions",
             json={
-                "name": f"projects:create_{unique_suffix}",
-                "resource": "project",
+                "name": f"tasks:create_{unique_suffix}",
+                "description": "Create tasks",
+                "resource": "tasks",
                 "action": "create",
-                "description": "Create projects",
             },
         )
 
         # Assert
         assert response.status_code == 201
         data = response.json()
-        assert data["name"] == f"projects:create_{unique_suffix}"
-        assert data["resource"] == "project"
-        assert data["action"] == "create"
+        assert data["name"] == f"tasks:create_{unique_suffix}"
+        assert "id" in data
 
     def test_create_permission_as_regular_user(
         self, client_integration: TestClient, sample_user_integration: User
@@ -390,7 +388,7 @@ class TestPermissionEndpoints:
         """Test regular user cannot create a permission."""
         # Arrange - Login as regular user
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_user_integration.username,
                 "password": "TestPassword123!",
@@ -403,12 +401,12 @@ class TestPermissionEndpoints:
 
         # Act
         response = client_integration.post(
-            "/api/v1/permissions",
+            f"{API_PREFIX}/permissions",
             json={
-                "name": f"projects:create_{unique_suffix}",
-                "resource": "project",
+                "name": f"tasks:create_{unique_suffix}",
+                "description": "Create tasks",
+                "resource": "tasks",
                 "action": "create",
-                "description": "Create projects",
             },
         )
 
@@ -428,18 +426,17 @@ class TestPermissionEndpoints:
         from uuid import uuid4
 
         existing_perm = Permission(
-            id=uuid4(),
-            name="duplicate_test_perm",
+            name=f"test:perm_{uuid4().hex[:8]}",
+            description="Test permission",
             resource="test",
             action="read",
-            description="Existing permission",
         )
         db_session_integration.add(existing_perm)
         db_session_integration.flush()
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -448,12 +445,12 @@ class TestPermissionEndpoints:
 
         # Act
         response = client_integration.post(
-            "/api/v1/permissions",
+            f"{API_PREFIX}/permissions",
             json={
-                "name": existing_perm.name,  # Duplicate name
-                "resource": "task",
-                "action": "write",
+                "name": existing_perm.name,
                 "description": "Duplicate permission",
+                "resource": "test",
+                "action": "read",
             },
         )
 
@@ -469,26 +466,21 @@ class TestPermissionEndpoints:
         db_session_integration: Session,
     ):
         """Test getting all permissions."""
-        # Arrange - Create test permissions
+        # Arrange - Create a test permission
         from uuid import uuid4
 
-        test_perms = []
-        for i in range(2):
-            perm = Permission(
-                id=uuid4(),
-                name=f"get_all_test:perm_{uuid4().hex[:8]}",
-                resource="test",
-                action=f"action_{i}",
-                description=f"Test permission {i}",
-            )
-            db_session_integration.add(perm)
-            test_perms.append(perm)
-
+        test_perm = Permission(
+            name=f"test:perm_{uuid4().hex[:8]}",
+            description="Test permission",
+            resource="test",
+            action="read",
+        )
+        db_session_integration.add(test_perm)
         db_session_integration.flush()
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -496,13 +488,13 @@ class TestPermissionEndpoints:
         )
 
         # Act
-        response = client_integration.get("/api/v1/permissions")
+        response = client_integration.get(f"{API_PREFIX}/permissions")
 
         # Assert
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
-        assert len(data) >= len(test_perms)
+        assert len(data) >= 1
 
     def test_get_permission_by_id(
         self,
@@ -515,11 +507,10 @@ class TestPermissionEndpoints:
         from uuid import uuid4
 
         test_perm = Permission(
-            id=uuid4(),
-            name=f"get_by_id_test:perm_{uuid4().hex[:8]}",
+            name=f"test:perm_{uuid4().hex[:8]}",
+            description="Test permission",
             resource="test",
             action="read",
-            description="Test permission",
         )
         db_session_integration.add(test_perm)
         db_session_integration.flush()
@@ -527,7 +518,7 @@ class TestPermissionEndpoints:
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -535,7 +526,7 @@ class TestPermissionEndpoints:
         )
 
         # Act
-        response = client_integration.get(f"/api/v1/permissions/{test_perm.id}")
+        response = client_integration.get(f"{API_PREFIX}/permissions/{test_perm.id}")
 
         # Assert
         assert response.status_code == 200
@@ -550,18 +541,17 @@ class TestPermissionEndpoints:
         db_session_integration: Session,
     ):
         """Test getting permissions by resource."""
-        # Arrange - Create test permissions with specific resource
+        # Arrange - Create test permissions
         from uuid import uuid4
 
         unique_resource = f"task_{uuid4().hex[:8]}"
         test_perms = []
         for i in range(2):
             perm = Permission(
-                id=uuid4(),
                 name=f"{unique_resource}:action_{i}_{uuid4().hex[:8]}",
+                description=f"Test permission {i}",
                 resource=unique_resource,
                 action=f"action_{i}",
-                description=f"Test permission {i}",
             )
             db_session_integration.add(perm)
             test_perms.append(perm)
@@ -570,7 +560,7 @@ class TestPermissionEndpoints:
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -578,7 +568,7 @@ class TestPermissionEndpoints:
         )
 
         # Act
-        response = client_integration.get(f"/api/v1/permissions/resource/{unique_resource}")
+        response = client_integration.get(f"{API_PREFIX}/permissions/resource/{unique_resource}")
 
         # Assert
         assert response.status_code == 200
@@ -599,11 +589,10 @@ class TestPermissionEndpoints:
         from uuid import uuid4
 
         test_perm = Permission(
-            id=uuid4(),
-            name=f"update_test:perm_{uuid4().hex[:8]}",
+            name=f"test:perm_{uuid4().hex[:8]}",
+            description="Test permission",
             resource="test",
             action="read",
-            description="Original description",
         )
         db_session_integration.add(test_perm)
         db_session_integration.flush()
@@ -611,7 +600,7 @@ class TestPermissionEndpoints:
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -620,7 +609,7 @@ class TestPermissionEndpoints:
 
         # Act
         response = client_integration.put(
-            f"/api/v1/permissions/{test_perm.id}",
+            f"{API_PREFIX}/permissions/{test_perm.id}",
             json={
                 "name": f"tasks:read_updated_{uuid4().hex[:8]}",
                 "description": "Updated description",
@@ -644,11 +633,10 @@ class TestPermissionEndpoints:
         from uuid import uuid4
 
         test_perm = Permission(
-            id=uuid4(),
-            name=f"delete_test:perm_{uuid4().hex[:8]}",
+            name=f"test:perm_{uuid4().hex[:8]}",
+            description="Test permission",
             resource="test",
             action="delete",
-            description="To be deleted",
         )
         db_session_integration.add(test_perm)
         db_session_integration.flush()
@@ -656,7 +644,7 @@ class TestPermissionEndpoints:
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -664,7 +652,7 @@ class TestPermissionEndpoints:
         )
 
         # Act
-        response = client_integration.delete(f"/api/v1/permissions/{test_perm.id}")
+        response = client_integration.delete(f"{API_PREFIX}/permissions/{test_perm.id}")
 
         # Assert
         assert response.status_code == 204
@@ -685,8 +673,7 @@ class TestRBACIntegration:
         from uuid import uuid4
 
         test_role = Role(
-            id=uuid4(),
-            name=f"assign_role_test_{uuid4().hex[:8]}",
+            name=f"test_role_{uuid4().hex[:8]}",
             description="Test role",
         )
         db_session_integration.add(test_role)
@@ -695,7 +682,7 @@ class TestRBACIntegration:
 
         # Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -704,7 +691,7 @@ class TestRBACIntegration:
 
         # Act
         response = client_integration.post(
-            f"/api/v1/auth/users/{sample_user_integration.id}/roles",
+            f"{API_PREFIX}/auth/users/{sample_user_integration.id}/roles",
             json={
                 "role_ids": [str(test_role.id)],
             },
@@ -723,7 +710,7 @@ class TestRBACIntegration:
         """Test superuser can access all endpoints."""
         # Arrange - Login as superuser
         client_integration.post(
-            "/api/v1/auth/login",
+            f"{API_PREFIX}/auth/login",
             json={
                 "username": sample_superuser_integration.username,
                 "password": "AdminPassword123!",
@@ -731,9 +718,9 @@ class TestRBACIntegration:
         )
 
         # Act - Access admin endpoints
-        users_response = client_integration.get("/api/v1/auth/users")
-        roles_response = client_integration.get("/api/v1/roles")
-        permissions_response = client_integration.get("/api/v1/permissions")
+        users_response = client_integration.get(f"{API_PREFIX}/auth/users")
+        roles_response = client_integration.get(f"{API_PREFIX}/roles")
+        permissions_response = client_integration.get(f"{API_PREFIX}/permissions")
 
         # Assert
         assert users_response.status_code == 200

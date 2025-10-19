@@ -1,5 +1,7 @@
 """Unit tests for custom exceptions."""
 
+import pytest
+
 from productivity_tracker.core.exceptions import (
     AppError,
     BusinessLogicError,
@@ -17,6 +19,8 @@ from productivity_tracker.core.exceptions import (
     UsernameAlreadyExistsError,
     ValidationError,
 )
+
+pytestmark = [pytest.mark.unit]
 
 
 class TestCustomExceptions:
