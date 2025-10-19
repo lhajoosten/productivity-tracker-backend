@@ -27,7 +27,7 @@ class DetailedHealthResponse(HealthResponse):
     database_version: str | None = None
 
 
-@router.get("/health", response_model=HealthResponse)
+@router.get("/health", response_model=HealthResponse, operation_id="healthCheck")
 def health_check():
     """Basic health check endpoint."""
     return {
@@ -39,7 +39,11 @@ def health_check():
     }
 
 
-@router.get("/health/detailed", response_model=DetailedHealthResponse)
+@router.get(
+    "/health/detailed",
+    response_model=DetailedHealthResponse,
+    operation_id="detailedHealthCheck",
+)
 def detailed_health_check(db: Session = Depends(get_db)):
     """Detailed health check with database connection test."""
     database_status = "disconnected"

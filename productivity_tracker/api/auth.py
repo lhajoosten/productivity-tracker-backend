@@ -38,7 +38,12 @@ from productivity_tracker.services.user_service import UserService
 router = APIRouter()
 
 
-@router.post("/auth/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/auth/register",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED,
+    operation_id="register",
+)
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
     """Register a new user."""
     user_service = UserService(db)
@@ -46,7 +51,7 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-@router.post("/auth/login", response_model=LoginResponse)
+@router.post("/auth/login", response_model=LoginResponse, operation_id="login")
 def login(
     response: Response,
     form_data: LoginRequest,
@@ -90,14 +95,14 @@ def login(
     )
 
 
-@router.post("/auth/logout")
+@router.post("/auth/logout", operation_id="logout")
 def logout(response: Response):
     """Logout user by clearing the access token cookie."""
     response.delete_cookie(key=settings.COOKIE_NAME)
     return {"message": "Logout successful"}
 
 
-@router.post("/auth/refresh", response_model=Token)
+@router.post("/auth/refresh", response_model=Token, operation_id="refreshToken")
 def refresh_token(
     response: Response,
     refresh_data: RefreshTokenRequest,
@@ -140,13 +145,13 @@ def refresh_token(
         raise InvalidTokenError(reason="Token verification failed") from e
 
 
-@router.get("/auth/me", response_model=UserResponse)
+@router.get("/auth/me", response_model=UserResponse, operation_id="getCurrentUser")
 def get_me(current_user: User = Depends(get_current_active_user)):
     """Get current authenticated user."""
     return current_user
 
 
-@router.put("/auth/me", response_model=UserResponse)
+@router.put("/auth/me", response_model=UserResponse, operation_id="updateCurrentUser")
 def update_me(
     user_data: UserUpdate,
     current_user: User = Depends(get_current_active_user),
@@ -158,7 +163,7 @@ def update_me(
     return updated_user
 
 
-@router.put("/auth/me/password", response_model=UserResponse)
+@router.put("/auth/me/password", response_model=UserResponse, operation_id="changePassword")
 def change_password(
     password_data: UserPasswordUpdate,
     current_user: User = Depends(get_current_active_user),
@@ -171,7 +176,7 @@ def change_password(
 
 
 # Admin endpoints (require superuser)
-@router.get("/auth/users", response_model=list[UserListResponse])
+@router.get("/auth/users", response_model=list[UserListResponse], operation_id="getAllUsers")
 def get_all_users(
     skip: int = 0,
     limit: int = 100,
@@ -184,7 +189,7 @@ def get_all_users(
     return users
 
 
-@router.get("/auth/users/{user_id}", response_model=UserResponse)
+@router.get("/auth/users/{user_id}", response_model=UserResponse, operation_id="getUser")
 def get_user(
     user_id: UUID,
     current_user: User = Depends(get_current_superuser),
@@ -196,7 +201,7 @@ def get_user(
     return user
 
 
-@router.put("/auth/users/{user_id}", response_model=UserResponse)
+@router.put("/auth/users/{user_id}", response_model=UserResponse, operation_id="updateUser")
 def update_user(
     user_id: UUID,
     user_data: UserUpdate,
@@ -209,7 +214,9 @@ def update_user(
     return updated_user
 
 
-@router.delete("/auth/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/auth/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT, operation_id="deleteUser"
+)
 def delete_user(
     user_id: UUID,
     current_user: User = Depends(get_current_superuser),
@@ -221,7 +228,9 @@ def delete_user(
     return None
 
 
-@router.post("/auth/users/{user_id}/activate", response_model=UserResponse)
+@router.post(
+    "/auth/users/{user_id}/activate", response_model=UserResponse, operation_id="activateUser"
+)
 def activate_user(
     user_id: UUID,
     current_user: User = Depends(get_current_superuser),
@@ -233,7 +242,9 @@ def activate_user(
     return user
 
 
-@router.post("/auth/users/{user_id}/deactivate", response_model=UserResponse)
+@router.post(
+    "/auth/users/{user_id}/deactivate", response_model=UserResponse, operation_id="deactivateUser"
+)
 def deactivate_user(
     user_id: UUID,
     current_user: User = Depends(get_current_superuser),
@@ -245,7 +256,9 @@ def deactivate_user(
     return user
 
 
-@router.post("/auth/users/{user_id}/roles", response_model=UserResponse)
+@router.post(
+    "/auth/users/{user_id}/roles", response_model=UserResponse, operation_id="assignRolesToUser"
+)
 def assign_roles_to_user(
     user_id: UUID,
     role_data: AssignRolesToUser,

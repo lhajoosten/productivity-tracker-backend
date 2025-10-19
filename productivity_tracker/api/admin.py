@@ -11,7 +11,11 @@ from productivity_tracker.versioning.versioning import DEPRECATED_VERSIONS
 router = APIRouter()
 
 
-@router.get("/versions", response_model=VersionResponse)
+@router.get(
+    "/versions",
+    response_model=VersionResponse,
+    operation_id="listApiVersions",
+)
 async def list_api_versions(current_user: User = Depends(get_current_superuser)):
     """Get all available API versions."""
 
