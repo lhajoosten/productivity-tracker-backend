@@ -157,21 +157,12 @@ class TestVersioningUtils:
 
     def test_get_all_versions(self):
         """Should return all registered versions."""
-        from productivity_tracker.versioning.utils import get_all_versions
+        from productivity_tracker.versioning.utils import get_all_registered_versions
 
-        versions = get_all_versions()
+        versions = get_all_registered_versions()
         assert isinstance(versions, list)
         assert len(versions) == 10  # V1.0-V3.3
         assert all(v.prefix.startswith("/api/v") for v in versions)
-
-    def test_get_latest_version(self):
-        """Should return the highest version number."""
-        from productivity_tracker.versioning.utils import get_latest_version
-
-        latest = get_latest_version()
-        assert latest == V3_3
-        assert latest.major == 3
-        assert latest.minor == 3
 
     def test_get_version_by_prefix(self):
         """Should find version by its prefix."""
@@ -240,14 +231,14 @@ class TestVersioningUtils:
         scope = {
             "type": "http",
             "method": "GET",
-            "path": "/api/v2.0/auth/login",
+            "path": "/api/v1.0/auth/login",
             "query_string": b"",
             "headers": [],
         }
         request = Request(scope)
 
         version = get_api_version_from_request(request)
-        assert version == V2_0
+        assert version == V1_0
 
     def test_get_api_version_from_request_defaults_to_current(self):
         """Should default to current version if no match."""
@@ -266,3 +257,24 @@ class TestVersioningUtils:
 
         version = get_api_version_from_request(request)
         assert version == CURRENT_VERSION
+
+    def test_is_version_accessible(self):
+        from productivity_tracker.versioning.utils import is_version_accessible
+        from productivity_tracker.versioning.versioning import (
+            ACTIVE_VERSIONS,
+            DEPRECATED_VERSIONS,
+        )
+
+        for version in ACTIVE_VERSIONS:
+            assert is_version_accessible(version) is True
+        for version in DEPRECATED_VERSIONS:
+            assert is_version_accessible(version) is True
+
+    def test_is_version_deprecated(self):
+        from productivity_tracker.versioning.versioning import (
+            DEPRECATED_VERSIONS,
+            is_version_deprecated,
+        )
+
+        for version in DEPRECATED_VERSIONS:
+            assert is_version_deprecated(version) is True

@@ -5,7 +5,7 @@ from productivity_tracker.core.database import Base, engine
 from productivity_tracker.core.logging_config import get_logger, setup_logging
 from productivity_tracker.core.settings import settings
 from productivity_tracker.core.setup import setup_exception_handling, setup_middleware
-from productivity_tracker.versioning.version import __version__, get_version_info
+from productivity_tracker.versioning.version import __version__
 from productivity_tracker.versioning.versioning import CURRENT_VERSION
 
 # Setup logging based on environment
@@ -31,26 +31,6 @@ setup_exception_handling(app)
 
 # Setup middleware
 setup_middleware(app)
-
-
-# Version info endpoint (unversioned)
-@app.get("/version")
-async def version():
-    """Get application version information"""
-    return get_version_info()
-
-
-# Root endpoint
-@app.get("/")
-async def root():
-    """Root endpoint with API information"""
-    return {
-        "message": "Productivity Tracker API",
-        "version": __version__,
-        "current_api_version": CURRENT_VERSION,
-        "docs": f"{CURRENT_VERSION.prefix}/docs",
-    }
-
 
 # Setup routers
 setup_versioned_routers(app)

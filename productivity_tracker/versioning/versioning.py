@@ -51,14 +51,17 @@ V4_0 = APIVersion(4, 0)  # Future major version
 # Current active version
 CURRENT_VERSION = V1_0
 
-# Supported versions (actively maintained)
-SUPPORTED_VERSIONS: list[APIVersion] = [
+# Only these versions are accessible via the API
+ACTIVE_VERSIONS: set[APIVersion] = {
     V1_0,
-    # V1_1,  # Uncomment when ready
-]
+    # V1_1,
+}
 
-# Deprecated versions (still accessible but with warnings)
-DEPRECATED_VERSIONS: list[APIVersion] = []
+# Versions that are deprecated but still accessible (with warning headers)
+DEPRECATED_VERSIONS: set[APIVersion] = set()
+
+# All versions that can be accessed (active + deprecated)
+ACCESSIBLE_VERSIONS: set[APIVersion] = set(ACTIVE_VERSIONS) | set(DEPRECATED_VERSIONS)
 
 _BASE_FEATURES = {
     "auth": False,
@@ -149,6 +152,7 @@ def _build_version_features() -> dict[APIVersion, dict[str, bool]]:
 # Build the complete feature dictionary
 VERSION_FEATURES = _build_version_features()
 
+# All versions registered for testing/validation
 REGISTERED_VERSIONS: dict[str, APIVersion] = {
     "v1.0": V1_0,
     "v1.1": V1_1,
@@ -176,7 +180,7 @@ def get_latest_minor_version(major: int) -> APIVersion | None:
 
 def is_version_supported(version: APIVersion) -> bool:
     """Check if a version is currently supported."""
-    return version in SUPPORTED_VERSIONS
+    return version in ACCESSIBLE_VERSIONS
 
 
 def is_version_deprecated(version: APIVersion) -> bool:

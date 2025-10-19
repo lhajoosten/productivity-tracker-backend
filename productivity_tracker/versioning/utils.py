@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from fastapi import Request, Response
 
 from productivity_tracker.versioning.versioning import (
+    ACTIVE_VERSIONS,
     CURRENT_VERSION,
     DEPRECATED_VERSIONS,
     REGISTERED_VERSIONS,
@@ -28,18 +29,24 @@ def add_version_headers(response: Response, version: APIVersion) -> Response:
     return response
 
 
+def get_all_versions() -> list[APIVersion]:
+    """Get all active API versions (exposed in API)."""
+    return [v for v in REGISTERED_VERSIONS.values() if v in ACTIVE_VERSIONS]
+
+
+def get_all_registered_versions() -> list[APIVersion]:
+    """Get ALL registered versions (including inactive ones, for testing)."""
+    return list(REGISTERED_VERSIONS.values())
+
+
 def get_api_version_from_request(request: Request) -> APIVersion:
     """Extract API version from request path."""
     path = request.url.path
-    for version in REGISTERED_VERSIONS.values():
+    # Only match against active versions
+    for version in ACTIVE_VERSIONS:
         if version.prefix in path:
             return version
-    return CURRENT_VERSION  # Default to current version
-
-
-def get_all_versions() -> list[APIVersion]:
-    """Get all registered API versions."""
-    return list(REGISTERED_VERSIONS.values())
+    return CURRENT_VERSION
 
 
 def get_latest_version() -> APIVersion:
@@ -63,3 +70,8 @@ def get_version_by_prefix(prefix: str) -> APIVersion | None:
 def iter_versions() -> "Iterator[APIVersion]":
     """Iterate over all registered versions."""
     return iter(REGISTERED_VERSIONS.values())
+
+
+def is_version_accessible(version: APIVersion) -> bool:
+    """Check if a version can be accessed (either active or deprecated)."""
+    return version in ACTIVE_VERSIONS or version in DEPRECATED_VERSIONS
