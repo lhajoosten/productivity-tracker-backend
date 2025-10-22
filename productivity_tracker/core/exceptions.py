@@ -1,10 +1,12 @@
+# mypy: disable-error-code = assignment
+
 """Custom exceptions for the application with user-friendly messages."""
 
 from typing import Any
 
 
 class AppError(Exception):
-    """Base exception for all application errors."""
+    """Base exception for all application errors with Problem Details support."""
 
     def __init__(
         self,
@@ -33,6 +35,24 @@ class AppError(Exception):
 
     def __str__(self):
         return f"[{self.error_code}] {self.message}"
+
+    def to_problem_detail(self, request_url: str | None = None) -> dict[str, Any]:
+        """Convert to RFC 7807 Problem Details format."""
+        problem_detail = {
+            "type": self.error_code.lower().replace("_", "-"),
+            "title": self.error_code.replace("_", " ").title(),
+            "status": self.status_code,
+            "detail": self.user_message,
+        }
+
+        if request_url:
+            problem_detail["instance"] = request_url
+
+        # Add any additional context
+        if self.context:
+            problem_detail.update(self.context)
+
+        return problem_detail
 
 
 # Authentication & Authorization Exceptions
@@ -190,12 +210,15 @@ class ValidationError(AppError):
         user_message: str | None = None,
         field: str | None = None,
         value: Any = None,
+        errors: list[dict[str, Any]] | None = None,
     ):
         context = {}
         if field:
             context["field"] = field
         if value is not None:
             context["value"] = str(value)
+        if errors:
+            context["errors"] = errors
 
         super().__init__(
             message=message,
@@ -204,6 +227,16 @@ class ValidationError(AppError):
             error_code="VALIDATION_ERROR",
             context=context,
         )
+
+    def to_problem_detail(self, request_url: str | None = None) -> dict[str, Any]:
+        problem_detail: dict[str, Any] = super().to_problem_detail(request_url)
+
+        if "errors" in self.context:
+            problem_detail["detail"] = self.context["errors"]
+            filtered_context = {k: v for k, v in self.context.items() if k != "errors"}
+            problem_detail.update(filtered_context)
+
+        return problem_detail
 
 
 class InvalidPasswordError(ValidationError):
