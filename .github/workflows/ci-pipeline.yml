@@ -32,6 +32,9 @@ jobs:
       - name: Install Poetry
         run: python -m pip install --upgrade pip && pip install poetry==1.8.0
 
+      - name: Write Poetry Lockfile
+        run: poetry lock [--no-update]
+
       - name: Configure Poetry & Install dependencies
         run: |
           poetry config virtualenvs.in-project true
