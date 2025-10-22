@@ -58,6 +58,12 @@ safety = "^3.6.2"
 prd_tracker = "productivity_tracker.cli:app"
 
 # Black configuration
+
+[[tool.poetry.source]]
+name = "safety"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple/"
+priority = "primary"
+
 [tool.black]
 line-length = 88
 target-version = ['py312']
