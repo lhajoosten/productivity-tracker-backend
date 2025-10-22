@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from productivity_tracker.database.entities import Permission, Role, User
 from productivity_tracker.versioning.versioning import CURRENT_VERSION
+from tests.utilities import assert_problem_detail_response
 
 pytestmark = [pytest.mark.integration, pytest.mark.rbac]
 
@@ -79,7 +80,12 @@ class TestRoleEndpoints:
         # Assert
         assert response.status_code == 403
         data = response.json()
-        assert data["error"] == "PERMISSION_DENIED"
+        assert_problem_detail_response(
+            data,
+            expected_type="permission-denied",
+            expected_status=403,
+            expected_detail_contains="permission",
+        )
 
     def test_create_role_duplicate_name(
         self,
@@ -119,7 +125,12 @@ class TestRoleEndpoints:
         # Assert
         assert response.status_code == 409
         data = response.json()
-        assert data["error"] == "RESOURCE_ALREADY_EXISTS"
+        assert_problem_detail_response(
+            data,
+            expected_type="resource-already-exists",
+            expected_status=409,
+            expected_detail_contains="already exists",
+        )
 
     def test_get_all_roles(
         self,
@@ -213,7 +224,12 @@ class TestRoleEndpoints:
         # Assert
         assert response.status_code == 404
         data = response.json()
-        assert data["error"] == "RESOURCE_NOT_FOUND"
+        assert_problem_detail_response(
+            data,
+            expected_type="resource-not-found",
+            expected_status=404,
+            expected_detail_contains="doesn't exist",
+        )
 
     def test_update_role(
         self,
@@ -413,7 +429,12 @@ class TestPermissionEndpoints:
         # Assert
         assert response.status_code == 403
         data = response.json()
-        assert data["error"] == "PERMISSION_DENIED"
+        assert_problem_detail_response(
+            data,
+            expected_type="permission-denied",
+            expected_status=403,
+            expected_detail_contains="permission",
+        )
 
     def test_create_permission_duplicate_name(
         self,
@@ -457,7 +478,12 @@ class TestPermissionEndpoints:
         # Assert
         assert response.status_code == 409
         data = response.json()
-        assert data["error"] == "RESOURCE_ALREADY_EXISTS"
+        assert_problem_detail_response(
+            data,
+            expected_type="resource-already-exists",
+            expected_status=409,
+            expected_detail_contains="already exists",
+        )
 
     def test_get_all_permissions(
         self,

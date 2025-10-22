@@ -155,3 +155,78 @@ def assert_permission_response(response_data: dict, expected_name: str | None = 
 def get_auth_headers(access_token: str) -> dict[str, str]:
     """Get authorization headers for API requests."""
     return {"Authorization": f"Bearer {access_token}"}
+
+
+def assert_problem_detail_response(
+    response_data: dict[str, Any],
+    expected_type: str,
+    expected_status: int,
+    expected_detail_contains: str | None = None,
+    expected_detail_exact: str | None = None,
+) -> None:
+    """
+    Assert that a response follows RFC 7807 Problem Details format.
+
+    Args:
+        response_data: The JSON response data
+        expected_type: Expected error type (e.g., "email-already-exists")
+        expected_status: Expected HTTP status code
+        expected_detail_contains: String that should be contained in the detail field
+        expected_detail_exact: Exact string that detail field should match
+    """
+    # Check required Problem Details fields
+    assert "type" in response_data, "Response should have 'type' field"
+    assert "title" in response_data, "Response should have 'title' field"
+    assert "status" in response_data, "Response should have 'status' field"
+    assert "detail" in response_data, "Response should have 'detail' field"
+
+    # Check expected values
+    assert response_data["type"] == expected_type, (
+        f"Expected type '{expected_type}', got '{response_data['type']}'"
+    )
+    assert response_data["status"] == expected_status, (
+        f"Expected status {expected_status}, got {response_data['status']}"
+    )
+
+    # Check detail field
+    if expected_detail_exact is not None:
+        assert response_data["detail"] == expected_detail_exact, (
+            f"Expected detail '{expected_detail_exact}', got '{response_data['detail']}'"
+        )
+    elif expected_detail_contains is not None:
+        detail = response_data["detail"]
+        if isinstance(detail, str):
+            assert expected_detail_contains.lower() in detail.lower(), (
+                f"Expected '{expected_detail_contains}' in detail '{detail}'"
+            )
+        elif isinstance(detail, list):
+            # For validation errors with array of errors
+            detail_str = str(detail).lower()
+            assert expected_detail_contains.lower() in detail_str, (
+                f"Expected '{expected_detail_contains}' in validation errors '{detail}'"
+            )
+
+
+def assert_validation_error_response(
+    response_data: dict[str, Any],
+    expected_field: str | None = None,
+) -> None:
+    """
+    Assert that a response is a validation error with array of field errors.
+
+    Args:
+        response_data: The JSON response data
+        expected_field: Optional field name that should be in the validation errors
+    """
+    assert_problem_detail_response(response_data, "validation-error", 422)
+
+    # Detail should be an array for validation errors
+    assert isinstance(response_data["detail"], list), "Validation error detail should be an array"
+    assert len(response_data["detail"]) > 0, "Validation error should have at least one error"
+
+    if expected_field:
+        fields = [error.get("field", "") for error in response_data["detail"]]
+        field_found = any(expected_field in field for field in fields)
+        assert field_found, (
+            f"Expected field '{expected_field}' not found in validation errors: {fields}"
+        )

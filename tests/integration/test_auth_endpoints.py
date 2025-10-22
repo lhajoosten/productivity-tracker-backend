@@ -5,6 +5,10 @@ from fastapi.testclient import TestClient
 
 from productivity_tracker.database.entities import User
 from productivity_tracker.versioning.versioning import CURRENT_VERSION
+from tests.utilities import (
+    assert_problem_detail_response,
+    assert_validation_error_response,
+)
 
 pytestmark = pytest.mark.integration
 
@@ -58,8 +62,12 @@ class TestAuthenticationEndpoints:
         # Assert
         assert response.status_code == 409
         data = response.json()
-        assert data["error"] == "EMAIL_ALREADY_EXISTS"
-        assert "email" in data["message"].lower()
+        assert_problem_detail_response(
+            data,
+            expected_type="email-already-exists",
+            expected_status=409,
+            expected_detail_contains="email",
+        )
 
     def test_register_user_duplicate_username(
         self, client_integration: TestClient, sample_user_integration: User
@@ -81,8 +89,12 @@ class TestAuthenticationEndpoints:
         # Assert
         assert response.status_code == 409
         data = response.json()
-        assert data["error"] == "USERNAME_ALREADY_EXISTS"
-        assert "username" in data["message"].lower()
+        assert_problem_detail_response(
+            data,
+            expected_type="username-already-exists",
+            expected_status=409,
+            expected_detail_contains="username",
+        )
 
     def test_register_user_invalid_email(self, client_integration: TestClient):
         """Test registration fails with invalid email format."""
@@ -99,8 +111,7 @@ class TestAuthenticationEndpoints:
         # Assert
         assert response.status_code == 422
         data = response.json()
-        assert data["error"] == "VALIDATION_ERROR"
-        assert "invalid" in data["message"].lower() or "validation" in data["message"].lower()
+        assert_validation_error_response(data, expected_field="email")
 
     def test_register_user_missing_required_fields(self, client_integration: TestClient):
         """Test registration fails with missing required fields."""
@@ -115,8 +126,7 @@ class TestAuthenticationEndpoints:
         # Assert
         assert response.status_code == 422
         data = response.json()
-        assert data["error"] == "VALIDATION_ERROR"
-        assert "details" in data
+        assert_validation_error_response(data)
 
     # ============================================================================
     # Login Tests
@@ -157,8 +167,12 @@ class TestAuthenticationEndpoints:
         # Assert
         assert response.status_code == 401
         data = response.json()
-        assert data["error"] == "INVALID_CREDENTIALS"
-        assert "invalid" in data["message"].lower()
+        assert_problem_detail_response(
+            data,
+            expected_type="invalid-credentials",
+            expected_status=401,
+            expected_detail_contains="invalid",
+        )
 
     def test_login_wrong_password(
         self, client_integration: TestClient, sample_user_integration: User
@@ -176,7 +190,12 @@ class TestAuthenticationEndpoints:
         # Assert
         assert response.status_code == 401
         data = response.json()
-        assert data["error"] == "INVALID_CREDENTIALS"
+        assert_problem_detail_response(
+            data,
+            expected_type="invalid-credentials",
+            expected_status=401,
+            expected_detail_contains="invalid",
+        )
 
     def test_login_inactive_user(
         self, client_integration: TestClient, sample_inactive_user_integration: User
@@ -194,8 +213,12 @@ class TestAuthenticationEndpoints:
         # Assert
         assert response.status_code == 403
         data = response.json()
-        assert data["error"] == "INACTIVE_USER"
-        assert "inactive" in data["message"].lower()
+        assert_problem_detail_response(
+            data,
+            expected_type="inactive-user",
+            expected_status=403,
+            expected_detail_contains="inactive",
+        )
 
     # ============================================================================
     # Get Current User Tests
@@ -232,7 +255,12 @@ class TestAuthenticationEndpoints:
         # Assert
         assert response.status_code == 401
         data = response.json()
-        assert data["error"] == "INVALID_TOKEN"
+        assert_problem_detail_response(
+            data,
+            expected_type="invalid-token",
+            expected_status=401,
+            expected_detail_contains="session is invalid",
+        )
 
     # ============================================================================
     # Logout Tests
@@ -298,7 +326,12 @@ class TestAuthenticationEndpoints:
         # Assert
         assert response.status_code == 401
         data = response.json()
-        assert data["error"] == "INVALID_TOKEN"
+        assert_problem_detail_response(
+            data,
+            expected_type="invalid-token",
+            expected_status=401,
+            expected_detail_contains="session is invalid",
+        )
 
     # ============================================================================
     # Update Current User Tests
@@ -406,7 +439,12 @@ class TestAuthenticationEndpoints:
         # Assert
         assert response.status_code == 422
         data = response.json()
-        assert data["error"] == "PASSWORD_MISMATCH"
+        assert_problem_detail_response(
+            data,
+            expected_type="password-mismatch",
+            expected_status=422,
+            expected_detail_contains="password",
+        )
 
 
 class TestAdminUserEndpoints:
@@ -456,7 +494,12 @@ class TestAdminUserEndpoints:
         # Assert
         assert response.status_code == 403
         data = response.json()
-        assert data["error"] == "PERMISSION_DENIED"
+        assert_problem_detail_response(
+            data,
+            expected_type="permission-denied",
+            expected_status=403,
+            expected_detail_contains="permission",
+        )
 
     def test_activate_user_as_superuser(
         self,

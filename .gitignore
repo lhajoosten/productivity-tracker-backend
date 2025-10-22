@@ -66,3 +66,6 @@ postgresql_data/
 productivity_tracker/scripts/**
 
 .copilot/
+.envrc
+.envrc_
+coverage.xml
