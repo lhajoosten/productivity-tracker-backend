@@ -22,7 +22,7 @@ class VersionData(BaseModel):
 class VersionResponse(BaseModel):
     """Version response model."""
 
-    version: list[VersionData]
+    versions: list[VersionData]
     latest: str
     current: str
     migration_url: str

@@ -60,5 +60,5 @@ def check_client_version(client_prefix: str) -> dict:
         "status": "outdated",
         "current": client_version.__str__(),
         "latest": latest.__str__(),
-        "migration_url": f"/docs/{latest.prefix}",
+        "migration_url": f"/docs{latest.prefix}",
     }
