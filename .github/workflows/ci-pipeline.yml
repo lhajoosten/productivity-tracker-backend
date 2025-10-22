@@ -56,7 +56,7 @@ jobs:
         run: poetry run bandit -r productivity_tracker -ll
 
       - name: Check dependencies (safety)
-        run: poetry run safety check
+        run: poetry run safety scan --full-report
 
   test:
     name: Tests
