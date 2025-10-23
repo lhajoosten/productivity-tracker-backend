@@ -104,6 +104,10 @@ _VERSION_FEATURE_CHANGES = {
         "tasks": True,
         "projects": True,
         "analytics": True,
+        "workspaces": True,
+        "notifications": True,
+        "reporting": True,
+        "calendar": True,
     },
     V2_1: {},  # Inherits from V2_0
     V2_2: {},  # Inherits from V2_1

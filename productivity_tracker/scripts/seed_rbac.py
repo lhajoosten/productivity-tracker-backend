@@ -35,7 +35,7 @@ def create_permissions(db: Session):
             "action": "delete",
             "description": "Delete users",
         },
-        # Task permissions (example)
+        # Task permissions
         {
             "name": "tasks:create",
             "resource": "task",
@@ -60,7 +60,7 @@ def create_permissions(db: Session):
             "action": "delete",
             "description": "Delete tasks",
         },
-        # Project permissions (example)
+        # Project permissions
         {
             "name": "projects:create",
             "resource": "project",
@@ -84,6 +84,99 @@ def create_permissions(db: Session):
             "resource": "project",
             "action": "delete",
             "description": "Delete projects",
+        },
+        # Organization permissions
+        {
+            "name": "organizations:create",
+            "resource": "organization",
+            "action": "create",
+            "description": "Create organizations",
+        },
+        {
+            "name": "organizations:read",
+            "resource": "organization",
+            "action": "read",
+            "description": "Read organizations",
+        },
+        {
+            "name": "organizations:update",
+            "resource": "organization",
+            "action": "update",
+            "description": "Update organizations",
+        },
+        {
+            "name": "organizations:delete",
+            "resource": "organization",
+            "action": "delete",
+            "description": "Delete organizations",
+        },
+        {
+            "name": "organizations:manage_members",
+            "resource": "organization",
+            "action": "manage_members",
+            "description": "Add or remove organization members",
+        },
+        # Department permissions
+        {
+            "name": "departments:create",
+            "resource": "department",
+            "action": "create",
+            "description": "Create departments",
+        },
+        {
+            "name": "departments:read",
+            "resource": "department",
+            "action": "read",
+            "description": "Read departments",
+        },
+        {
+            "name": "departments:update",
+            "resource": "department",
+            "action": "update",
+            "description": "Update departments",
+        },
+        {
+            "name": "departments:delete",
+            "resource": "department",
+            "action": "delete",
+            "description": "Delete departments",
+        },
+        # Team permissions
+        {
+            "name": "teams:create",
+            "resource": "team",
+            "action": "create",
+            "description": "Create teams",
+        },
+        {
+            "name": "teams:read",
+            "resource": "team",
+            "action": "read",
+            "description": "Read teams",
+        },
+        {
+            "name": "teams:update",
+            "resource": "team",
+            "action": "update",
+            "description": "Update teams",
+        },
+        {
+            "name": "teams:delete",
+            "resource": "team",
+            "action": "delete",
+            "description": "Delete teams",
+        },
+        {
+            "name": "teams:manage_members",
+            "resource": "team",
+            "action": "manage_members",
+            "description": "Add or remove team members",
+        },
+        {
+            "name": "teams:manage_lead",
+            "resource": "team",
+            "action": "manage_lead",
+            "description": "Set or update team lead",
         },
     ]
 
@@ -117,7 +210,8 @@ def create_roles(db: Session, permissions: list):
         user_permissions = [
             p
             for p in permissions
-            if p.resource in ["task", "project"] and p.action in ["create", "read", "update"]
+            if (p.resource in ["task", "project"] and p.action in ["create", "read", "update"])
+            or (p.resource in ["organization", "department", "team"] and p.action == "read")
         ]
         user_role = Role(name="user", description="Regular user with limited access")
         user_role.permissions = user_permissions
@@ -131,8 +225,65 @@ def create_roles(db: Session, permissions: list):
         viewer_role.permissions = viewer_permissions
         db.add(viewer_role)
 
+    # Create Organization Manager role
+    org_manager_role = db.query(Role).filter(Role.name == "organization_manager").first()
+    if not org_manager_role:
+        org_manager_permissions = [
+            p
+            for p in permissions
+            if p.resource in ["organization", "department", "team"]
+            or (p.resource in ["task", "project"] and p.action in ["create", "read", "update"])
+        ]
+        org_manager_role = Role(
+            name="organization_manager",
+            description="Manage organizations, departments, and teams",
+        )
+        org_manager_role.permissions = org_manager_permissions
+        db.add(org_manager_role)
+
+    # Create Team Lead role
+    team_lead_role = db.query(Role).filter(Role.name == "team_lead").first()
+    if not team_lead_role:
+        team_lead_permissions = [
+            p
+            for p in permissions
+            if (p.resource == "team" and p.action in ["read", "update", "manage_members"])
+            or (p.resource in ["organization", "department"] and p.action == "read")
+            or (p.resource in ["task", "project"])
+        ]
+        team_lead_role = Role(
+            name="team_lead",
+            description="Lead a team with task and member management",
+        )
+        team_lead_role.permissions = team_lead_permissions
+        db.add(team_lead_role)
+
+    # Create Department Manager role
+    dept_manager_role = db.query(Role).filter(Role.name == "department_manager").first()
+    if not dept_manager_role:
+        dept_manager_permissions = [
+            p
+            for p in permissions
+            if (p.resource in ["department", "team"])
+            or (p.resource == "organization" and p.action == "read")
+            or (p.resource in ["task", "project"] and p.action in ["create", "read", "update"])
+        ]
+        dept_manager_role = Role(
+            name="department_manager",
+            description="Manage departments and teams within an organization",
+        )
+        dept_manager_role.permissions = dept_manager_permissions
+        db.add(dept_manager_role)
+
     db.commit()
-    return {"admin": admin_role, "user": user_role, "viewer": viewer_role}
+    return {
+        "admin": admin_role,
+        "user": user_role,
+        "viewer": viewer_role,
+        "organization_manager": org_manager_role,
+        "team_lead": team_lead_role,
+        "department_manager": dept_manager_role,
+    }
 
 
 def create_default_admin(db: Session, admin_role: Role):
@@ -145,8 +296,8 @@ def create_default_admin(db: Session, admin_role: Role):
             hashed_password=hash_password("admin123"),  # Change this password!
             is_active=True,
             is_superuser=True,
-            role_id=admin_role.id,
         )
+        admin.roles.append(admin_role)
         db.add(admin)
         db.commit()
         print("✓ Created default admin user (username: admin, password: admin123)")
