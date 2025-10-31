@@ -269,3 +269,15 @@ def assign_roles_to_user(
     user_service = UserService(db)
     user = user_service.assign_roles(user_id, role_data.role_ids)
     return user
+
+
+@router.patch("/auth/users/{user_id}/toggle-superuser", operation_id="toggleSuperuser")
+def toggle_superuser(
+    user_id: UUID,
+    current_user: User = Depends(get_current_superuser),
+    db: Session = Depends(get_db),
+):
+    """Toggle superuser status of a user (admin only)."""
+    user_service = UserService(db)
+    user = user_service.toggle_superuser_status(user_id)
+    return user
