@@ -1,5 +1,7 @@
+from uuid import UUID
+
 from sqlalchemy import ForeignKey, String
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from productivity_tracker.database.entities.base import BaseEntity
@@ -15,7 +17,7 @@ class Department(BaseEntity):
 
     # Foreign key to organization
     organization_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True),
+        PG_UUID(as_uuid=True),
         ForeignKey("organizations.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
