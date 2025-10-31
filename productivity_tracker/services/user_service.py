@@ -172,3 +172,12 @@ class UserService:
         if not verify_password(password, str(user.hashed_password)):
             return None
         return user
+
+    def toggle_superuser_status(self, user_id: UUID) -> User | None:
+        "Toggle superuser status for a user."
+        user = self.repository.get_by_id(user_id)
+        if not user:
+            return None
+
+        user.is_superuser = not user.is_superuser
+        return self.repository.update(user)
