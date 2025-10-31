@@ -100,7 +100,6 @@ def create_super_user():
             hashed_password=hash_password(password),
             is_active=True,
             is_superuser=True,
-            role_id=None,  # Superusers don't need a role
         )
 
         db.add(superuser)
