@@ -84,8 +84,8 @@ _BASE_FEATURES = {
 
 # Version feature flags
 _VERSION_FEATURE_CHANGES = {
+    # Core features
     V1_0: {
-        # Core features
         "auth": True,
         "rbac": True,
         "users": True,
@@ -96,30 +96,61 @@ _VERSION_FEATURE_CHANGES = {
         "departments": True,
         "teams": True,
     },
-    V1_1: {},  # Inherits from V1_0
-    V1_2: {},  # Inherits from V1_1
+    V1_1: {
+        "audit_logging": True,  # Track all system changes and user actions
+        "bulk_operations": True,  # Bulk import/export/update for users and teams
+        "data_export": True,  # Export data to CSV/JSON formats
+        "search": True,  # Global search across all entities
+    },
+    V1_2: {
+        "advanced_permissions": True,  # Granular role-based permissions
+        "organization_settings": True,  # Configurable organization policies
+        "user_preferences": True,  # User settings for theme, locale, timezone
+        "basic_integrations": True,  # Webhook support for external systems
+        "notifications": True,  # In-app and email notifications
+    },
+    # Advanced productivity features
     V2_0: {
-        # Adds advanced features
-        "time_tracking": True,
-        "tasks": True,
-        "projects": True,
-        "analytics": True,
-        "workspaces": True,
-        "notifications": True,
-        "reporting": True,
-        "calendar": True,
+        "workspaces": True,  # Isolated work environments
+        "projects": True,  # Project management capabilities
+        "tasks": True,  # Task creation and management
+        "time_tracking": True,  # Track time spent on tasks/projects
+        "file_management": True,  # Document attachments and storage
     },
-    V2_1: {},  # Inherits from V2_0
-    V2_2: {},  # Inherits from V2_1
+    V2_1: {
+        "task_dependencies": True,  # Task relationship and blocking
+        "project_templates": True,  # Reusable project structures
+        "calendar_integration": True,  # Calendar sync and scheduling
+        "task_comments": True,  # Collaborative task discussions
+        "milestone_tracking": True,  # Project milestone management
+    },
+    V2_2: {
+        "analytics": True,  # Basic productivity analytics
+        "reporting": True,  # Advanced reporting and dashboards
+        "workflow_automation": True,  # Automated task and project workflows
+        "performance_metrics": True,  # Individual and team performance tracking
+    },
+    # AI and machine learning features
     V3_0: {
-        # Adds AI features
-        "ai_integration": True,
-        "llm_features": True,
-        "mcp_support": True,
+        "ai_integration": True,  # Core AI service integration
+        "smart_insights": True,  # AI-driven productivity insights
+        "auto_categorization": True,  # AI-powered task/project categorization
+        "predictive_analytics": True,  # AI predictions for project completion
     },
-    V3_1: {},  # Inherits from V3_0
-    V3_2: {},  # Inherits from V3_1
-    V3_3: {},  # Inherits from V3_2
+    V3_1: {
+        "mcp_support": True,  # Model Context Protocol for AI agents
+        "intelligent_scheduling": True,  # AI-optimized task scheduling
+        "smart_recommendations": True,  # AI-powered task and resource suggestions
+    },
+    V3_2: {
+        "natural_language_queries": True,  # Query data using natural language
+        "ai_assistants": True,  # Conversational AI helpers
+        "automated_reporting": True,  # AI-generated reports and summaries
+    },
+    V3_3: {
+        "sentiment_analysis": True,  # Analyze team communication sentiment
+        "risk_detection": True,  # AI-powered project risk identification
+    },
 }
 
 
