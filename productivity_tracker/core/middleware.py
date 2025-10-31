@@ -1,6 +1,8 @@
 import logging
 import time
+from collections import defaultdict
 from collections.abc import Callable
+from typing import Any
 
 from fastapi import Request
 from fastapi.exceptions import HTTPException, RequestValidationError
@@ -9,7 +11,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
 
 from productivity_tracker.core.exception_filter import GlobalExceptionFilter
-from productivity_tracker.core.exceptions import AppError
+from productivity_tracker.core.exceptions import AppError, RateLimitError
 from productivity_tracker.versioning.utils import (
     add_version_headers,
     get_api_version_from_request,
@@ -31,7 +33,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         else:
             return f"{client_host} | Unknown"
 
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         start_time = time.time()
         user_info = self._get_user_info(request)
 
@@ -86,10 +88,33 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 class VersionHeaderMiddleware(BaseHTTPMiddleware):
     """Middleware to add version headers to all API responses."""
 
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         version = get_api_version_from_request(request)
         response: Response = await call_next(request)
         response = add_version_headers(response, version)
+        return response
+
+
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app: Any, requests_per_minute: int = 60):
+        super().__init__(app)
+        self.requests_per_minute = requests_per_minute
+        self.client_requests: dict[str, list[float]] = defaultdict(list)
+
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        client_ip = request.client.host if request.client else "unknown"
+        now = time.time()
+
+        # Clean old requests
+        self.client_requests[client_ip] = [
+            req_time for req_time in self.client_requests[client_ip] if now - req_time < 60
+        ]
+
+        if len(self.client_requests[client_ip]) >= self.requests_per_minute:
+            raise RateLimitError(retry_after=60)
+
+        self.client_requests[client_ip].append(now)
+        response: Response = await call_next(request)
         return response
 
 

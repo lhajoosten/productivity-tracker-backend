@@ -129,7 +129,15 @@ class TestOpenAPIGeneration:
                     used_tags.update(operation_data["tags"])
 
         # Should have feature tags only
-        expected_tags = {"Health", "Authentication", "Roles", "Permissions"}
+        expected_tags = {
+            "Health",
+            "Authentication",
+            "Roles",
+            "Permissions",
+            "Teams",
+            "Organizations",
+            "Departments",
+        }
 
         # All used tags should be in expected tags
         unexpected = used_tags - expected_tags

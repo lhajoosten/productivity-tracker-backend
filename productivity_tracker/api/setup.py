@@ -2,9 +2,12 @@ from fastapi import FastAPI
 
 from productivity_tracker.api.admin import router as admin_router
 from productivity_tracker.api.auth import router as auth_router
+from productivity_tracker.api.departments import router as departments_router
 from productivity_tracker.api.health import router as health_router
+from productivity_tracker.api.organizations import router as organizations_router
 from productivity_tracker.api.permissions import router as permissions_router
 from productivity_tracker.api.roles import router as roles_router
+from productivity_tracker.api.teams import router as teams_router
 from productivity_tracker.core.logging_config import get_logger
 from productivity_tracker.versioning.utils import (
     get_latest_version,
@@ -43,6 +46,20 @@ def setup_versioned_routers(app: FastAPI) -> None:
     if is_feature_enabled(CURRENT_VERSION, "permissions"):
         logger.info("Adding permissions router")
         app.include_router(permissions_router, prefix=CURRENT_VERSION.prefix, tags=["Permissions"])
+
+    if is_feature_enabled(CURRENT_VERSION, "organizations"):
+        logger.info("Adding organizations router")
+        app.include_router(
+            organizations_router, prefix=CURRENT_VERSION.prefix, tags=["Organizations"]
+        )
+
+    if is_feature_enabled(CURRENT_VERSION, "departments"):
+        logger.info("Adding departments router")
+        app.include_router(departments_router, prefix=CURRENT_VERSION.prefix, tags=["Departments"])
+
+    if is_feature_enabled(CURRENT_VERSION, "teams"):
+        logger.info("Adding teams router")
+        app.include_router(teams_router, prefix=CURRENT_VERSION.prefix, tags=["Teams"])
 
 
 def check_client_version(client_prefix: str) -> dict:
