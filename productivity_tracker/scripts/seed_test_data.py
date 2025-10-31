@@ -22,7 +22,7 @@ class TestDataSeeder:
     def __init__(self, db: Session, superuser_id: str):
         self.db = db
         self.superuser_id = UUID(superuser_id)
-        self.superuser = None
+        self.superuser: User | None = None
         self.created_users: list[User] = []
         self.created_orgs: list[Organization] = []
         self.created_depts: list[Department] = []
