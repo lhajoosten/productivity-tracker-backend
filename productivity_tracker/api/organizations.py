@@ -74,6 +74,35 @@ def get_all_organizations(
 
 
 @router.get(
+    "/organizations/current",
+    response_model=OrganizationResponse,
+    operation_id="getCurrentOrganization",
+)
+def get_current_organization(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get current user's organization."""
+    from productivity_tracker.core.exceptions import ResourceNotFoundError
+
+    org_repo = OrganizationRepository(db)
+
+    # Get user's organizations
+    orgs = org_repo.get_by_user(current_user.id)
+    if not orgs:
+        raise ResourceNotFoundError(
+            resource_type="Organization", resource_id=f"for user {current_user.id}"
+        )
+
+    # Return first organization (assuming user belongs to one organization)
+    org = orgs[0]
+    response = OrganizationResponse.model_validate(org)
+    response.member_count = org_repo.get_member_count(org.id)
+    response.department_count = org_repo.get_department_count(org.id)
+    return response
+
+
+@router.get(
     "/organizations/{org_id}",
     response_model=OrganizationResponse,
     operation_id="getOrganization",
@@ -161,7 +190,8 @@ def delete_organization(
 
 @router.post(
     "/organizations/{org_id}/members/{user_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=OrganizationResponse,
+    status_code=status.HTTP_200_OK,
     operation_id="addOrganizationMember",
 )
 def add_organization_member(
@@ -173,7 +203,14 @@ def add_organization_member(
     """Add a member to an organization."""
     org_service = OrganizationService(db)
     org_service.add_member(org_id, user_id)
-    return None
+
+    # Return updated organization
+    org = org_service.get_organization(org_id)
+    org_repo = OrganizationRepository(db)
+    response = OrganizationResponse.model_validate(org)
+    response.member_count = org_repo.get_member_count(org.id)
+    response.department_count = org_repo.get_department_count(org.id)
+    return response
 
 
 @router.delete(

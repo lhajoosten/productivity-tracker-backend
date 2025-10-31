@@ -455,3 +455,97 @@ def mock_permission_data():
         "action": "create",
         "description": "Create projects",
     }
+
+
+# ============================================================================
+# Organization, Department, and Team Fixtures
+# ============================================================================
+
+
+@pytest.fixture
+def test_organization(db_session_integration: Session):
+    """Create a test organization for integration tests."""
+    from productivity_tracker.database.entities.organization import Organization
+
+    unique_id = get_unique_id()
+    org = Organization(
+        name=f"Test Organization {unique_id}",
+        slug=f"test-org-{unique_id}",
+        description="A test organization",
+    )
+    db_session_integration.add(org)
+    db_session_integration.flush()
+    db_session_integration.refresh(org)
+    return org
+
+
+@pytest.fixture
+def test_department(db_session_integration: Session, test_organization):
+    """Create a test department for integration tests."""
+    from productivity_tracker.database.entities.department import Department
+
+    unique_id = get_unique_id()
+    dept = Department(
+        name=f"Test Department {unique_id}",
+        organization_id=test_organization.id,
+        description="A test department",
+    )
+    db_session_integration.add(dept)
+    db_session_integration.flush()
+    db_session_integration.refresh(dept)
+    return dept
+
+
+@pytest.fixture
+def test_team(db_session_integration: Session, test_department):
+    """Create a test team for integration tests."""
+    from productivity_tracker.database.entities.team import Team
+
+    unique_id = get_unique_id()
+    team = Team(
+        name=f"Test Team {unique_id}",
+        department_id=test_department.id,
+        description="A test team",
+    )
+    db_session_integration.add(team)
+    db_session_integration.flush()
+    db_session_integration.refresh(team)
+    return team
+
+
+@pytest.fixture
+def test_user(db_session_integration: Session):
+    """Create a test user for integration tests (alias for sample_user_integration)."""
+    unique_id = get_unique_id()
+    user = User(
+        username=f"testuser_{unique_id}",
+        email=f"testuser_{unique_id}@example.com",
+        hashed_password=hash_password("TestPassword123!"),
+        is_active=True,
+        is_superuser=False,
+    )
+    db_session_integration.add(user)
+    db_session_integration.flush()
+    db_session_integration.refresh(user)
+    return user
+
+
+@pytest.fixture
+def authenticated_client(
+    client_integration: TestClient, test_user: User, db_session_integration: Session
+):
+    """Create an authenticated client for integration tests."""
+    from productivity_tracker.core.dependencies import get_current_user
+
+    def override_get_current_user():
+        return test_user
+
+    app.dependency_overrides[get_current_user] = override_get_current_user
+    yield client_integration
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def db_session(db_session_integration: Session):
+    """Alias for db_session_integration to simplify test code."""
+    return db_session_integration
