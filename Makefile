@@ -69,7 +69,7 @@ test-ci-full: ## Run all tests with coverage for CI environment
 	@echo "Starting fresh test database..."
 	@$(MAKE) test-db-up
 	@echo "Running tests with coverage..."
-	TESTING=1 TEST_DATABASE_URL=postgresql://test_user:test_password@localhost:5433/test_productivity_tracker poetry run pytest --cov=productivity_tracker --cov-report=xml --cov-report=term-missing
+	TESTING=1 TEST_DATABASE_URL=postgresql://test_user:test_password@localhost:5433/test_productivity_tracker poetry run pytest --cov=productivity_tracker --cov-report=xml --cov-report=term-missing --junitxml=testreport.junit.xml -o junit_family=legacy
 	@$(MAKE) test-db-clean
 
 run: ## Run the development server
