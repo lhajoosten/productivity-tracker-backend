@@ -117,6 +117,10 @@ class TeamService:
     def delete_team(self, team_id: UUID, soft: bool = True) -> bool:
         """Delete a team."""
         logger.info(f"Deleting team: {team_id} (soft={soft})")
+
+        # Verify team exists before attempting delete
+        self.get_team(team_id)  # This will raise ResourceNotFoundError if not found
+
         result = self.repository.delete(team_id, soft=soft)
         if result:
             logger.info(f"Team deleted successfully: {team_id}")

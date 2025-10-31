@@ -5,7 +5,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from productivity_tracker.core.exceptions import (
-    DatabaseError,
+    BusinessLogicError,
     ResourceNotFoundError,
 )
 from productivity_tracker.core.logging_config import get_logger
@@ -36,8 +36,10 @@ class OrganizationService:
         existing_org = self.repository.get_by_slug(org_data.slug)
         if existing_org:
             logger.warning(f"Organization creation failed: Slug {org_data.slug} already exists")
-            raise DatabaseError(
+            raise BusinessLogicError(
                 message=f"Organization with slug '{org_data.slug}' already exists",
+                user_message=f"An organization with the slug '{org_data.slug}' already exists. Please use a different slug.",
+                context={"field": "slug", "value": org_data.slug},
             )
 
         new_org = Organization(
@@ -79,8 +81,10 @@ class OrganizationService:
             existing_org = self.repository.get_by_slug(org_data.slug)
             if existing_org:
                 logger.warning(f"Organization update failed: Slug {org_data.slug} already exists")
-                raise DatabaseError(
+                raise BusinessLogicError(
                     message=f"Organization with slug '{org_data.slug}' already exists",
+                    user_message=f"An organization with the slug '{org_data.slug}' already exists. Please use a different slug.",
+                    context={"field": "slug", "value": org_data.slug},
                 )
 
         # Update fields
@@ -98,6 +102,10 @@ class OrganizationService:
     def delete_organization(self, org_id: UUID, soft: bool = True) -> bool:
         """Delete an organization."""
         logger.info(f"Deleting organization: {org_id} (soft={soft})")
+
+        # Verify organization exists before attempting delete
+        self.get_organization(org_id)  # This will raise ResourceNotFoundError if not found
+
         result = self.repository.delete(org_id, soft=soft)
         if result:
             logger.info(f"Organization deleted successfully: {org_id}")

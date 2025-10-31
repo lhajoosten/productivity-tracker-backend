@@ -98,6 +98,10 @@ class DepartmentService:
     def delete_department(self, dept_id: UUID, soft: bool = True) -> bool:
         """Delete a department."""
         logger.info(f"Deleting department: {dept_id} (soft={soft})")
+
+        # Verify department exists before attempting delete
+        self.get_department(dept_id)  # This will raise ResourceNotFoundError if not found
+
         result = self.repository.delete(dept_id, soft=soft)
         if result:
             logger.info(f"Department deleted successfully: {dept_id}")

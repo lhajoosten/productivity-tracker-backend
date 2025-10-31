@@ -29,6 +29,17 @@ class OrganizationRepository(BaseRepository[Organization]):
         result = query.first()
         return result if result else None
 
+    def get_by_user(self, user_id: UUID, include_deleted: bool = False) -> list[Organization]:
+        """Get all organizations a user belongs to."""
+        query = (
+            self.db.query(self.model)
+            .join(user_organizations)
+            .filter(user_organizations.c.user_id == user_id)  # type: ignore[arg-type]
+        )
+        if not include_deleted:
+            query = query.filter(self.model.is_deleted == False)  # noqa: E712
+        return list(query.all())  # type: ignore[return-value]
+
     def get_with_stats(self, org_id: UUID) -> Organization | None:
         """Get organization with member and department counts."""
         org = self.get_by_id(org_id)

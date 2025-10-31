@@ -12,7 +12,6 @@ from productivity_tracker.models.auth import UserResponse
 from productivity_tracker.models.organization import (
     TeamCreate,
     TeamMemberAdd,
-    TeamMemberRemove,
     TeamUpdate,
     TeamWithLeadResponse,
 )
@@ -161,7 +160,8 @@ def delete_team(
 
 @router.post(
     "/teams/{team_id}/members",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=TeamWithLeadResponse,
+    status_code=status.HTTP_200_OK,
     operation_id="addTeamMember",
 )
 def add_team_member(
@@ -173,23 +173,29 @@ def add_team_member(
     """Add a member to a team."""
     team_service = TeamService(db)
     team_service.add_member(team_id, member_data.user_id)
-    return None
+
+    # Return updated team
+    team = team_service.get_team(team_id)
+    team_repo = TeamRepository(db)
+    response = TeamWithLeadResponse.model_validate(team)
+    response.member_count = team_repo.get_member_count(team.id)
+    return response
 
 
 @router.delete(
-    "/teams/{team_id}/members",
+    "/teams/{team_id}/members/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="removeTeamMember",
 )
 def remove_team_member(
     team_id: UUID,
-    member_data: TeamMemberRemove,
+    user_id: UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Remove a member from a team."""
     team_service = TeamService(db)
-    team_service.remove_member(team_id, member_data.user_id)
+    team_service.remove_member(team_id, user_id)
     return None
 
 
