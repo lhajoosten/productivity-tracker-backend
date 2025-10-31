@@ -69,7 +69,7 @@ test-ci-full: ## Run all tests with coverage for CI environment
 	@echo "Starting fresh test database..."
 	@$(MAKE) test-db-up
 	@echo "Running tests with coverage..."
-	TESTING=1 TEST_DATABASE_URL=postgresql://test_user:test_password@localhost:5433/test_productivity_tracker poetry run pytest --cov=productivity_tracker --cov-report=xml --cov-report=term-missing
+	TESTING=1 TEST_DATABASE_URL=postgresql://test_user:test_password@localhost:5433/test_productivity_tracker poetry run pytest --cov=productivity_tracker --cov-report=xml --cov-report=term-missing --junitxml=testreport.junit.xml -o junit_family=legacy
 	@$(MAKE) test-db-clean
 
 run: ## Run the development server
@@ -84,6 +84,69 @@ upgrade: ## Run database migrations
 
 downgrade: ## Rollback last migration
 	poetry run alembic downgrade -1
+
+# Database Management
+db-up: ## Start the development database with Docker
+	@echo "Starting development database..."
+	docker compose -f .devcontainer/docker-compose.yml up -d
+	@echo "Waiting for database to be ready..."
+	@sleep 5
+	@echo "✓ Database is running on localhost:5432"
+
+db-down: ## Stop the development database
+	docker compose -f .devcontainer/docker-compose.yml down
+
+db-restart: ## Restart the development database
+	@$(MAKE) db-down
+	@$(MAKE) db-up
+
+db-clean: ## Stop database and remove volumes (WARNING: deletes all data)
+	@echo "⚠️  This will delete all database data!"
+	@read -p "Are you sure? [y/N] " confirm && [ "$$confirm" = "y" ] || exit 1
+	docker compose -f .devcontainer/docker-compose.yml down -v
+
+db-logs: ## Show database logs
+	docker compose logs -f postgres
+
+db-reset: db-clean db-up upgrade ## Reset database (clean + recreate + migrate)
+	@echo "✓ Database reset complete"
+
+# Seeding Commands
+seed-rbac: ## Seed RBAC roles and permissions
+	poetry run python -m productivity_tracker.scripts.seed_rbac
+
+seed-data: ## Seed test data (requires superuser ID as argument)
+	@if [ -z "$(SUPERUSER_ID)" ]; then \
+		echo "Error: Please provide SUPERUSER_ID"; \
+		echo "Usage: make seed-data SUPERUSER_ID=your-uuid-here"; \
+		exit 1; \
+	fi
+	poetry run python -m productivity_tracker.scripts.seed_test_data "$(SUPERUSER_ID)"
+
+seed-all: ## Seed RBAC and test data (requires superuser ID as argument)
+	@if [ -z "$(SUPERUSER_ID)" ]; then \
+		echo "Error: Please provide SUPERUSER_ID"; \
+		echo "Usage: make seed-all SUPERUSER_ID=your-uuid-here"; \
+		exit 1; \
+	fi
+	poetry run python -m productivity_tracker.scripts.setup_dev_env "$(SUPERUSER_ID)"
+
+create-superuser: ## Create a new superuser interactively
+	poetry run python -m productivity_tracker.scripts.create_super_user
+
+# Development Workflow
+dev-setup: db-up upgrade seed-rbac ## Complete development setup (db + migrations + rbac)
+	@echo ""
+	@echo "✓ Development environment ready!"
+	@echo ""
+	@echo "Next steps:"
+	@echo "  1. Create a superuser: make create-superuser"
+	@echo "  2. Seed test data: make seed-all SUPERUSER_ID=<your-superuser-id>"
+	@echo "  3. Run the server: make run"
+	@echo ""
+
+dev-reset: db-reset seed-rbac ## Reset and re-seed development database
+	@echo "✓ Development database reset complete"
 
 clean: ## Clean up cache and build files
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
