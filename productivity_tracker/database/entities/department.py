@@ -1,6 +1,6 @@
-from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from productivity_tracker.database.entities.base import BaseEntity
 
@@ -10,11 +10,11 @@ class Department(BaseEntity):
 
     __tablename__ = "departments"
 
-    name = Column(String(255), nullable=False, index=True)
-    description = Column(String(500), nullable=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    description: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     # Foreign key to organization
-    organization_id = Column(
+    organization_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("organizations.id", ondelete="CASCADE"),
         nullable=False,

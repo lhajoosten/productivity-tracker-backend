@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, String, Table
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from productivity_tracker.database.entities.base import BaseEntity
 
@@ -17,9 +17,9 @@ class Organization(BaseEntity):
 
     __tablename__ = "organizations"
 
-    name = Column(String(255), nullable=False, index=True)
-    description = Column(String(500), nullable=True)
-    slug = Column(String(100), unique=True, nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    description: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
 
     # Relationships
     departments = relationship(

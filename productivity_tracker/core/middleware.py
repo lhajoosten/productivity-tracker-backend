@@ -88,7 +88,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 class VersionHeaderMiddleware(BaseHTTPMiddleware):
     """Middleware to add version headers to all API responses."""
 
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         version = get_api_version_from_request(request)
         response: Response = await call_next(request)
         response = add_version_headers(response, version)
@@ -114,7 +114,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             raise RateLimitError(retry_after=60)
 
         self.client_requests[client_ip].append(now)
-        return await call_next(request)
+        response: Response = await call_next(request)
+        return response
 
 
 # Exception Handlers using GlobalExceptionFilter

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, String, Table
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from productivity_tracker.database.entities.base import BaseEntity
 
@@ -29,8 +29,8 @@ class Role(BaseEntity):
 
     __tablename__ = "roles"
 
-    name = Column(String(50), unique=True, nullable=False, index=True)
-    description = Column(String(255))
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False, index=True)
+    description: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     # Relationships
     permissions = relationship(
@@ -54,10 +54,14 @@ class Permission(BaseEntity):
 
     __tablename__ = "permissions"
 
-    name = Column(String(100), unique=True, nullable=False, index=True)
-    resource = Column(String(50), nullable=False, index=True)  # e.g., "user", "task", "project"
-    action = Column(String(50), nullable=False)  # e.g., "create", "read", "update", "delete"
-    description = Column(String(255))
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
+    resource: Mapped[str] = mapped_column(
+        String(50), nullable=False, index=True
+    )  # e.g., "user", "task", "project"
+    action: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )  # e.g., "create", "read", "update", "delete"
+    description: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     # Relationships
     roles = relationship(
