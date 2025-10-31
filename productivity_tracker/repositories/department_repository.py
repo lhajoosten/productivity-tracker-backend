@@ -24,7 +24,7 @@ class DepartmentRepository(BaseRepository[Department]):
         query = self.db.query(self.model).filter(self.model.organization_id == org_id)
         if not include_deleted:
             query = query.filter(self.model.is_deleted == False)  # noqa: E712
-        return list(query.offset(skip).limit(limit).all())
+        return list(query.offset(skip).limit(limit).all())  # type: ignore[return-value]
 
     def get_team_count(self, dept_id: UUID) -> int:
         """Get the count of teams in a department."""
@@ -40,7 +40,7 @@ class DepartmentRepository(BaseRepository[Department]):
         """Get the count of unique members across all teams in a department."""
         return (
             self.db.query(func.count(func.distinct(user_teams.c.user_id)))
-            .join(Team, user_teams.c.team_id == Team.id)
+            .join(Team, user_teams.c.team_id == Team.id)  # type: ignore[arg-type]
             .filter(Team.department_id == dept_id)
             .filter(Team.is_deleted == False)  # noqa: E712
             .scalar()
@@ -53,4 +53,4 @@ class DepartmentRepository(BaseRepository[Department]):
         query = self.db.query(self.model).filter(self.model.organization_id == org_id)
         if not include_deleted:
             query = query.filter(self.model.is_deleted == False)  # noqa: E712
-        return int(query.count())
+        return query.count()  # type: ignore[no-any-return]

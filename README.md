@@ -12,6 +12,19 @@
 
 A production-ready FastAPI backend for tracking productivity metrics with comprehensive authentication, authorization, and RBAC (Role-Based Access Control).
 
+## 📋 Current Status
+
+**🎯 Version:** v1.0 (Core Features) - **Production Ready**
+
+**✅ Implemented Features:**
+- Complete authentication & authorization system
+- Full RBAC with users, roles, and permissions
+- Organization management with departments and teams
+- Comprehensive API documentation
+- Production-grade security and error handling
+
+**🚧 In Development:** v1.1 features (audit logging, bulk operations, search)
+
 ## 📊 Code Coverage
 
 [![codecov](https://codecov.io/gh/lhajoosten/productivity-tracker-backend/branch/master/graph/badge.svg)](https://codecov.io/gh/lhajoosten/productivity-tracker-backend)
@@ -20,6 +33,8 @@ Current coverage: ![coverage](https://codecov.io/gh/lhajoosten/productivity-trac
 
 ## 🚀 Features
 
+### ✅ Core Features (v1.0 - Available Now)
+
 - **Authentication & Authorization**
   - JWT-based authentication with access and refresh tokens
   - Cookie-based session management
@@ -27,8 +42,14 @@ Current coverage: ![coverage](https://codecov.io/gh/lhajoosten/productivity-trac
   - Role-Based Access Control (RBAC)
   - Permission management system
 
+- **Organization Management**
+  - Multi-organization support
+  - Department hierarchy management
+  - Team creation and member management
+  - User assignment to organizations/departments/teams
+
 - **API Features**
-  - RESTful API design
+  - RESTful API design with versioning support
   - Automatic OpenAPI/Swagger documentation
   - Request/response validation with Pydantic
   - **User-friendly error handling with proper context**
@@ -55,6 +76,13 @@ Current coverage: ![coverage](https://codecov.io/gh/lhajoosten/productivity-trac
   - mypy type checking
   - Bandit security scanning
   - Comprehensive test coverage
+
+### 🔮 Planned Features
+
+- **v1.1:** Audit logging, bulk operations, data export, search
+- **v1.2:** Advanced permissions, organization settings, notifications
+- **v2.0:** Workspaces, projects, tasks, time tracking
+- **v3.0:** AI integration, smart insights, predictive analytics
 
 ## 📋 Requirements
 
@@ -143,6 +171,19 @@ The API will be available at:
 - **API**: <http://localhost:8500>
 - **Swagger UI**: <http://localhost:8500/docs>
 - **ReDoc**: <http://localhost:8500/redoc>
+
+### 🔄 API Versioning
+
+The API uses semantic versioning with the following structure:
+- **Current Version:** v1.0 (Production Ready)
+- **API Base Path:** `/api/v1.0/` or `/api/v1/` (major version alias)
+- **Feature Flags:** Controlled via version-specific feature toggles
+
+**Version Status:**
+- ✅ **v1.0** - Active (Core RBAC, Organizations, Teams, Departments)
+- 🚧 **v1.1** - In Development (Audit Logging, Bulk Operations, Search)
+- 📋 **v1.2** - Planned (Advanced Permissions, Notifications)
+- 🔮 **v2.0** - Future (Projects, Tasks, Time Tracking)
 
 ## 🧪 Testing
 
@@ -260,7 +301,7 @@ make downgrade
 
 ## 📚 API Documentation
 
-### Authentication Endpoints
+### 🔐 Authentication Endpoints
 
 - `POST /auth/register` - Register a new user
 - `POST /auth/login` - Login and receive access token
@@ -270,7 +311,7 @@ make downgrade
 - `PUT /auth/me` - Update current user
 - `PUT /auth/me/password` - Change password
 
-### User Management (Admin only)
+### 👥 User Management (Admin only)
 
 - `GET /auth/users` - List all users
 - `GET /auth/users/{user_id}` - Get user by ID
@@ -280,22 +321,84 @@ make downgrade
 - `POST /auth/users/{user_id}/deactivate` - Deactivate user
 - `POST /auth/users/{user_id}/roles` - Assign roles to user
 
-### Role Management (Admin only)
+### 🏢 Organization Management
+
+- `POST /organizations` - Create organization
+- `GET /organizations` - List all organizations
+- `GET /organizations/{org_id}` - Get organization by ID
+- `GET /organizations/current` - Get current user's organization
+- `PUT /organizations/{org_id}` - Update organization
+- `DELETE /organizations/{org_id}` - Delete organization
+- `POST /organizations/{org_id}/members/{user_id}` - Add member to organization
+- `DELETE /organizations/{org_id}/members/{user_id}` - Remove member from organization
+- `GET /organizations/{org_id}/members` - Get organization members
+
+### 🏬 Department Management
+
+- `POST /departments` - Create department
+- `GET /departments` - List all departments
+- `GET /departments/{dept_id}` - Get department by ID
+- `GET /departments/organization/{org_id}` - Get departments by organization
+- `PUT /departments/{dept_id}` - Update department
+- `DELETE /departments/{dept_id}` - Delete department
+
+### 👨‍👩‍👧‍👦 Team Management
+
+- `POST /teams` - Create team
+- `GET /teams` - List all teams
+- `GET /teams/{team_id}` - Get team by ID
+- `GET /teams/department/{dept_id}` - Get teams by department
+- `PUT /teams/{team_id}` - Update team
+- `DELETE /teams/{team_id}` - Delete team
+- `POST /teams/{team_id}/members` - Add member to team
+- `DELETE /teams/{team_id}/members` - Remove member from team
+- `GET /teams/{team_id}/members` - Get team members
+
+### 🎭 Role Management (Admin only)
 
 - `POST /roles/` - Create role
 - `GET /roles/` - List all roles
 - `GET /roles/{role_id}` - Get role by ID
+- `GET /roles/name/{role_name}` - Get role by name
 - `PUT /roles/{role_id}` - Update role
 - `DELETE /roles/{role_id}` - Delete role
 - `POST /roles/{role_id}/permissions` - Assign permissions to role
+- `DELETE /roles/{role_id}/permissions/{permission_id}` - Remove permission from role
 
-### Permission Management (Admin only)
+### 🔑 Permission Management (Admin only)
 
 - `POST /permissions/` - Create permission
 - `GET /permissions/` - List all permissions
 - `GET /permissions/{permission_id}` - Get permission by ID
 - `PUT /permissions/{permission_id}` - Update permission
 - `DELETE /permissions/{permission_id}` - Delete permission
+
+### 🏥 System Health
+
+- `GET /health` - Health check endpoint
+
+## 📈 API Overview
+
+The API currently provides **75+ endpoints** across **8 main modules**:
+
+| Module | Endpoints | Description |
+|--------|-----------|-------------|
+| **Authentication** | 14 | User registration, login, profile management |
+| **Organizations** | 8 | Multi-org support, member management |
+| **Departments** | 6 | Department hierarchy within organizations |
+| **Teams** | 7 | Team creation, member assignment |
+| **Roles** | 8 | Role-based access control |
+| **Permissions** | 5 | Granular permission management |
+| **Admin** | 3 | Administrative utilities |
+| **Health** | 1 | System monitoring |
+
+**Total Coverage:**
+- ✅ **Complete CRUD** operations for all entities
+- ✅ **Relationship management** between entities
+- ✅ **Soft delete** support across all models
+- ✅ **Pagination** on all list endpoints
+- ✅ **Filtering** by parent entities (org → dept → team)
+- ✅ **Member counting** and statistics
 
 ## 🏗️ Project Structure
 
@@ -304,8 +407,13 @@ productivity-tracker-backend/
 ├── productivity_tracker/
 │   ├── api/                    # API routes
 │   │   ├── auth.py            # Authentication endpoints
+│   │   ├── organizations.py   # Organization management
+│   │   ├── departments.py     # Department management
+│   │   ├── teams.py           # Team management
 │   │   ├── roles.py           # Role management
 │   │   ├── permissions.py     # Permission management
+│   │   ├── admin.py           # Admin utilities
+│   │   ├── setup.py           # API setup
 │   │   └── health.py          # Health check
 │   ├── core/                   # Core functionality
 │   │   ├── database.py        # Database connection
@@ -313,24 +421,43 @@ productivity-tracker-backend/
 │   │   ├── dependencies.py    # FastAPI dependencies
 │   │   ├── middleware.py      # Custom middleware
 │   │   ├── settings.py        # Configuration
-│   │   └── logging_config.py  # Logging setup
+│   │   ├── exceptions.py      # Custom exceptions
+│   │   ├── exception_filter.py # Global exception handling
+│   │   ├── logging_config.py  # Logging setup
+│   │   └── setup.py           # Core setup
 │   ├── database/
 │   │   └── entities/          # SQLAlchemy models
 │   │       ├── base.py        # Base entity
 │   │       ├── user.py        # User model
-│   │       └── role.py        # Role & Permission models
+│   │       ├── role.py        # Role & Permission models
+│   │       ├── organization.py # Organization model
+│   │       ├── department.py  # Department model
+│   │       └── team.py        # Team model
 │   ├── models/                 # Pydantic schemas
-│   │   └── auth.py            # Auth-related schemas
+│   │   ├── auth.py            # Auth-related schemas
+│   │   └── organization.py    # Organization schemas
 │   ├── repositories/           # Data access layer
 │   │   ├── base.py            # Base repository
 │   │   ├── user_repository.py
 │   │   ├── role_repository.py
-│   │   └── permission_repository.py
+│   │   ├── permission_repository.py
+│   │   ├── organization_repository.py
+│   │   ├── department_repository.py
+│   │   └── team_repository.py
 │   ├── services/               # Business logic
 │   │   ├── user_service.py
 │   │   ├── role_service.py
-│   │   └── permission_service.py
+│   │   ├── permission_service.py
+│   │   ├── organization_service.py
+│   │   ├── department_service.py
+│   │   └── team_service.py
+│   ├── versioning/             # API versioning
+│   │   ├── versioning.py      # Version definitions
+│   │   ├── utils.py           # Versioning utilities
+│   │   └── version.py         # Version helpers
 │   ├── scripts/                # Utility scripts
+│   │   ├── create_super_user.py
+│   │   └── seed_rbac.py
 │   ├── cli.py                  # CLI commands
 │   └── main.py                 # FastAPI application
 ├── migrations/                  # Alembic migrations

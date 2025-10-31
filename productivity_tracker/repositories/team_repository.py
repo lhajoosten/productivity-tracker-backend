@@ -24,7 +24,7 @@ class TeamRepository(BaseRepository[Team]):
         query = self.db.query(self.model).filter(self.model.department_id == dept_id)
         if not include_deleted:
             query = query.filter(self.model.is_deleted == False)  # noqa: E712
-        return list(query.offset(skip).limit(limit).all())
+        return list(query.offset(skip).limit(limit).all())  # type: ignore[return-value]
 
     def add_member(self, team_id: UUID, user_id: UUID) -> bool:
         """Add a user to a team."""
@@ -38,8 +38,8 @@ class TeamRepository(BaseRepository[Team]):
         exists = (
             self.db.query(user_teams)
             .filter(
-                user_teams.c.team_id == team_id,
-                user_teams.c.user_id == user_id,
+                user_teams.c.team_id == team_id,  # type: ignore[arg-type]
+                user_teams.c.user_id == user_id,  # type: ignore[arg-type]
             )
             .first()
         )
@@ -66,25 +66,25 @@ class TeamRepository(BaseRepository[Team]):
             )
         )
         self.db.commit()
-        return bool(result.rowcount > 0)
+        return bool(result.rowcount and result.rowcount > 0)  # type: ignore[attr-defined]
 
     def get_members(self, team_id: UUID, skip: int = 0, limit: int = 100) -> list[User]:
         """Get all members of a team."""
         return list(
             self.db.query(User)
             .join(user_teams)
-            .filter(user_teams.c.team_id == team_id)
+            .filter(user_teams.c.team_id == team_id)  # type: ignore[arg-type]
             .filter(User.is_deleted == False)  # noqa: E712
             .offset(skip)
             .limit(limit)
             .all()
-        )
+        )  # type: ignore[return-value]
 
     def get_member_count(self, team_id: UUID) -> int:
         """Get the count of members in a team."""
         return (
             self.db.query(func.count(user_teams.c.user_id))
-            .filter(user_teams.c.team_id == team_id)
+            .filter(user_teams.c.team_id == team_id)  # type: ignore[arg-type]
             .scalar()
             or 0
         )
@@ -95,7 +95,7 @@ class TeamRepository(BaseRepository[Team]):
         query = self.db.query(self.model).filter(self.model.department_id == dept_id)
         if not include_deleted:
             query = query.filter(self.model.is_deleted == False)  # noqa: E712
-        return int(query.count())
+        return query.count()  # type: ignore[no-any-return]
 
     def set_lead(self, team_id: UUID, user_id: UUID | None) -> bool:
         """Set or update the team lead."""

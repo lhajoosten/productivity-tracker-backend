@@ -2,6 +2,7 @@ import logging
 import time
 from collections import defaultdict
 from collections.abc import Callable
+from typing import Any
 
 from fastapi import Request
 from fastapi.exceptions import HTTPException, RequestValidationError
@@ -32,7 +33,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         else:
             return f"{client_host} | Unknown"
 
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         start_time = time.time()
         user_info = self._get_user_info(request)
 
@@ -95,12 +96,12 @@ class VersionHeaderMiddleware(BaseHTTPMiddleware):
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app, requests_per_minute: int = 60):
+    def __init__(self, app: Any, requests_per_minute: int = 60):
         super().__init__(app)
         self.requests_per_minute = requests_per_minute
         self.client_requests: dict[str, list[float]] = defaultdict(list)
 
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         client_ip = request.client.host if request.client else "unknown"
         now = time.time()
 

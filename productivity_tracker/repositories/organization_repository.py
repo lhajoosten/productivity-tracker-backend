@@ -27,7 +27,7 @@ class OrganizationRepository(BaseRepository[Organization]):
         if not include_deleted:
             query = query.filter(self.model.is_deleted == False)  # noqa: E712
         result = query.first()
-        return result if result is not None else None
+        return result if result else None
 
     def get_with_stats(self, org_id: UUID) -> Organization | None:
         """Get organization with member and department counts."""
@@ -46,8 +46,8 @@ class OrganizationRepository(BaseRepository[Organization]):
         exists = (
             self.db.query(user_organizations)
             .filter(
-                user_organizations.c.organization_id == org_id,
-                user_organizations.c.user_id == user_id,
+                user_organizations.c.organization_id == org_id,  # type: ignore[arg-type]
+                user_organizations.c.user_id == user_id,  # type: ignore[arg-type]
             )
             .first()
         )
@@ -74,25 +74,25 @@ class OrganizationRepository(BaseRepository[Organization]):
             )
         )
         self.db.commit()
-        return bool(result.rowcount > 0)
+        return bool(result.rowcount and result.rowcount > 0)  # type: ignore[attr-defined]
 
     def get_members(self, org_id: UUID, skip: int = 0, limit: int = 100) -> list[User]:
         """Get all members of an organization."""
         return list(
             self.db.query(User)
             .join(user_organizations)
-            .filter(user_organizations.c.organization_id == org_id)
+            .filter(user_organizations.c.organization_id == org_id)  # type: ignore[arg-type]
             .filter(User.is_deleted == False)  # noqa: E712
             .offset(skip)
             .limit(limit)
             .all()
-        )
+        )  # type: ignore[return-value]
 
     def get_member_count(self, org_id: UUID) -> int:
         """Get the count of members in an organization."""
         return (
             self.db.query(func.count(user_organizations.c.user_id))
-            .filter(user_organizations.c.organization_id == org_id)
+            .filter(user_organizations.c.organization_id == org_id)  # type: ignore[arg-type]
             .scalar()
             or 0
         )
