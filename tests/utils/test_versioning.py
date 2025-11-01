@@ -1,426 +1,607 @@
-from unittest.mock import patch
+"""
+Comprehensive tests for the versioning and feature flag system.
+
+Tests cover:
+- Version class and lifecycle management
+- Feature flag functionality
+- Version comparison and compatibility
+- Feature dependencies
+- Environment-specific toggles
+- Helper functions
+- Utility functions
+"""
+
+from datetime import date
+from unittest.mock import Mock
 
 import pytest
 
-from productivity_tracker.versioning.versioning import (
+from productivity_tracker.versioning import (  # Version constants; Mappings; Classes; Functions
+    ALL_VERSIONS,
     CURRENT_VERSION,
+    FEATURE_DEPENDENCIES,
+    LATEST_VERSION,
     V1_0,
     V1_1,
     V1_2,
     V2_0,
-    V2_1,
-    V2_2,
-    V3_0,
-    V3_1,
-    V3_2,
-    V3_3,
     VERSION_FEATURES,
-    APIVersion,
+    DeprecationInfo,
+    Feature,
+    Version,
+    VersionStatus,
+    check_feature_dependencies,
+    get_all_features_up_to_version,
+    get_enabled_features,
+    get_migration_path,
+    get_supported_versions,
+    get_version_from_string,
+    get_version_headers,
+    get_version_info,
     is_feature_enabled,
+)
+from productivity_tracker.versioning.utils import (
+    add_version_headers,
+    get_active_versions,
+    get_all_versions,
+    get_api_version_from_request,
+    get_deprecated_versions,
+    get_version_by_prefix,
+    is_version_accessible,
 )
 
 pytestmark = [pytest.mark.utils]
 
-
-# Mock versions for testing the versioning system mechanics
-MOCK_V1_0 = APIVersion(1, 0)
-MOCK_V1_1 = APIVersion(1, 1)
-MOCK_V2_0 = APIVersion(2, 0)
-MOCK_V2_1 = APIVersion(2, 1)
-MOCK_V3_0 = APIVersion(3, 0)
-MOCK_V3_1 = APIVersion(3, 1)
-
-# Mock feature configurations to test inheritance
-MOCK_BASE_FEATURES = {
-    "auth": False,
-    "users": False,
-    "advanced_feature": False,
-    "ai_feature": False,
-}
-
-MOCK_VERSION_CHANGES = {
-    MOCK_V1_0: {
-        "auth": True,
-        "users": True,
-    },
-    MOCK_V1_1: {},  # No new features - should inherit from V1.0
-    MOCK_V2_0: {
-        "advanced_feature": True,
-    },
-    MOCK_V2_1: {},  # No new features - should inherit from V2.0
-    MOCK_V3_0: {
-        "ai_feature": True,
-    },
-    MOCK_V3_1: {},  # No new features - should inherit from V3.0
-}
+# ============================================================================
+# Version Class Tests
+# ============================================================================
 
 
-def build_mock_features():
-    """Build mock feature dictionary with inheritance."""
-    result = {}
-    versions = sorted(MOCK_VERSION_CHANGES.keys(), key=lambda v: (v.major, v.minor))
+class TestVersionClass:
+    """Test the Version dataclass."""
 
-    for version in versions:
-        features = MOCK_BASE_FEATURES.copy()
+    def test_version_initialization(self):
+        """Test basic version initialization."""
+        v = Version(major=1, minor=0, patch=0)
+        assert v.major == 1
+        assert v.minor == 0
+        assert v.patch == 0
+        assert v.version_string == "1.0.0"
+        assert v.api_prefix == "/api/v1.0"
 
-        for prev in versions:
-            if prev.major < version.major or (
-                prev.major == version.major and prev.minor < version.minor
-            ):
-                features.update(MOCK_VERSION_CHANGES[prev])
+    def test_version_with_prerelease(self):
+        """Test version with prerelease tag."""
+        v = Version(major=1, minor=0, patch=0, prerelease="beta")
+        assert v.version_string == "1.0.0-beta"
+        assert str(v) == "1.0.0-beta"
 
-        features.update(MOCK_VERSION_CHANGES[version])
-        result[version] = features
-
-    return result
-
-
-MOCK_VERSION_FEATURES = build_mock_features()
-
-
-class TestVersionDefinitions:
-    """Test that the current production version is properly defined."""
-
-    def test_current_version_is_v1_0(self):
-        """Current version should be V1.0."""
-        assert CURRENT_VERSION == V1_0
-        assert CURRENT_VERSION.major == 1
-        assert CURRENT_VERSION.minor == 0
-
-    def test_all_versions_have_features(self):
-        """All defined versions should have feature mappings."""
-        versions = [V1_0, V1_1, V1_2, V2_0, V2_1, V2_2, V3_0, V3_1, V3_2, V3_3]
-        for version in versions:
-            assert version in VERSION_FEATURES
-            assert isinstance(VERSION_FEATURES[version], dict)
-
-    def test_current_version_is_valid(self):
-        """Current version should be in VERSION_FEATURES."""
-        assert CURRENT_VERSION in VERSION_FEATURES
-
-
-class TestV1ProductionFeatures:
-    """Test V1.0 production features (currently implemented)."""
-
-    def test_v1_0_has_core_features(self):
-        """V1.0 should have all core features enabled."""
-        features = VERSION_FEATURES[V1_0]
-
-        # Core features enabled in production
-        assert features["auth"] is True
-        assert features["rbac"] is True
-        assert features["users"] is True
-        assert features["roles"] is True
-        assert features["permissions"] is True
-        assert features["health"] is True
-        assert features["organizations"] is True
-        assert features["departments"] is True
-        assert features["teams"] is True
-
-    def test_v1_0_future_features_disabled(self):
-        """V1.0 should have all future features disabled."""
-        features = VERSION_FEATURES[V1_0]
-
-        # V1.1+ features not yet implemented
-        assert features.get("audit_logging", False) is False
-        assert features.get("bulk_operations", False) is False
-        assert features.get("data_export", False) is False
-        assert features.get("search", False) is False
-
-        # V2.0+ features not yet implemented
-        assert features.get("workspaces", False) is False
-        assert features.get("projects", False) is False
-        assert features.get("tasks", False) is False
-        assert features.get("time_tracking", False) is False
-
-        # V3.0+ features not yet implemented
-        assert features.get("ai_integration", False) is False
-        assert features.get("smart_insights", False) is False
-
-
-class TestVersioningSystemMechanics:
-    """Test the versioning system mechanics using mock data."""
-
-    def test_feature_inheritance_mock(self):
-        """Patch versions should inherit features from base version."""
-        # V1.1 should have V1.0 features
-        assert MOCK_VERSION_FEATURES[MOCK_V1_1]["auth"] is True
-        assert MOCK_VERSION_FEATURES[MOCK_V1_1]["users"] is True
-        assert MOCK_VERSION_FEATURES[MOCK_V1_1]["advanced_feature"] is False
-
-        # V2.1 should have V1.0 + V2.0 features
-        assert MOCK_VERSION_FEATURES[MOCK_V2_1]["auth"] is True
-        assert MOCK_VERSION_FEATURES[MOCK_V2_1]["users"] is True
-        assert MOCK_VERSION_FEATURES[MOCK_V2_1]["advanced_feature"] is True
-        assert MOCK_VERSION_FEATURES[MOCK_V2_1]["ai_feature"] is False
-
-        # V3.1 should have all previous features
-        assert MOCK_VERSION_FEATURES[MOCK_V3_1]["auth"] is True
-        assert MOCK_VERSION_FEATURES[MOCK_V3_1]["users"] is True
-        assert MOCK_VERSION_FEATURES[MOCK_V3_1]["advanced_feature"] is True
-        assert MOCK_VERSION_FEATURES[MOCK_V3_1]["ai_feature"] is True
-
-    def test_patch_versions_identical_to_base_mock(self):
-        """Patch versions without changes should match their base version."""
-        # V1.1 should equal V1.0 (no new features)
-        assert MOCK_VERSION_FEATURES[MOCK_V1_0] == MOCK_VERSION_FEATURES[MOCK_V1_1]
-
-        # V2.1 should equal V2.0 (no new features)
-        assert MOCK_VERSION_FEATURES[MOCK_V2_0] == MOCK_VERSION_FEATURES[MOCK_V2_1]
-
-        # V3.1 should equal V3.0 (no new features)
-        assert MOCK_VERSION_FEATURES[MOCK_V3_0] == MOCK_VERSION_FEATURES[MOCK_V3_1]
-
-    def test_major_versions_add_features_mock(self):
-        """Major versions should add new features."""
-        # V2.0 should have everything from V1.0 plus new features
-        v1_features = MOCK_VERSION_FEATURES[MOCK_V1_0]
-        v2_features = MOCK_VERSION_FEATURES[MOCK_V2_0]
-
-        assert v2_features["auth"] == v1_features["auth"]
-        assert v2_features["users"] == v1_features["users"]
-        assert v2_features["advanced_feature"] is True  # New in V2
-
-        # V3.0 should have everything from V2.0 plus new features
-        v3_features = MOCK_VERSION_FEATURES[MOCK_V3_0]
-
-        assert v3_features["auth"] == v2_features["auth"]
-        assert v3_features["advanced_feature"] == v2_features["advanced_feature"]
-        assert v3_features["ai_feature"] is True  # New in V3
-
-
-class TestFeatureInheritance:
-    """Test that patch versions inherit features correctly in production."""
-
-    def test_v1_patches_have_same_core_features(self):
-        """V1.1 and V1.2 should have same core features enabled as V1.0."""
-        # Core features should be enabled in all V1.x versions
-        core_features = [
-            "auth",
-            "rbac",
-            "users",
-            "roles",
-            "permissions",
-            "health",
-            "organizations",
-            "departments",
-            "teams",
-        ]
-
-        for feature in core_features:
-            assert VERSION_FEATURES[V1_0][feature] is True
-            assert VERSION_FEATURES[V1_1][feature] is True
-            assert VERSION_FEATURES[V1_2][feature] is True
-
-    def test_v1_patches_no_new_enabled_features(self):
-        """V1.1 and V1.2 should not have any new features enabled beyond V1.0."""
-        # Count enabled features in each version
-        v1_0_enabled = sum(1 for v in VERSION_FEATURES[V1_0].values() if v is True)
-        v1_1_enabled = sum(1 for v in VERSION_FEATURES[V1_1].values() if v is True)
-        v1_2_enabled = sum(1 for v in VERSION_FEATURES[V1_2].values() if v is True)
-
-        # All V1.x should have same number of enabled features
-        assert v1_0_enabled == v1_1_enabled
-        assert v1_1_enabled == v1_2_enabled
-
-    def test_future_versions_defined(self):
-        """Future versions should be defined but not necessarily implemented."""
-        # Just verify they exist in VERSION_FEATURES
-        assert V2_0 in VERSION_FEATURES
-        assert V2_1 in VERSION_FEATURES
-        assert V2_2 in VERSION_FEATURES
-        assert V3_0 in VERSION_FEATURES
-        assert V3_1 in VERSION_FEATURES
-        assert V3_2 in VERSION_FEATURES
-        assert V3_3 in VERSION_FEATURES
-
-
-class TestIsFeatureEnabled:
-    """Test the is_feature_enabled helper function."""
-
-    def test_enabled_feature_returns_true(self):
-        """Should return True for enabled features in V1.0."""
-        assert is_feature_enabled(V1_0, "auth") is True
-        assert is_feature_enabled(V1_0, "rbac") is True
-        assert is_feature_enabled(V1_0, "users") is True
-        assert is_feature_enabled(V1_0, "organizations") is True
-
-    def test_disabled_feature_returns_false(self):
-        """Should return False for disabled/future features in V1.0."""
-        assert is_feature_enabled(V1_0, "audit_logging") is False
-        assert is_feature_enabled(V1_0, "time_tracking") is False
-        assert is_feature_enabled(V1_0, "ai_integration") is False
-
-    def test_nonexistent_feature_returns_false(self):
-        """Should return False for non-existent features."""
-        assert is_feature_enabled(V1_0, "nonexistent") is False
-        assert is_feature_enabled(V1_0, "invalid_feature") is False
-
-    @patch("productivity_tracker.versioning.versioning.VERSION_FEATURES", MOCK_VERSION_FEATURES)
-    def test_feature_enabled_with_mocks(self):
-        """Test feature enabling works correctly with mock data."""
-        assert is_feature_enabled(MOCK_V1_0, "auth") is True
-        assert is_feature_enabled(MOCK_V2_0, "advanced_feature") is True
-        assert is_feature_enabled(MOCK_V3_0, "ai_feature") is True
-        assert is_feature_enabled(MOCK_V1_0, "advanced_feature") is False
-
-
-class TestAPIVersionDataclass:
-    """Test the APIVersion dataclass."""
-
-    def test_version_prefix(self):
-        """Should generate correct API prefix."""
-        v = APIVersion(1, 0)
-        assert v.prefix == "/api/v1.0"
-
-    def test_version_major_prefix(self):
-        """Should generate correct major version prefix."""
-        v = APIVersion(2, 5)
-        assert v.major_prefix == "/api/v2"
+    def test_version_with_build_metadata(self):
+        """Test version with build metadata."""
+        v = Version(major=1, minor=0, patch=0, build_metadata="20250101")
+        assert v.version_string == "1.0.0+20250101"
 
     def test_version_string_representation(self):
-        """Should have correct string representation."""
-        v = APIVersion(3, 2)
-        assert str(v) == "v3.2"
-        assert repr(v) == "APIVersion(3.2)"
+        """Test __str__ and __repr__."""
+        v = Version(major=2, minor=3, patch=1, status=VersionStatus.ACTIVE)
+        assert str(v) == "2.3.1"
+        assert "2.3.1" in repr(v)
+        assert "active" in repr(v)
 
-    def test_version_hashable(self):
-        """Versions should be hashable for use in sets/dicts."""
-        v1 = APIVersion(1, 0)
-        v2 = APIVersion(1, 0)
-        v3 = APIVersion(2, 0)
+    def test_version_equality(self):
+        """Test version equality comparison."""
+        v1 = Version(major=1, minor=0, patch=0)
+        v2 = Version(major=1, minor=0, patch=0)
+        v3 = Version(major=1, minor=0, patch=1)
+
+        assert v1 == v2
+        assert v1 != v3
+
+    def test_version_comparison_major(self):
+        """Test version comparison on major version."""
+        v1 = Version(major=1, minor=0, patch=0)
+        v2 = Version(major=2, minor=0, patch=0)
+
+        assert v1 < v2
+        assert v2 > v1
+        assert v1 <= v2
+        assert v2 >= v1
+
+    def test_version_comparison_minor(self):
+        """Test version comparison on minor version."""
+        v1 = Version(major=1, minor=0, patch=0)
+        v2 = Version(major=1, minor=1, patch=0)
+
+        assert v1 < v2
+        assert v2 > v1
+
+    def test_version_comparison_patch(self):
+        """Test version comparison on patch version."""
+        v1 = Version(major=1, minor=0, patch=0)
+        v2 = Version(major=1, minor=0, patch=1)
+
+        assert v1 < v2
+        assert v2 > v1
+
+    def test_version_comparison_prerelease(self):
+        """Test that stable version is greater than prerelease."""
+        v1 = Version(major=1, minor=0, patch=0, prerelease="beta")
+        v2 = Version(major=1, minor=0, patch=0)
+
+        assert v1 < v2  # prerelease < stable
+        assert v2 > v1
+
+    def test_version_hash(self):
+        """Test version hashing for use in dicts/sets."""
+        v1 = Version(major=1, minor=0, patch=0)
+        v2 = Version(major=1, minor=0, patch=0)
+        v3 = Version(major=2, minor=0, patch=0)
 
         assert hash(v1) == hash(v2)
         assert hash(v1) != hash(v3)
 
-        # Can be used in sets
-        versions = {v1, v2, v3}
-        assert len(versions) == 2  # v1 and v2 are identical
+        # Test usage in set
+        version_set = {v1, v2, v3}
+        assert len(version_set) == 2  # v1 and v2 are equal
+
+    def test_version_compatibility(self):
+        """Test version compatibility (same major version)."""
+        v1_0 = Version(major=1, minor=0, patch=0)
+        v1_1 = Version(major=1, minor=1, patch=0)
+        v2_0 = Version(major=2, minor=0, patch=0)
+
+        assert v1_0.is_compatible_with(v1_1)
+        assert not v1_0.is_compatible_with(v2_0)
+
+    def test_breaking_change_detection(self):
+        """Test breaking change detection."""
+        v1_0 = Version(major=1, minor=0, patch=0)
+        v1_1 = Version(major=1, minor=1, patch=0)
+        v2_0 = Version(major=2, minor=0, patch=0)
+
+        assert not v1_1.is_breaking_change_from(v1_0)
+        assert v2_0.is_breaking_change_from(v1_0)
+
+    def test_version_lifecycle_states(self):
+        """Test version lifecycle status checks."""
+        v_planned = Version(major=1, minor=0, patch=0, status=VersionStatus.PLANNED)
+        v_active = Version(major=1, minor=0, patch=0, status=VersionStatus.ACTIVE)
+        v_deprecated = Version(major=1, minor=0, patch=0, status=VersionStatus.DEPRECATED)
+        v_eol = Version(major=1, minor=0, patch=0, status=VersionStatus.EOL)
+
+        # Supported versions
+        assert not v_planned.is_supported()
+        assert v_active.is_supported()
+        assert not v_deprecated.is_supported()
+        assert not v_eol.is_supported()
+
+        # Deprecated check
+        assert v_deprecated.is_deprecated()
+        assert not v_active.is_deprecated()
+
+        # EOL check
+        assert v_eol.is_eol()
+        assert not v_active.is_eol()
+
+    def test_version_eol_date(self):
+        """Test EOL date checking."""
+        past_date = date(2024, 1, 1)
+        future_date = date(2026, 1, 1)
+
+        v_past = Version(major=1, minor=0, patch=0, eol_date=past_date)
+        v_future = Version(major=1, minor=0, patch=0, eol_date=future_date)
+
+        assert v_past.is_eol()  # EOL date has passed
+        assert not v_future.is_eol()  # EOL date in future
+
+    def test_version_to_dict(self):
+        """Test version serialization to dict."""
+        v = Version(
+            major=1,
+            minor=2,
+            patch=3,
+            prerelease="beta",
+            status=VersionStatus.ACTIVE,
+            release_date=date(2025, 1, 1),
+            docs_url="/docs",
+        )
+
+        data = v.to_dict()
+
+        assert data["version"] == "1.2.3-beta"
+        assert data["major"] == 1
+        assert data["minor"] == 2
+        assert data["patch"] == 3
+        assert data["prerelease"] == "beta"
+        assert data["status"] == "active"
+        assert data["release_date"] == "2025-01-01"
+        assert data["api_prefix"] == "/api/v1.2"
+        assert data["docs_url"] == "/docs"
 
 
-class TestVersioningUtils:
-    """Test versioning utility functions."""
+# ============================================================================
+# Feature Flag Tests
+# ============================================================================
+
+
+class TestFeatureFlags:
+    """Test feature flag functionality."""
+
+    def test_feature_enum_values(self):
+        """Test that Feature enum has expected values."""
+        assert Feature.JWT_AUTHENTICATION.value == "jwt_authentication"
+        assert Feature.TASK_MANAGEMENT.value == "task_management"
+        assert Feature.RBAC_SYSTEM.value == "rbac_system"
+
+    def test_is_feature_enabled_current_version(self):
+        """Test feature checking against current version."""
+        # V1.0 features should be enabled
+        assert is_feature_enabled(Feature.JWT_AUTHENTICATION)
+        assert is_feature_enabled(Feature.ORGANIZATION_MANAGEMENT)
+
+        # Future features should not be enabled
+        assert not is_feature_enabled(Feature.TASK_MANAGEMENT)  # V1.2
+        assert not is_feature_enabled(Feature.AI_PRODUCTIVITY_PATTERNS)  # V2.1
+
+    def test_is_feature_enabled_specific_version(self):
+        """Test feature checking against specific version."""
+        # Check features against V1.2
+        assert is_feature_enabled(Feature.TASK_MANAGEMENT, version=V1_2)
+        assert is_feature_enabled(Feature.JWT_AUTHENTICATION, version=V1_2)  # Inherited
+
+        # V1.3 features not enabled in V1.2
+        assert not is_feature_enabled(Feature.ANALYTICS_DASHBOARD, version=V1_2)
+
+    def test_is_feature_enabled_environment(self):
+        """Test environment-specific feature toggles."""
+        # In development, all features should be enabled
+        assert is_feature_enabled(Feature.TASK_MANAGEMENT, environment="development")
+        assert is_feature_enabled(Feature.AI_PRODUCTIVITY_PATTERNS, environment="development")
+
+        # In production, only current version features
+        assert not is_feature_enabled(Feature.TASK_MANAGEMENT, environment="production")
+
+    def test_get_all_features_up_to_version(self):
+        """Test cumulative feature retrieval."""
+        v1_0_features = get_all_features_up_to_version(V1_0)
+        v1_2_features = get_all_features_up_to_version(V1_2)
+
+        # V1.2 should include V1.0, V1.1, and V1.2 features
+        assert len(v1_2_features) > len(v1_0_features)
+
+        # V1.0 features should be in V1.2
+        assert Feature.JWT_AUTHENTICATION in v1_2_features
+
+        # V1.2 specific features
+        assert Feature.TASK_MANAGEMENT in v1_2_features
+
+    def test_get_enabled_features(self):
+        """Test getting all enabled features."""
+        features = get_enabled_features()
+
+        # Current version features should be enabled
+        assert Feature.JWT_AUTHENTICATION in features
+        assert Feature.ORGANIZATION_MANAGEMENT in features
+
+        # Future features should not be
+        assert Feature.TASK_MANAGEMENT not in features
+
+    def test_feature_dependencies(self):
+        """Test feature dependency system."""
+        # Smart task suggestions requires task management + AI
+        deps = FEATURE_DEPENDENCIES.get(Feature.SMART_TASK_SUGGESTIONS, set())
+
+        assert Feature.TASK_MANAGEMENT in deps
+        assert Feature.AI_PRODUCTIVITY_PATTERNS in deps
+
+    def test_check_feature_dependencies_satisfied(self):
+        """Test dependency checking when satisfied."""
+        # JWT_AUTHENTICATION has no dependencies
+        assert check_feature_dependencies(Feature.JWT_AUTHENTICATION)
+
+    def test_check_feature_dependencies_not_satisfied(self):
+        """Test dependency checking when not satisfied."""
+        # SMART_TASK_SUGGESTIONS requires features not in V1.0
+        assert not check_feature_dependencies(Feature.SMART_TASK_SUGGESTIONS, version=V1_0)
+
+
+# ============================================================================
+# Version Helper Function Tests
+# ============================================================================
+
+
+class TestVersionHelpers:
+    """Test version helper functions."""
+
+    def test_get_supported_versions(self):
+        """Test getting supported versions."""
+        supported = get_supported_versions()
+
+        # V1.0 is ACTIVE (supported)
+        assert V1_0 in supported
+
+        # Planned versions are not supported
+        assert V1_1 not in supported  # PLANNED
+
+    def test_get_version_from_string_valid(self):
+        """Test parsing valid version strings."""
+        v = get_version_from_string("1.0")
+        assert v == V1_0
+
+        v = get_version_from_string("1.1")
+        assert v == V1_1
+
+        v = get_version_from_string("v2.0")  # with 'v' prefix
+        assert v == V2_0
+
+    def test_get_version_from_string_invalid(self):
+        """Test parsing invalid version strings."""
+        assert get_version_from_string("99.99") is None
+        assert get_version_from_string("invalid") is None
+        assert get_version_from_string("") is None
+
+    def test_get_version_headers(self):
+        """Test version header generation."""
+        headers = get_version_headers(V1_0)
+
+        assert "API-Version" in headers
+        assert headers["API-Version"] == V1_0.version_string
+        assert "API-Status" in headers
+        assert headers["API-Status"] == V1_0.status.value
+        assert "API-Deprecated" in headers
+        assert headers["API-Deprecated"] == "false"
+
+    def test_get_version_headers_deprecated(self):
+        """Test headers for deprecated version."""
+        v_deprecated = Version(
+            major=0,
+            minor=9,
+            patch=0,
+            status=VersionStatus.DEPRECATED,
+            eol_date=date(2025, 12, 31),
+        )
+
+        headers = get_version_headers(v_deprecated)
+
+        assert headers["API-Deprecated"] == "true"
+        assert "Sunset" in headers  # RFC 8594 sunset header
+
+    def test_get_version_info(self):
+        """Test getting detailed version information."""
+        info = get_version_info(V1_0)
+
+        assert "version" in info
+        assert "features" in info
+        assert "compatibility" in info
+
+        assert info["features"]["total"] > 0
+        assert info["compatibility"]["supported"]
+        assert not info["compatibility"]["deprecated"]
+
+    def test_get_migration_path(self):
+        """Test migration path calculation."""
+        migration = get_migration_path(V1_0, V1_2)
+
+        assert migration["from_version"] == str(V1_0)
+        assert migration["to_version"] == str(V1_2)
+        assert not migration["breaking_change"]  # Same major version
+        assert migration["new_features_count"] > 0
+        assert V1_1.version_string in migration["intermediate_versions"]
+
+    def test_get_migration_path_breaking_change(self):
+        """Test migration with breaking changes."""
+        migration = get_migration_path(V1_0, V2_0)
+
+        assert migration["breaking_change"]  # Major version change
+        assert not migration["rollback_supported"]
+
+
+# ============================================================================
+# Utility Function Tests
+# ============================================================================
+
+
+class TestUtilityFunctions:
+    """Test utility functions from utils.py."""
 
     def test_get_all_versions(self):
-        """Should return all registered versions."""
-        from productivity_tracker.versioning.utils import get_all_registered_versions
+        """Test getting all supported versions."""
+        versions = get_all_versions()
 
-        versions = get_all_registered_versions()
-        assert isinstance(versions, list)
-        assert len(versions) == 10  # V1.0-V3.3
-        assert all(v.prefix.startswith("/api/v") for v in versions)
+        # Should include supported versions (ACTIVE, BETA, RC, MAINTENANCE)
+        assert len(versions) >= 1
+        assert V1_0 in versions  # ACTIVE
+
+    def test_get_active_versions(self):
+        """Test getting only active versions."""
+        active = get_active_versions()
+
+        assert V1_0 in active  # status=ACTIVE
+        assert all(v.status == VersionStatus.ACTIVE for v in active)
+
+    def test_get_deprecated_versions(self):
+        """Test getting deprecated versions."""
+        deprecated = get_deprecated_versions()
+
+        # Currently no deprecated versions
+        assert isinstance(deprecated, list)
 
     def test_get_version_by_prefix(self):
-        """Should find version by its prefix."""
-        from productivity_tracker.versioning.utils import get_version_by_prefix
+        """Test getting version by API prefix."""
+        v = get_version_by_prefix("/api/v1.0")
+        assert v == V1_0
 
-        v1 = get_version_by_prefix("/api/v1.0")
-        assert v1 == V1_0
+        v = get_version_by_prefix("/api/v1.2")
+        assert v == V1_2
 
-        v2 = get_version_by_prefix("/api/v2.1")
-        assert v2 == V2_1
-
-        v3 = get_version_by_prefix("/api/v3.2")
-        assert v3 == V3_2
-
-    def test_get_version_by_invalid_prefix(self):
-        """Should return None for invalid prefix."""
-        from productivity_tracker.versioning.utils import get_version_by_prefix
-
-        result = get_version_by_prefix("/api/v99.0")
-        assert result is None
-
-    def test_iter_versions(self):
-        """Should iterate over all versions."""
-        from productivity_tracker.versioning.utils import iter_versions
-
-        versions = list(iter_versions())
-        assert len(versions) == 10
-        assert V1_0 in versions
-        assert V3_3 in versions
-
-    def test_add_version_headers(self):
-        """Should add version headers to response."""
-        from fastapi import Response
-
-        from productivity_tracker.versioning.utils import add_version_headers
-
-        response = Response()
-        result = add_version_headers(response, V2_0)
-
-        assert "X-API-Version" in result.headers
-        assert result.headers["X-API-Version"] == "v2.0"
-
-    def test_add_version_headers_deprecated(self):
-        """Should add deprecation warning for deprecated versions."""
-        from fastapi import Response
-
-        from productivity_tracker.versioning.utils import add_version_headers
-        from productivity_tracker.versioning.versioning import DEPRECATED_VERSIONS
-
-        # Use first deprecated version
-        if DEPRECATED_VERSIONS:
-            deprecated_version = list(DEPRECATED_VERSIONS)[0]
-            response = Response()
-            result = add_version_headers(response, deprecated_version)
-
-            assert "Warning" in result.headers
-            assert "deprecated" in result.headers["Warning"].lower()
-
-    def test_get_api_version_from_request(self):
-        """Should extract version from request path."""
-        from fastapi import Request
-
-        from productivity_tracker.versioning.utils import get_api_version_from_request
-
-        # Create mock request
-        scope = {
-            "type": "http",
-            "method": "GET",
-            "path": "/api/v1.0/auth/login",
-            "query_string": b"",
-            "headers": [],
-        }
-        request = Request(scope)
-
-        version = get_api_version_from_request(request)
-        assert version == V1_0
-
-    def test_get_api_version_from_request_defaults_to_current(self):
-        """Should default to current version if no match."""
-        from fastapi import Request
-
-        from productivity_tracker.versioning.utils import get_api_version_from_request
-
-        scope = {
-            "type": "http",
-            "method": "GET",
-            "path": "/unknown/path",
-            "query_string": b"",
-            "headers": [],
-        }
-        request = Request(scope)
-
-        version = get_api_version_from_request(request)
-        assert version == CURRENT_VERSION
+        v = get_version_by_prefix("/api/v99.99")
+        assert v is None
 
     def test_is_version_accessible(self):
-        from productivity_tracker.versioning.utils import is_version_accessible
-        from productivity_tracker.versioning.versioning import (
-            ACTIVE_VERSIONS,
-            DEPRECATED_VERSIONS,
+        """Test version accessibility check."""
+        # Active versions are accessible
+        assert is_version_accessible(V1_0)
+
+        # Planned versions are not accessible
+        assert not is_version_accessible(V1_1)
+
+    def test_add_version_headers_to_response(self):
+        """Test adding version headers to response."""
+        from fastapi import Response
+
+        response = Response()
+        response = add_version_headers(response, V1_0)
+
+        assert "API-Version" in response.headers
+        assert response.headers["API-Version"] == str(V1_0)
+        assert "X-API-Version" in response.headers  # Legacy header
+
+    def test_get_api_version_from_request(self):
+        """Test extracting version from request path."""
+        from fastapi import Request
+
+        # Mock request with version in path
+        mock_request = Mock(spec=Request)
+        mock_request.url.path = "/api/v1.0/health"
+
+        version = get_api_version_from_request(mock_request)
+        assert version == V1_0
+
+    def test_get_api_version_from_request_no_version(self):
+        """Test extracting version when no version in path."""
+        from fastapi import Request
+
+        mock_request = Mock(spec=Request)
+        mock_request.url.path = "/admin/users"
+
+        version = get_api_version_from_request(mock_request)
+        assert version == CURRENT_VERSION  # Falls back to current
+
+
+# ============================================================================
+# Integration Tests
+# ============================================================================
+
+
+class TestVersioningIntegration:
+    """Integration tests for versioning system."""
+
+    def test_current_version_is_defined(self):
+        """Test that CURRENT_VERSION is properly defined."""
+        assert CURRENT_VERSION is not None
+        assert isinstance(CURRENT_VERSION, Version)
+        assert CURRENT_VERSION == V1_0
+
+    def test_latest_version_is_defined(self):
+        """Test that LATEST_VERSION is properly defined."""
+        assert LATEST_VERSION is not None
+        assert isinstance(LATEST_VERSION, Version)
+
+    def test_all_versions_defined(self):
+        """Test that all versions are in ALL_VERSIONS."""
+        assert len(ALL_VERSIONS) == 11  # V1.0 through V2.3
+        assert V1_0 in ALL_VERSIONS
+        assert V1_1 in ALL_VERSIONS
+        assert V2_0 in ALL_VERSIONS
+
+    def test_version_features_mapping_complete(self):
+        """Test that all versions have feature mappings."""
+        for version in ALL_VERSIONS:
+            assert version in VERSION_FEATURES
+            features = VERSION_FEATURES[version]
+            assert isinstance(features, set)
+
+    def test_v1_0_features_correct(self):
+        """Test that V1.0 has correct features."""
+        v1_0_features = VERSION_FEATURES[V1_0]
+
+        expected_features = {
+            Feature.ORGANIZATION_MANAGEMENT,
+            Feature.DEPARTMENT_MANAGEMENT,
+            Feature.TEAM_MANAGEMENT,
+            Feature.USER_MANAGEMENT,
+            Feature.RBAC_SYSTEM,
+            Feature.PERMISSION_SYSTEM,
+            Feature.JWT_AUTHENTICATION,
+            Feature.HEALTH_CHECKS,
+            Feature.API_DOCUMENTATION,
+            Feature.ERROR_HANDLING,
+            Feature.DATABASE_MIGRATIONS,
+        }
+
+        assert v1_0_features == expected_features
+
+    def test_feature_dependencies_are_valid(self):
+        """Test that all feature dependencies reference valid features."""
+        for feature, deps in FEATURE_DEPENDENCIES.items():
+            assert isinstance(feature, Feature)
+            for dep in deps:
+                assert isinstance(dep, Feature)
+
+    def test_version_sorting(self):
+        """Test that versions can be sorted correctly."""
+        versions = [V2_0, V1_0, V1_2, V1_1]
+        sorted_versions = sorted(versions)
+
+        assert sorted_versions == [V1_0, V1_1, V1_2, V2_0]
+
+    def test_version_prefix_format(self):
+        """Test that all versions have correct API prefix format."""
+        for version in ALL_VERSIONS:
+            assert version.api_prefix.startswith("/api/v")
+            assert f"{version.major}.{version.minor}" in version.api_prefix
+
+
+# ============================================================================
+# Deprecation Tests
+# ============================================================================
+
+
+class TestDeprecation:
+    """Test deprecation functionality."""
+
+    def test_deprecation_info_structure(self):
+        """Test DeprecationInfo dataclass."""
+        info = DeprecationInfo(
+            sunset_date=date(2026, 12, 31),
+            replacement="JWT_AUTHENTICATION",
+            migration_guide="/docs/migration",
+            reason="Enhanced security",
         )
 
-        for version in ACTIVE_VERSIONS:
-            assert is_version_accessible(version) is True
-        for version in DEPRECATED_VERSIONS:
-            assert is_version_accessible(version) is True
+        assert info.sunset_date == date(2026, 12, 31)
+        assert info.replacement == "JWT_AUTHENTICATION"
+        assert info.migration_guide == "/docs/migration"
+        assert info.reason == "Enhanced security"
 
-    def test_is_version_deprecated(self):
-        from productivity_tracker.versioning.versioning import (
-            DEPRECATED_VERSIONS,
-            is_version_deprecated,
-        )
 
-        for version in DEPRECATED_VERSIONS:
-            assert is_version_deprecated(version) is True
+# ============================================================================
+# Edge Cases and Error Handling
+# ============================================================================
+
+
+class TestEdgeCases:
+    """Test edge cases and error handling."""
+
+    def test_version_comparison_with_none(self):
+        """Test that version comparison handles None gracefully."""
+        v = Version(major=1, minor=0, patch=0)
+
+        # Should return NotImplemented for invalid comparisons
+        assert v.__eq__(None) == NotImplemented
+
+    def test_empty_feature_set(self):
+        """Test handling of versions with no features."""
+        # This shouldn't happen in practice, but test the system handles it
+        features = get_all_features_up_to_version(V1_0)
+        assert len(features) > 0  # V1.0 has features
+
+    def test_get_enabled_features_no_version(self):
+        """Test get_enabled_features with no version defaults to CURRENT."""
+        features_default = get_enabled_features()
+        features_current = get_enabled_features(version=CURRENT_VERSION)
+
+        assert features_default == features_current
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

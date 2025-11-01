@@ -9,12 +9,9 @@ from productivity_tracker.api.permissions import router as permissions_router
 from productivity_tracker.api.roles import router as roles_router
 from productivity_tracker.api.teams import router as teams_router
 from productivity_tracker.core.logging_config import get_logger
-from productivity_tracker.versioning.utils import (
-    get_latest_version,
-    get_version_by_prefix,
-)
-from productivity_tracker.versioning.versioning import (
+from productivity_tracker.versioning import (
     CURRENT_VERSION,
+    Feature,
     is_feature_enabled,
 )
 
@@ -26,56 +23,50 @@ def setup_versioned_routers(app: FastAPI) -> None:
     Configure all versioned routers for the application based on feature flags.
     Routers are included conditionally based on the features enabled for the current API version.
     """
-    logger.info("Setting up versioned routers")
+    logger.info(f"Setting up versioned routers for {CURRENT_VERSION}")
 
-    # super_user only /admin route
-    app.include_router(admin_router, prefix="/admin")
+    # Admin route (super_user only, not versioned)
+    app.include_router(admin_router, prefix="/admin", tags=["Admin"])
 
-    if is_feature_enabled(CURRENT_VERSION, "health"):
+    # Health checks - always available
+    if is_feature_enabled(Feature.HEALTH_CHECKS):
         logger.info("Adding health router")
-        app.include_router(health_router, prefix=CURRENT_VERSION.prefix, tags=["Health"])
+        app.include_router(health_router, prefix=CURRENT_VERSION.api_prefix, tags=["Health"])
 
-    if is_feature_enabled(CURRENT_VERSION, "auth"):
+    # Authentication
+    if is_feature_enabled(Feature.JWT_AUTHENTICATION):
         logger.info("Adding auth router")
-        app.include_router(auth_router, prefix=CURRENT_VERSION.prefix, tags=["Authentication"])
+        app.include_router(auth_router, prefix=CURRENT_VERSION.api_prefix, tags=["Authentication"])
 
-    if is_feature_enabled(CURRENT_VERSION, "roles"):
+    # RBAC - Roles
+    if is_feature_enabled(Feature.RBAC_SYSTEM):
         logger.info("Adding roles router")
-        app.include_router(roles_router, prefix=CURRENT_VERSION.prefix, tags=["Roles"])
+        app.include_router(roles_router, prefix=CURRENT_VERSION.api_prefix, tags=["Roles"])
 
-    if is_feature_enabled(CURRENT_VERSION, "permissions"):
+    # RBAC - Permissions
+    if is_feature_enabled(Feature.PERMISSION_SYSTEM):
         logger.info("Adding permissions router")
-        app.include_router(permissions_router, prefix=CURRENT_VERSION.prefix, tags=["Permissions"])
-
-    if is_feature_enabled(CURRENT_VERSION, "organizations"):
-        logger.info("Adding organizations router")
         app.include_router(
-            organizations_router, prefix=CURRENT_VERSION.prefix, tags=["Organizations"]
+            permissions_router, prefix=CURRENT_VERSION.api_prefix, tags=["Permissions"]
         )
 
-    if is_feature_enabled(CURRENT_VERSION, "departments"):
+    # Organization Management
+    if is_feature_enabled(Feature.ORGANIZATION_MANAGEMENT):
+        logger.info("Adding organizations router")
+        app.include_router(
+            organizations_router, prefix=CURRENT_VERSION.api_prefix, tags=["Organizations"]
+        )
+
+    # Department Management
+    if is_feature_enabled(Feature.DEPARTMENT_MANAGEMENT):
         logger.info("Adding departments router")
-        app.include_router(departments_router, prefix=CURRENT_VERSION.prefix, tags=["Departments"])
+        app.include_router(
+            departments_router, prefix=CURRENT_VERSION.api_prefix, tags=["Departments"]
+        )
 
-    if is_feature_enabled(CURRENT_VERSION, "teams"):
+    # Team Management
+    if is_feature_enabled(Feature.TEAM_MANAGEMENT):
         logger.info("Adding teams router")
-        app.include_router(teams_router, prefix=CURRENT_VERSION.prefix, tags=["Teams"])
+        app.include_router(teams_router, prefix=CURRENT_VERSION.api_prefix, tags=["Teams"])
 
-
-def check_client_version(client_prefix: str) -> dict:
-    """Check if client is using latest version."""
-    client_version = get_version_by_prefix(client_prefix)
-    latest = get_latest_version()
-
-    if not client_version:
-        return {"error": "Invalid API version"}
-
-    if client_version == latest:
-        return {"status": "up_to_date"}
-
-    return {
-        "status": "outdated",
-        "current": client_version.__str__(),
-        "latest": latest.__str__(),
-        "migration_url": f"/docs{latest.prefix}",
-    }
+    logger.info(f"Versioned routers setup complete for {CURRENT_VERSION}")

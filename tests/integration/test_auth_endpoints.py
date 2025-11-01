@@ -13,7 +13,7 @@ from tests.utilities import (
 pytestmark = pytest.mark.integration
 
 # Get the version prefix for all endpoints
-API_PREFIX = CURRENT_VERSION.prefix
+API_PREFIX = CURRENT_VERSION.api_prefix
 
 
 class TestAuthenticationEndpoints:

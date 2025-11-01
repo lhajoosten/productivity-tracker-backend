@@ -1,3 +1,4 @@
+# Builder stage
 FROM python:3.12-slim as builder
 
 WORKDIR /app
@@ -20,7 +21,7 @@ ENV POETRY_NO_INTERACTION=1 \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
 # Copy dependency files
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml poetry.lock* ./
 
 # Install dependencies (production only)
 RUN poetry install --only main --no-root && rm -rf $POETRY_CACHE_DIR
@@ -40,8 +41,8 @@ COPY --from=builder /app/.venv /app/.venv
 
 # Copy application code
 COPY productivity_tracker ./productivity_tracker
-COPY alembic.ini ./
-COPY alembic ./alembic
+COPY migrations ./migrations
+COPY alembic.ini .
 
 # Set environment variables
 ENV PATH="/app/.venv/bin:$PATH" \
@@ -53,11 +54,11 @@ RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
 # Expose port (Render, Railway, Fly.io use $PORT env var)
-EXPOSE 8000
+EXPOSE 8500
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/health')" || exit 1
+    CMD python -c "import requests; requests.get('http://localhost:8500/health')" || exit 1
 
 # Start command
-CMD ["uvicorn", "productivity_tracker.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "productivity_tracker.main:app", "--host", "0.0.0.0", "--port", "8500"]

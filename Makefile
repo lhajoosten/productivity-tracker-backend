@@ -50,16 +50,16 @@ test-watch: ## Run tests in watch mode
 
 test-db-up: ## Start the test database
 	@echo "Starting test database..."
-	docker compose -f .devcontainer/docker-compose.test.yml up -d
+	docker compose -f docker-compose.test.yml up -d
 	@echo "Waiting for test database to be ready..."
 	@sleep 5
 
 test-db-down: ## Stop test database
-	docker-compose -f .devcontainer/docker-compose.test.yml down
+	docker compose -f docker-compose.test.yml down
 
 test-db-clean: ## Clean up test database
 	@echo "Cleaning up test database..."
-	docker compose -f .devcontainer/docker-compose.test.yml down -v
+	docker compose -f docker-compose.test.yml down -v
 
 
 test-ci-full: ## Run all tests with coverage for CI environment
@@ -88,13 +88,13 @@ downgrade: ## Rollback last migration
 # Database Management
 db-up: ## Start the development database with Docker
 	@echo "Starting development database..."
-	docker compose -f .devcontainer/docker-compose.yml up -d
+	docker compose -f docker-compose.yml up -d
 	@echo "Waiting for database to be ready..."
 	@sleep 5
 	@echo "✓ Database is running on localhost:5432"
 
 db-down: ## Stop the development database
-	docker compose -f .devcontainer/docker-compose.yml down
+	docker compose -f docker-compose.yml down
 
 db-restart: ## Restart the development database
 	@$(MAKE) db-down
@@ -103,7 +103,7 @@ db-restart: ## Restart the development database
 db-clean: ## Stop database and remove volumes (WARNING: deletes all data)
 	@echo "⚠️  This will delete all database data!"
 	@read -p "Are you sure? [y/N] " confirm && [ "$$confirm" = "y" ] || exit 1
-	docker compose -f .devcontainer/docker-compose.yml down -v
+	docker compose -f docker-compose.yml down -v
 
 db-logs: ## Show database logs
 	docker compose logs -f postgres
