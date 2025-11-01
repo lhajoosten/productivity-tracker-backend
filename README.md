@@ -3,7 +3,7 @@
 [![CI/CD Pipeline](https://github.com/lhajoosten/productivity-tracker-backend/actions/workflows/ci-pipeline.yml/badge.svg)](https://github.com/lhajoosten/productivity-tracker-backend/actions/workflows/ci-pipeline.yml)
 [![codecov](https://codecov.io/gh/lhajoosten/productivity-tracker-backend/branch/master/graph/badge.svg)](https://codecov.io/gh/lhajoosten/productivity-tracker-backend)
 [![Python Version](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.199-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.120.4-1.svg?logo=fastapi)](https://fastapi.tiangolo.com)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
