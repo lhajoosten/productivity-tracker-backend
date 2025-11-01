@@ -11,7 +11,7 @@ from tests.utilities import assert_problem_detail_response
 pytestmark = [pytest.mark.integration, pytest.mark.rbac]
 
 # Get the version prefix for all endpoints
-API_PREFIX = CURRENT_VERSION.prefix
+API_PREFIX = CURRENT_VERSION.api_prefix
 
 
 class TestRoleEndpoints:

@@ -21,9 +21,9 @@ app = FastAPI(
     title="Productivity Tracker API",
     description="Professional productivity tracking application",
     version=__version__,
-    docs_url=f"{CURRENT_VERSION.prefix}/docs",
-    redoc_url=f"{CURRENT_VERSION.prefix}/redoc",
-    openapi_url=f"{CURRENT_VERSION.prefix}/openapi.json",
+    docs_url=f"{CURRENT_VERSION.api_prefix}/docs",
+    redoc_url=f"{CURRENT_VERSION.api_prefix}/redoc",
+    openapi_url=f"{CURRENT_VERSION.api_prefix}/openapi.json",
 )
 
 # Setup exception handling

@@ -9,6 +9,8 @@ from productivity_tracker.core.dependencies import get_current_user, get_db
 from productivity_tracker.versioning.versioning import CURRENT_VERSION
 from tests.utils.mock_auth import create_mock_user, mock_current_user
 
+pytestmark = [pytest.mark.utils]
+
 
 @pytest.fixture
 def mock_db_session():
@@ -24,9 +26,9 @@ def app():
     app = FastAPI(
         title="Test API",
         version="1.0.0",
-        docs_url=f"{CURRENT_VERSION.prefix}/docs",
-        redoc_url=f"{CURRENT_VERSION.prefix}/redoc",
-        openapi_url=f"{CURRENT_VERSION.prefix}/openapi.json",
+        docs_url=f"{CURRENT_VERSION.api_prefix}/docs",
+        redoc_url=f"{CURRENT_VERSION.api_prefix}/redoc",
+        openapi_url=f"{CURRENT_VERSION.api_prefix}/openapi.json",
     )
     setup_versioned_routers(app)
     return app
@@ -63,18 +65,18 @@ class TestRouterRegistration:
 
     def test_health_endpoint_exists(self, client):
         """Health endpoint should be registered."""
-        response = client.get(f"{CURRENT_VERSION.prefix}/health")
+        response = client.get(f"{CURRENT_VERSION.api_prefix}/health")
         assert response.status_code == 200
 
     def test_auth_endpoints_exist(self, client):
         """Auth endpoints should be registered."""
         # This will fail validation (missing body) but endpoint exists
-        response = client.post(f"{CURRENT_VERSION.prefix}/auth/login")
+        response = client.post(f"{CURRENT_VERSION.api_prefix}/auth/login")
         assert response.status_code == 422  # Validation error, not 404
 
     def test_roles_endpoints_exist(self, authenticated_client):
         """Roles endpoints should be registered."""
-        response = authenticated_client.get(f"{CURRENT_VERSION.prefix}/roles")
+        response = authenticated_client.get(f"{CURRENT_VERSION.api_prefix}/roles")
         # Should return 200 (success) not 404 (not found)
         assert response.status_code == 200
         # Empty list since we're mocking
@@ -82,7 +84,7 @@ class TestRouterRegistration:
 
     def test_permissions_endpoints_exist(self, authenticated_client):
         """Permissions endpoints should be registered."""
-        response = authenticated_client.get(f"{CURRENT_VERSION.prefix}/permissions")
+        response = authenticated_client.get(f"{CURRENT_VERSION.api_prefix}/permissions")
         # Should return 200 (success) not 404 (not found)
         assert response.status_code == 200
         # Empty list since we're mocking
@@ -94,7 +96,7 @@ class TestOpenAPIGeneration:
 
     def test_openapi_schema_generated(self, client):
         """OpenAPI schema should be generated."""
-        response = client.get(f"{CURRENT_VERSION.prefix}/openapi.json")
+        response = client.get(f"{CURRENT_VERSION.api_prefix}/openapi.json")
         assert response.status_code == 200
         schema = response.json()
         assert "openapi" in schema
@@ -102,7 +104,7 @@ class TestOpenAPIGeneration:
 
     def test_no_duplicate_paths(self, client):
         """OpenAPI schema should not have duplicate paths."""
-        response = client.get(f"{CURRENT_VERSION.prefix}/openapi.json")
+        response = client.get(f"{CURRENT_VERSION.api_prefix}/openapi.json")
         assert response.status_code == 200
         schema = response.json()
         paths = schema["paths"]
@@ -117,7 +119,7 @@ class TestOpenAPIGeneration:
 
     def test_correct_tags(self, client):
         """Endpoints should have correct tags."""
-        response = client.get(f"{CURRENT_VERSION.prefix}/openapi.json")
+        response = client.get(f"{CURRENT_VERSION.api_prefix}/openapi.json")
         assert response.status_code == 200
         schema = response.json()
 
@@ -130,6 +132,7 @@ class TestOpenAPIGeneration:
 
         # Should have feature tags only
         expected_tags = {
+            "Admin",
             "Health",
             "Authentication",
             "Roles",

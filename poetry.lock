@@ -20,6 +20,11 @@ typing-extensions = ">=4.12"
 [package.extras]
 tz = ["tzdata"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
@@ -31,6 +36,11 @@ files = [
     {file = "annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"},
     {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "anyio"
@@ -52,6 +62,11 @@ typing_extensions = {version = ">=4.5", markers = "python_version < \"3.13\""}
 [package.extras]
 trio = ["trio (>=0.31.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "argon2-cffi"
 version = "25.1.0"
@@ -66,6 +81,11 @@ files = [
 
 [package.dependencies]
 argon2-cffi-bindings = "*"
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "argon2-cffi-bindings"
@@ -109,6 +129,11 @@ cffi = [
     {version = ">=2.0.0b1", markers = "python_version >= \"3.14\""},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "authlib"
 version = "1.6.5"
@@ -123,6 +148,11 @@ files = [
 
 [package.dependencies]
 cryptography = "*"
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "bandit"
@@ -148,6 +178,11 @@ sarif = ["jschema-to-python (>=1.2.3)", "sarif-om (>=1.0.4)"]
 test = ["beautifulsoup4 (>=4.8.0)", "coverage (>=4.5.4)", "fixtures (>=3.0.0)", "flake8 (>=4.0.0)", "pylint (==1.9.4)", "stestr (>=2.5.0)", "testscenarios (>=0.5.0)", "testtools (>=2.3.0)"]
 toml = ["tomli (>=1.1.0) ; python_version < \"3.11\""]
 yaml = ["PyYAML"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "bcrypt"
@@ -226,6 +261,11 @@ files = [
 tests = ["pytest (>=3.2.1,!=3.3.0)"]
 typecheck = ["mypy"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "certifi"
 version = "2025.10.5"
@@ -237,6 +277,11 @@ files = [
     {file = "certifi-2025.10.5-py3-none-any.whl", hash = "sha256:0f212c2744a9bb6de0c56639a6f68afe01ecd92d91f14ae897c4fe7bbeeef0de"},
     {file = "certifi-2025.10.5.tar.gz", hash = "sha256:47c09d31ccf2acf0be3f701ea53595ee7e0b8fa08801c6624be771df09ae7b43"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "cffi"
@@ -336,6 +381,11 @@ markers = {dev = "platform_python_implementation != \"PyPy\""}
 [package.dependencies]
 pycparser = {version = "*", markers = "implementation_name != \"PyPy\""}
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "cfgv"
 version = "3.4.0"
@@ -347,6 +397,11 @@ files = [
     {file = "cfgv-3.4.0-py2.py3-none-any.whl", hash = "sha256:b7265b1f29fd3316bfcd2b330d63d024f2bfd8bcb8b0272f8e19a504856c48f9"},
     {file = "cfgv-3.4.0.tar.gz", hash = "sha256:e52591d4c5f5dead8e0f673fb16db7949d2cfb3f7da4582893288f0ded8fe560"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "charset-normalizer"
@@ -471,6 +526,11 @@ files = [
     {file = "charset_normalizer-3.4.4.tar.gz", hash = "sha256:94537985111c35f28720e43603b8e7b43a6ecfb2ce1d3058bbe955b73404e21a"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "click"
 version = "8.3.0"
@@ -486,6 +546,11 @@ files = [
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "colorama"
 version = "0.4.6"
@@ -498,6 +563,11 @@ files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "coverage"
@@ -604,12 +674,17 @@ files = [
 [package.extras]
 toml = ["tomli ; python_full_version <= \"3.11.0a6\""]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "cryptography"
 version = "46.0.3"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
 optional = false
-python-versions = "!=3.9.0,!=3.9.1,>=3.8"
+python-versions = ">=3.8, !=3.9.0, !=3.9.1"
 groups = ["dev"]
 files = [
     {file = "cryptography-46.0.3-cp311-abi3-macosx_10_9_universal2.whl", hash = "sha256:109d4ddfadf17e8e7779c39f9b18111a09efb969a301a31e987416a0191ed93a"},
@@ -681,6 +756,11 @@ ssh = ["bcrypt (>=3.1.5)"]
 test = ["certifi (>=2024)", "cryptography-vectors (==46.0.3)", "pretend (>=0.7)", "pytest (>=7.4.0)", "pytest-benchmark (>=4.0)", "pytest-cov (>=2.10.1)", "pytest-xdist (>=3.5.0)"]
 test-randomorder = ["pytest-randomly"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "distlib"
 version = "0.4.0"
@@ -692,6 +772,11 @@ files = [
     {file = "distlib-0.4.0-py2.py3-none-any.whl", hash = "sha256:9659f7d87e46584a30b5780e43ac7a2143098441670ff0a49d5f9034c54a6c16"},
     {file = "distlib-0.4.0.tar.gz", hash = "sha256:feec40075be03a04501a973d81f633735b4b69f98b05450592310c0f401a4e0d"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "dnspython"
@@ -714,6 +799,11 @@ idna = ["idna (>=3.10)"]
 trio = ["trio (>=0.30)"]
 wmi = ["wmi (>=1.5.1) ; platform_system == \"Windows\""]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "dparse"
 version = "0.6.4"
@@ -735,6 +825,11 @@ conda = ["pyyaml"]
 pipenv = ["pipenv"]
 poetry = ["poetry"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "email-validator"
 version = "2.3.0"
@@ -750,6 +845,11 @@ files = [
 [package.dependencies]
 dnspython = ">=2.0.0"
 idna = ">=2.0.0"
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "fastapi"
@@ -773,6 +873,11 @@ all = ["email-validator (>=2.0.0)", "fastapi-cli[standard] (>=0.0.8)", "httpx (>
 standard = ["email-validator (>=2.0.0)", "fastapi-cli[standard] (>=0.0.8)", "httpx (>=0.23.0,<1.0.0)", "jinja2 (>=3.1.5)", "python-multipart (>=0.0.18)", "uvicorn[standard] (>=0.12.0)"]
 standard-no-fastapi-cloud-cli = ["email-validator (>=2.0.0)", "fastapi-cli[standard-no-fastapi-cloud-cli] (>=0.0.8)", "httpx (>=0.23.0,<1.0.0)", "jinja2 (>=3.1.5)", "python-multipart (>=0.0.18)", "uvicorn[standard] (>=0.12.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "filelock"
 version = "3.20.0"
@@ -784,6 +889,11 @@ files = [
     {file = "filelock-3.20.0-py3-none-any.whl", hash = "sha256:339b4732ffda5cd79b13f4e2711a31b0365ce445d95d243bb996273d072546a2"},
     {file = "filelock-3.20.0.tar.gz", hash = "sha256:711e943b4ec6be42e1d4e6690b48dc175c822967466bb31c0c293f34334c13f4"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "greenlet"
@@ -854,6 +964,11 @@ files = [
 docs = ["Sphinx", "furo"]
 test = ["objgraph", "psutil", "setuptools"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "h11"
 version = "0.16.0"
@@ -865,6 +980,11 @@ files = [
     {file = "h11-0.16.0-py3-none-any.whl", hash = "sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86"},
     {file = "h11-0.16.0.tar.gz", hash = "sha256:4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "httpcore"
@@ -887,6 +1007,11 @@ asyncio = ["anyio (>=4.0,<5.0)"]
 http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
 trio = ["trio (>=0.22.0,<1.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "httptools"
@@ -941,6 +1066,11 @@ files = [
     {file = "httptools-0.7.1.tar.gz", hash = "sha256:abd72556974f8e7c74a259655924a717a2365b236c882c3f6f8a45fe94703ac9"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "httpx"
 version = "0.28.1"
@@ -966,6 +1096,11 @@ http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
 zstd = ["zstandard (>=0.18.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "identify"
 version = "2.6.15"
@@ -980,6 +1115,11 @@ files = [
 
 [package.extras]
 license = ["ukkonen"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "idna"
@@ -996,6 +1136,11 @@ files = [
 [package.extras]
 all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "iniconfig"
 version = "2.1.0"
@@ -1007,6 +1152,11 @@ files = [
     {file = "iniconfig-2.1.0-py3-none-any.whl", hash = "sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760"},
     {file = "iniconfig-2.1.0.tar.gz", hash = "sha256:3abbd2e30b36733fee78f9c7f7308f2d0050e88f0087fd25c2645f63c773e1c7"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "isort"
@@ -1023,6 +1173,11 @@ files = [
 [package.extras]
 colors = ["colorama"]
 plugins = ["setuptools"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "jinja2"
@@ -1042,6 +1197,11 @@ MarkupSafe = ">=2.0"
 [package.extras]
 i18n = ["Babel (>=2.7)"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "joblib"
 version = "1.5.2"
@@ -1053,6 +1213,11 @@ files = [
     {file = "joblib-1.5.2-py3-none-any.whl", hash = "sha256:4e1f0bdbb987e6d843c70cf43714cb276623def372df3c22fe5266b2670bc241"},
     {file = "joblib-1.5.2.tar.gz", hash = "sha256:3faa5c39054b2f03ca547da9b2f52fde67c06240c31853f306aea97f13647b55"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "mako"
@@ -1074,13 +1239,18 @@ babel = ["Babel"]
 lingua = ["lingua"]
 testing = ["pytest"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "markdown-it-py"
 version = "4.0.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
 optional = false
 python-versions = ">=3.10"
-groups = ["dev"]
+groups = ["main", "dev"]
 files = [
     {file = "markdown_it_py-4.0.0-py3-none-any.whl", hash = "sha256:87327c59b172c5011896038353a81343b6754500a08cd7a4973bb48c6d578147"},
     {file = "markdown_it_py-4.0.0.tar.gz", hash = "sha256:cb0a2b4aa34f932c007117b194e945bd74e0ec24133ceb5bac59009cda1cb9f3"},
@@ -1097,6 +1267,11 @@ plugins = ["mdit-py-plugins (>=0.5.0)"]
 profiling = ["gprof2dot"]
 rtd = ["ipykernel", "jupyter_sphinx", "mdit-py-plugins (>=0.5.0)", "myst-parser", "pyyaml", "sphinx", "sphinx-book-theme (>=1.0,<2.0)", "sphinx-copybutton", "sphinx-design"]
 testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions", "requests"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "markupsafe"
@@ -1197,6 +1372,11 @@ files = [
     {file = "markupsafe-3.0.3.tar.gz", hash = "sha256:722695808f4b6457b320fdc131280796bdceb04ab50fe1795cd540799ebe1698"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "marshmallow"
 version = "4.0.1"
@@ -1214,17 +1394,27 @@ dev = ["marshmallow[tests]", "pre-commit (>=3.5,<5.0)", "tox"]
 docs = ["autodocsumm (==0.2.14)", "furo (==2025.7.19)", "sphinx (==8.2.3)", "sphinx-copybutton (==0.5.2)", "sphinx-issues (==5.0.1)", "sphinxext-opengraph (==0.12.0)"]
 tests = ["pytest", "simplejson"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "mdurl"
 version = "0.1.2"
 description = "Markdown URL utilities"
 optional = false
 python-versions = ">=3.7"
-groups = ["dev"]
+groups = ["main", "dev"]
 files = [
     {file = "mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"},
     {file = "mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "minio"
@@ -1244,6 +1434,11 @@ certifi = "*"
 pycryptodome = "*"
 typing-extensions = "*"
 urllib3 = "*"
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "mypy"
@@ -1305,6 +1500,11 @@ install-types = ["pip"]
 mypyc = ["setuptools (>=50)"]
 reports = ["lxml"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "mypy-extensions"
 version = "1.1.0"
@@ -1316,6 +1516,11 @@ files = [
     {file = "mypy_extensions-1.1.0-py3-none-any.whl", hash = "sha256:1be4cccdb0f2482337c4743e60421de3a356cd97508abadd57d47403e94f5505"},
     {file = "mypy_extensions-1.1.0.tar.gz", hash = "sha256:52e68efc3284861e772bbcd66823fde5ae21fd2fdb51c62a211403730b916558"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "nltk"
@@ -1343,17 +1548,27 @@ plot = ["matplotlib"]
 tgrep = ["pyparsing"]
 twitter = ["twython"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "nodeenv"
 version = "1.9.1"
 description = "Node.js virtual environment builder"
 optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*"
 groups = ["dev"]
 files = [
     {file = "nodeenv-1.9.1-py2.py3-none-any.whl", hash = "sha256:ba11c9782d29c27c70ffbdda2d7415098754709be8a7056d79a737cd901155c9"},
     {file = "nodeenv-1.9.1.tar.gz", hash = "sha256:6ec12890a2dab7946721edbfbcd91f3319c6ccc9aec47be7c7e6b7011ee6645f"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "packaging"
@@ -1366,6 +1581,11 @@ files = [
     {file = "packaging-25.0-py3-none-any.whl", hash = "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484"},
     {file = "packaging-25.0.tar.gz", hash = "sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "passlib"
@@ -1388,6 +1608,11 @@ bcrypt = ["bcrypt (>=3.1.0)"]
 build-docs = ["cloud-sptheme (>=1.10.1)", "sphinx (>=1.6)", "sphinxcontrib-fulltoc (>=1.2.0)"]
 totp = ["cryptography"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "pathspec"
 version = "0.12.1"
@@ -1399,6 +1624,11 @@ files = [
     {file = "pathspec-0.12.1-py3-none-any.whl", hash = "sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08"},
     {file = "pathspec-0.12.1.tar.gz", hash = "sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "platformdirs"
@@ -1417,6 +1647,11 @@ docs = ["furo (>=2025.9.25)", "proselint (>=0.14)", "sphinx (>=8.2.3)", "sphinx-
 test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=8.4.2)", "pytest-cov (>=7)", "pytest-mock (>=3.15.1)"]
 type = ["mypy (>=1.18.2)"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "pluggy"
 version = "1.6.0"
@@ -1432,6 +1667,11 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["coverage", "pytest", "pytest-benchmark"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "pre-commit"
@@ -1451,6 +1691,11 @@ identify = ">=1.0.0"
 nodeenv = ">=0.11.1"
 pyyaml = ">=5.1"
 virtualenv = ">=20.10.0"
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "psutil"
@@ -1472,8 +1717,13 @@ files = [
 ]
 
 [package.extras]
-dev = ["abi3audit", "black", "check-manifest", "coverage", "packaging", "pylint", "pyperf", "pypinfo", "pyreadline ; os_name == \"nt\"", "pytest", "pytest-cov", "pytest-instafail", "pytest-subtests", "pytest-xdist", "pywin32 ; os_name == \"nt\" and platform_python_implementation != \"PyPy\"", "requests", "rstcheck", "ruff", "setuptools", "sphinx", "sphinx_rtd_theme", "toml-sort", "twine", "virtualenv", "vulture", "wheel", "wheel ; os_name == \"nt\" and platform_python_implementation != \"PyPy\"", "wmi ; os_name == \"nt\" and platform_python_implementation != \"PyPy\""]
+dev = ["abi3audit", "black", "check-manifest", "coverage", "packaging", "pylint", "pyperf", "pypinfo", "pyreadline ; os_name == \"nt\"", "pytest", "pytest-cov", "pytest-instafail", "pytest-subtests", "pytest-xdist", "pywin32 ; os_name == \"nt\" and platform_python_implementation != \"PyPy\"", "requests", "rstcheck", "ruff", "setuptools", "sphinx", "sphinx-rtd-theme", "toml-sort", "twine", "virtualenv", "vulture", "wheel", "wheel ; os_name == \"nt\" and platform_python_implementation != \"PyPy\"", "wmi ; os_name == \"nt\" and platform_python_implementation != \"PyPy\""]
 test = ["pytest", "pytest-instafail", "pytest-subtests", "pytest-xdist", "pywin32 ; os_name == \"nt\" and platform_python_implementation != \"PyPy\"", "setuptools", "wheel ; os_name == \"nt\" and platform_python_implementation != \"PyPy\"", "wmi ; os_name == \"nt\" and platform_python_implementation != \"PyPy\""]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "psycopg2-binary"
@@ -1489,8 +1739,10 @@ files = [
     {file = "psycopg2_binary-2.9.11-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:c47676e5b485393f069b4d7a811267d3168ce46f988fa602658b8bb901e9e64d"},
     {file = "psycopg2_binary-2.9.11-cp310-cp310-manylinux2014_ppc64le.manylinux_2_17_ppc64le.whl", hash = "sha256:a28d8c01a7b27a1e3265b11250ba7557e5f72b5ee9e5f3a2fa8d2949c29bf5d2"},
     {file = "psycopg2_binary-2.9.11-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:5f3f2732cf504a1aa9e9609d02f79bea1067d99edf844ab92c247bbca143303b"},
+    {file = "psycopg2_binary-2.9.11-cp310-cp310-manylinux_2_38_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:865f9945ed1b3950d968ec4690ce68c55019d79e4497366d36e090327ce7db14"},
     {file = "psycopg2_binary-2.9.11-cp310-cp310-musllinux_1_2_aarch64.whl", hash = "sha256:91537a8df2bde69b1c1db01d6d944c831ca793952e4f57892600e96cee95f2cd"},
     {file = "psycopg2_binary-2.9.11-cp310-cp310-musllinux_1_2_ppc64le.whl", hash = "sha256:4dca1f356a67ecb68c81a7bc7809f1569ad9e152ce7fd02c2f2036862ca9f66b"},
+    {file = "psycopg2_binary-2.9.11-cp310-cp310-musllinux_1_2_riscv64.whl", hash = "sha256:0da4de5c1ac69d94ed4364b6cbe7190c1a70d325f112ba783d83f8440285f152"},
     {file = "psycopg2_binary-2.9.11-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:37d8412565a7267f7d79e29ab66876e55cb5e8e7b3bbf94f8206f6795f8f7e7e"},
     {file = "psycopg2_binary-2.9.11-cp310-cp310-win_amd64.whl", hash = "sha256:c665f01ec8ab273a61c62beeb8cce3014c214429ced8a308ca1fc410ecac3a39"},
     {file = "psycopg2_binary-2.9.11-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:0e8480afd62362d0a6a27dd09e4ca2def6fa50ed3a4e7c09165266106b2ffa10"},
@@ -1498,8 +1750,10 @@ files = [
     {file = "psycopg2_binary-2.9.11-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:2e164359396576a3cc701ba8af4751ae68a07235d7a380c631184a611220d9a4"},
     {file = "psycopg2_binary-2.9.11-cp311-cp311-manylinux2014_ppc64le.manylinux_2_17_ppc64le.whl", hash = "sha256:d57c9c387660b8893093459738b6abddbb30a7eab058b77b0d0d1c7d521ddfd7"},
     {file = "psycopg2_binary-2.9.11-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:2c226ef95eb2250974bf6fa7a842082b31f68385c4f3268370e3f3870e7859ee"},
+    {file = "psycopg2_binary-2.9.11-cp311-cp311-manylinux_2_38_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:a311f1edc9967723d3511ea7d2708e2c3592e3405677bf53d5c7246753591fbb"},
     {file = "psycopg2_binary-2.9.11-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:ebb415404821b6d1c47353ebe9c8645967a5235e6d88f914147e7fd411419e6f"},
     {file = "psycopg2_binary-2.9.11-cp311-cp311-musllinux_1_2_ppc64le.whl", hash = "sha256:f07c9c4a5093258a03b28fab9b4f151aa376989e7f35f855088234e656ee6a94"},
+    {file = "psycopg2_binary-2.9.11-cp311-cp311-musllinux_1_2_riscv64.whl", hash = "sha256:00ce1830d971f43b667abe4a56e42c1e2d594b32da4802e44a73bacacb25535f"},
     {file = "psycopg2_binary-2.9.11-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:cffe9d7697ae7456649617e8bb8d7a45afb71cd13f7ab22af3e5c61f04840908"},
     {file = "psycopg2_binary-2.9.11-cp311-cp311-win_amd64.whl", hash = "sha256:304fd7b7f97eef30e91b8f7e720b3db75fee010b520e434ea35ed1ff22501d03"},
     {file = "psycopg2_binary-2.9.11-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:be9b840ac0525a283a96b556616f5b4820e0526addb8dcf6525a0fa162730be4"},
@@ -1507,8 +1761,10 @@ files = [
     {file = "psycopg2_binary-2.9.11-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:ab8905b5dcb05bf3fb22e0cf90e10f469563486ffb6a96569e51f897c750a76a"},
     {file = "psycopg2_binary-2.9.11-cp312-cp312-manylinux2014_ppc64le.manylinux_2_17_ppc64le.whl", hash = "sha256:bf940cd7e7fec19181fdbc29d76911741153d51cab52e5c21165f3262125685e"},
     {file = "psycopg2_binary-2.9.11-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:fa0f693d3c68ae925966f0b14b8edda71696608039f4ed61b1fe9ffa468d16db"},
+    {file = "psycopg2_binary-2.9.11-cp312-cp312-manylinux_2_38_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:a1cf393f1cdaf6a9b57c0a719a1068ba1069f022a59b8b1fe44b006745b59757"},
     {file = "psycopg2_binary-2.9.11-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:ef7a6beb4beaa62f88592ccc65df20328029d721db309cb3250b0aae0fa146c3"},
     {file = "psycopg2_binary-2.9.11-cp312-cp312-musllinux_1_2_ppc64le.whl", hash = "sha256:31b32c457a6025e74d233957cc9736742ac5a6cb196c6b68499f6bb51390bd6a"},
+    {file = "psycopg2_binary-2.9.11-cp312-cp312-musllinux_1_2_riscv64.whl", hash = "sha256:edcb3aeb11cb4bf13a2af3c53a15b3d612edeb6409047ea0b5d6a21a9d744b34"},
     {file = "psycopg2_binary-2.9.11-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:62b6d93d7c0b61a1dd6197d208ab613eb7dcfdcca0a49c42ceb082257991de9d"},
     {file = "psycopg2_binary-2.9.11-cp312-cp312-win_amd64.whl", hash = "sha256:b33fabeb1fde21180479b2d4667e994de7bbf0eec22832ba5d9b5e4cf65b6c6d"},
     {file = "psycopg2_binary-2.9.11-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:b8fb3db325435d34235b044b199e56cdf9ff41223a4b9752e8576465170bb38c"},
@@ -1516,8 +1772,10 @@ files = [
     {file = "psycopg2_binary-2.9.11-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:8c55b385daa2f92cb64b12ec4536c66954ac53654c7f15a203578da4e78105c0"},
     {file = "psycopg2_binary-2.9.11-cp313-cp313-manylinux2014_ppc64le.manylinux_2_17_ppc64le.whl", hash = "sha256:c0377174bf1dd416993d16edc15357f6eb17ac998244cca19bc67cdc0e2e5766"},
     {file = "psycopg2_binary-2.9.11-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:5c6ff3335ce08c75afaed19e08699e8aacf95d4a260b495a4a8545244fe2ceb3"},
+    {file = "psycopg2_binary-2.9.11-cp313-cp313-manylinux_2_38_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:84011ba3109e06ac412f95399b704d3d6950e386b7994475b231cf61eec2fc1f"},
     {file = "psycopg2_binary-2.9.11-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:ba34475ceb08cccbdd98f6b46916917ae6eeb92b5ae111df10b544c3a4621dc4"},
     {file = "psycopg2_binary-2.9.11-cp313-cp313-musllinux_1_2_ppc64le.whl", hash = "sha256:b31e90fdd0f968c2de3b26ab014314fe814225b6c324f770952f7d38abf17e3c"},
+    {file = "psycopg2_binary-2.9.11-cp313-cp313-musllinux_1_2_riscv64.whl", hash = "sha256:d526864e0f67f74937a8fce859bd56c979f5e2ec57ca7c627f5f1071ef7fee60"},
     {file = "psycopg2_binary-2.9.11-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:04195548662fa544626c8ea0f06561eb6203f1984ba5b4562764fbeb4c3d14b1"},
     {file = "psycopg2_binary-2.9.11-cp313-cp313-win_amd64.whl", hash = "sha256:efff12b432179443f54e230fdf60de1f6cc726b6c832db8701227d089310e8aa"},
     {file = "psycopg2_binary-2.9.11-cp314-cp314-macosx_10_13_x86_64.whl", hash = "sha256:92e3b669236327083a2e33ccfa0d320dd01b9803b3e14dd986a4fc54aa00f4e1"},
@@ -1525,8 +1783,10 @@ files = [
     {file = "psycopg2_binary-2.9.11-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:9b52a3f9bb540a3e4ec0f6ba6d31339727b2950c9772850d6545b7eae0b9d7c5"},
     {file = "psycopg2_binary-2.9.11-cp314-cp314-manylinux2014_ppc64le.manylinux_2_17_ppc64le.whl", hash = "sha256:db4fd476874ccfdbb630a54426964959e58da4c61c9feba73e6094d51303d7d8"},
     {file = "psycopg2_binary-2.9.11-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:47f212c1d3be608a12937cc131bd85502954398aaa1320cb4c14421a0ffccf4c"},
+    {file = "psycopg2_binary-2.9.11-cp314-cp314-manylinux_2_38_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:e35b7abae2b0adab776add56111df1735ccc71406e56203515e228a8dc07089f"},
     {file = "psycopg2_binary-2.9.11-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:fcf21be3ce5f5659daefd2b3b3b6e4727b028221ddc94e6c1523425579664747"},
     {file = "psycopg2_binary-2.9.11-cp314-cp314-musllinux_1_2_ppc64le.whl", hash = "sha256:9bd81e64e8de111237737b29d68039b9c813bdf520156af36d26819c9a979e5f"},
+    {file = "psycopg2_binary-2.9.11-cp314-cp314-musllinux_1_2_riscv64.whl", hash = "sha256:32770a4d666fbdafab017086655bcddab791d7cb260a16679cc5a7338b64343b"},
     {file = "psycopg2_binary-2.9.11-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:c3cb3a676873d7506825221045bd70e0427c905b9c8ee8d6acd70cfcbd6e576d"},
     {file = "psycopg2_binary-2.9.11-cp314-cp314-win_amd64.whl", hash = "sha256:4012c9c954dfaccd28f94e84ab9f94e12df76b4afb22331b1f0d3154893a6316"},
     {file = "psycopg2_binary-2.9.11-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:20e7fb94e20b03dcc783f76c0865f9da39559dcc0c28dd1a3fce0d01902a6b9c"},
@@ -1534,11 +1794,18 @@ files = [
     {file = "psycopg2_binary-2.9.11-cp39-cp39-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:9d3a9edcfbe77a3ed4bc72836d466dfce4174beb79eda79ea155cc77237ed9e8"},
     {file = "psycopg2_binary-2.9.11-cp39-cp39-manylinux2014_ppc64le.manylinux_2_17_ppc64le.whl", hash = "sha256:44fc5c2b8fa871ce7f0023f619f1349a0aa03a0857f2c96fbc01c657dcbbdb49"},
     {file = "psycopg2_binary-2.9.11-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:9c55460033867b4622cda1b6872edf445809535144152e5d14941ef591980edf"},
+    {file = "psycopg2_binary-2.9.11-cp39-cp39-manylinux_2_38_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:2d11098a83cca92deaeaed3d58cfd150d49b3b06ee0d0852be466bf87596899e"},
     {file = "psycopg2_binary-2.9.11-cp39-cp39-musllinux_1_2_aarch64.whl", hash = "sha256:691c807d94aecfbc76a14e1408847d59ff5b5906a04a23e12a89007672b9e819"},
     {file = "psycopg2_binary-2.9.11-cp39-cp39-musllinux_1_2_ppc64le.whl", hash = "sha256:8b81627b691f29c4c30a8f322546ad039c40c328373b11dff7490a3e1b517855"},
+    {file = "psycopg2_binary-2.9.11-cp39-cp39-musllinux_1_2_riscv64.whl", hash = "sha256:b637d6d941209e8d96a072d7977238eea128046effbf37d1d8b2c0764750017d"},
     {file = "psycopg2_binary-2.9.11-cp39-cp39-musllinux_1_2_x86_64.whl", hash = "sha256:41360b01c140c2a03d346cec3280cf8a71aa07d94f3b1509fa0161c366af66b4"},
     {file = "psycopg2_binary-2.9.11-cp39-cp39-win_amd64.whl", hash = "sha256:875039274f8a2361e5207857899706da840768e2a775bf8c65e82f60b197df02"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "pycparser"
@@ -1553,12 +1820,17 @@ files = [
 ]
 markers = {main = "implementation_name != \"PyPy\"", dev = "platform_python_implementation != \"PyPy\" and implementation_name != \"PyPy\""}
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "pycryptodome"
 version = "3.23.0"
 description = "Cryptographic library for Python"
 optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, !=3.6.*"
 groups = ["main"]
 files = [
     {file = "pycryptodome-3.23.0-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:a176b79c49af27d7f6c12e4b178b0824626f40a7b9fed08f712291b6d54bf566"},
@@ -1604,6 +1876,11 @@ files = [
     {file = "pycryptodome-3.23.0.tar.gz", hash = "sha256:447700a657182d60338bab09fdb27518f8856aecd80ae4c6bdddb67ff5da44ef"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "pydantic"
 version = "2.12.3"
@@ -1625,6 +1902,11 @@ typing-inspection = ">=0.4.2"
 [package.extras]
 email = ["email-validator (>=2.0.0)"]
 timezone = ["tzdata ; python_version >= \"3.9\" and platform_system == \"Windows\""]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "pydantic-core"
@@ -1756,6 +2038,11 @@ files = [
 [package.dependencies]
 typing-extensions = ">=4.14.1"
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "pydantic-settings"
 version = "2.11.0"
@@ -1780,6 +2067,11 @@ gcp-secret-manager = ["google-cloud-secret-manager (>=2.23.1)"]
 toml = ["tomli (>=2.0.1)"]
 yaml = ["pyyaml (>=6.0.1)"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "pygments"
 version = "2.19.2"
@@ -1794,6 +2086,11 @@ files = [
 
 [package.extras]
 windows-terminal = ["colorama (>=0.4.6)"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "pyjwt"
@@ -1812,6 +2109,11 @@ crypto = ["cryptography (>=3.4.0)"]
 dev = ["coverage[toml] (==5.0.4)", "cryptography (>=3.4.0)", "pre-commit", "pytest (>=6.0.0,<7.0.0)", "sphinx", "sphinx-rtd-theme", "zope.interface"]
 docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
 tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "pytest"
@@ -1835,6 +2137,11 @@ pygments = ">=2.7.2"
 [package.extras]
 dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "requests", "setuptools", "xmlschema"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "pytest-asyncio"
 version = "1.2.0"
@@ -1854,6 +2161,11 @@ typing-extensions = {version = ">=4.12", markers = "python_version < \"3.13\""}
 [package.extras]
 docs = ["sphinx (>=5.3)", "sphinx-rtd-theme (>=1)"]
 testing = ["coverage (>=6.2)", "hypothesis (>=5.7.1)"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "pytest-cov"
@@ -1875,6 +2187,11 @@ pytest = ">=7"
 [package.extras]
 testing = ["process-tests", "pytest-xdist", "virtualenv"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "python-dotenv"
 version = "1.1.1"
@@ -1890,6 +2207,11 @@ files = [
 [package.extras]
 cli = ["click (>=5.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "python-multipart"
 version = "0.0.20"
@@ -1901,6 +2223,11 @@ files = [
     {file = "python_multipart-0.0.20-py3-none-any.whl", hash = "sha256:8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104"},
     {file = "python_multipart-0.0.20.tar.gz", hash = "sha256:8dd0cab45b8e23064ae09147625994d090fa46f5b0d1e13af944c331a7fa9d13"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "pyyaml"
@@ -1985,6 +2312,11 @@ files = [
     {file = "pyyaml-6.0.3.tar.gz", hash = "sha256:d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "redis"
 version = "6.4.0"
@@ -2001,6 +2333,11 @@ files = [
 hiredis = ["hiredis (>=3.2.0)"]
 jwt = ["pyjwt (>=2.9.0)"]
 ocsp = ["cryptography (>=36.0.1)", "pyopenssl (>=20.0.1)", "requests (>=2.31.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "regex"
@@ -2127,6 +2464,11 @@ files = [
     {file = "regex-2025.9.18.tar.gz", hash = "sha256:c5ba23274c61c6fef447ba6a39333297d0c247f53059dba0bca415cac511edc4"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "requests"
 version = "2.32.5"
@@ -2149,13 +2491,18 @@ urllib3 = ">=1.21.1,<3"
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "rich"
 version = "14.2.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 optional = false
 python-versions = ">=3.8.0"
-groups = ["dev"]
+groups = ["main", "dev"]
 files = [
     {file = "rich-14.2.0-py3-none-any.whl", hash = "sha256:76bc51fe2e57d2b1be1f96c524b890b816e334ab4c1e45888799bfaab0021edd"},
     {file = "rich-14.2.0.tar.gz", hash = "sha256:73ff50c7c0c1c77c8243079283f4edb376f0f6442433aecb8ce7e6d0b92d1fe4"},
@@ -2167,6 +2514,11 @@ pygments = ">=2.13.0,<3.0.0"
 
 [package.extras]
 jupyter = ["ipywidgets (>=7.5.1,<9)"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "ruamel-yaml"
@@ -2186,6 +2538,11 @@ files = [
 [package.extras]
 docs = ["mercurial (>5.7)", "ryd"]
 jinja2 = ["ruamel.yaml.jinja2 (>=0.2)"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "ruamel-yaml-clib"
@@ -2253,6 +2610,11 @@ files = [
     {file = "ruamel.yaml.clib-0.2.14.tar.gz", hash = "sha256:803f5044b13602d58ea378576dd75aa759f52116a0232608e8fdada4da33752e"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "ruff"
 version = "0.14.1"
@@ -2281,6 +2643,11 @@ files = [
     {file = "ruff-0.14.1-py3-none-win_arm64.whl", hash = "sha256:e3b443c4c9f16ae850906b8d0a707b2a4c16f8d2f0a7fe65c475c5886665ce44"},
     {file = "ruff-0.14.1.tar.gz", hash = "sha256:1dd86253060c4772867c61791588627320abcb6ed1577a90ef432ee319729b69"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "safety"
@@ -2320,6 +2687,11 @@ github = ["pygithub (>=1.43.3)"]
 gitlab = ["python-gitlab (>=1.3.0)"]
 spdx = ["spdx-tools (>=0.8.2)"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "safety-schemas"
 version = "0.0.16"
@@ -2338,6 +2710,11 @@ packaging = ">=21.0"
 pydantic = ">=2.6.0"
 ruamel-yaml = ">=0.17.21"
 typing-extensions = ">=4.7.1"
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "setuptools"
@@ -2360,17 +2737,27 @@ enabler = ["pytest-enabler (>=2.2)"]
 test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21) ; python_version >= \"3.9\" and sys_platform != \"cygwin\"", "jaraco.envs (>=2.2)", "jaraco.path (>=3.7.2)", "jaraco.test (>=5.5)", "packaging (>=24.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.*)", "pytest-home (>=0.5)", "pytest-perf ; sys_platform != \"cygwin\"", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel (>=0.44.0)"]
 type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.develop (>=7.21) ; sys_platform != \"cygwin\"", "mypy (==1.14.*)", "pytest-mypy"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "shellingham"
 version = "1.5.4"
 description = "Tool to Detect Surrounding Shell"
 optional = false
 python-versions = ">=3.7"
-groups = ["dev"]
+groups = ["main", "dev"]
 files = [
     {file = "shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686"},
     {file = "shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "sniffio"
@@ -2383,6 +2770,11 @@ files = [
     {file = "sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2"},
     {file = "sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "sqlalchemy"
@@ -2480,6 +2872,11 @@ postgresql-psycopgbinary = ["psycopg[binary] (>=3.0.7)"]
 pymysql = ["pymysql"]
 sqlcipher = ["sqlcipher3_binary"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "starlette"
 version = "0.48.0"
@@ -2499,6 +2896,11 @@ typing-extensions = {version = ">=4.10.0", markers = "python_version < \"3.13\""
 [package.extras]
 full = ["httpx (>=0.27.0,<0.29.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.18)", "pyyaml"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "stevedore"
 version = "5.5.0"
@@ -2510,6 +2912,11 @@ files = [
     {file = "stevedore-5.5.0-py3-none-any.whl", hash = "sha256:18363d4d268181e8e8452e71a38cd77630f345b2ef6b4a8d5614dac5ee0d18cf"},
     {file = "stevedore-5.5.0.tar.gz", hash = "sha256:d31496a4f4df9825e1a1e4f1f74d19abb0154aff311c3b376fcc89dae8fccd73"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "tenacity"
@@ -2527,6 +2934,11 @@ files = [
 doc = ["reno", "sphinx"]
 test = ["pytest", "tornado (>=4.5)", "typeguard"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "tomlkit"
 version = "0.13.3"
@@ -2538,6 +2950,11 @@ files = [
     {file = "tomlkit-0.13.3-py3-none-any.whl", hash = "sha256:c89c649d79ee40629a9fda55f8ace8c6a1b42deb912b2a8fd8d942ddadb606b0"},
     {file = "tomlkit-0.13.3.tar.gz", hash = "sha256:430cf247ee57df2b94ee3fbe588e71d362a941ebb545dec29b53961d61add2a1"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "tqdm"
@@ -2561,13 +2978,18 @@ notebook = ["ipywidgets (>=6)"]
 slack = ["slack-sdk"]
 telegram = ["requests"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "typer"
 version = "0.19.2"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = false
 python-versions = ">=3.8"
-groups = ["dev"]
+groups = ["main", "dev"]
 files = [
     {file = "typer-0.19.2-py3-none-any.whl", hash = "sha256:755e7e19670ffad8283db353267cb81ef252f595aa6834a0d1ca9312d9326cb9"},
     {file = "typer-0.19.2.tar.gz", hash = "sha256:9ad824308ded0ad06cc716434705f691d4ee0bfd0fb081839d2e426860e7fdca"},
@@ -2578,6 +3000,11 @@ click = ">=8.0.0"
 rich = ">=10.11.0"
 shellingham = ">=1.3.0"
 typing-extensions = ">=3.7.4.3"
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "typing-extensions"
@@ -2590,6 +3017,11 @@ files = [
     {file = "typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"},
     {file = "typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "typing-inspection"
@@ -2605,6 +3037,11 @@ files = [
 
 [package.dependencies]
 typing-extensions = ">=4.12.0"
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "urllib3"
@@ -2623,6 +3060,11 @@ brotli = ["brotli (>=1.0.9) ; platform_python_implementation == \"CPython\"", "b
 h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "uvicorn"
@@ -2649,6 +3091,11 @@ websockets = {version = ">=10.4", optional = true, markers = "extra == \"standar
 
 [package.extras]
 standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.6.3)", "python-dotenv (>=0.13)", "pyyaml (>=5.1)", "uvloop (>=0.15.1) ; sys_platform != \"win32\" and sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\"", "watchfiles (>=0.13)", "websockets (>=10.4)"]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "uvloop"
@@ -2715,6 +3162,11 @@ dev = ["Cython (>=3.0,<4.0)", "setuptools (>=60)"]
 docs = ["Sphinx (>=4.1.2,<4.2.0)", "sphinx_rtd_theme (>=0.5.2,<0.6.0)", "sphinxcontrib-asyncio (>=0.3.0,<0.4.0)"]
 test = ["aiohttp (>=3.10.5)", "flake8 (>=6.1,<7.0)", "mypy (>=0.800)", "psutil", "pyOpenSSL (>=25.3.0,<25.4.0)", "pycodestyle (>=2.11.0,<2.12.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "virtualenv"
 version = "20.35.3"
@@ -2735,6 +3187,11 @@ platformdirs = ">=3.9.1,<5"
 [package.extras]
 docs = ["furo (>=2023.7.26)", "proselint (>=0.13)", "sphinx (>=7.1.2,!=7.3)", "sphinx-argparse (>=0.4)", "sphinxcontrib-towncrier (>=0.2.1a0)", "towncrier (>=23.6)"]
 test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7)", "packaging (>=23.1)", "pytest (>=7.4)", "pytest-env (>=0.8.2)", "pytest-freezer (>=0.4.8) ; platform_python_implementation == \"PyPy\" or platform_python_implementation == \"GraalVM\" or platform_python_implementation == \"CPython\" and sys_platform == \"win32\" and python_version >= \"3.13\"", "pytest-mock (>=3.11.1)", "pytest-randomly (>=3.12)", "pytest-timeout (>=2.1)", "setuptools (>=68)", "time-machine (>=2.10) ; platform_python_implementation == \"CPython\""]
+
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
 
 [[package]]
 name = "watchfiles"
@@ -2858,6 +3315,11 @@ files = [
 [package.dependencies]
 anyio = ">=3.0.0"
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [[package]]
 name = "websockets"
 version = "15.0.1"
@@ -2937,7 +3399,12 @@ files = [
     {file = "websockets-15.0.1.tar.gz", hash = "sha256:82544de02076bafba038ce055ee6412d68da13ab47f0c60cab827346de828dee"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pkgs.safetycli.com/repository/moppiesoftware/project/productivity-tracker-backend/pypi/simple"
+reference = "safety"
+
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "98e12adcfecd2697c742678ec1d8584c0284639d3c9c319d66307129905cc824"
+content-hash = "6470fc0789a0f867f0e7739923d1c7cf6564a672ad25f47ad92a6596b6a8b30c"
