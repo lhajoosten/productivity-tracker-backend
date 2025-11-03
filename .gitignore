@@ -70,3 +70,4 @@ productivity_tracker/scripts/**
 .envrc_
 coverage.xml
 testreport.junit.xml
+certs/

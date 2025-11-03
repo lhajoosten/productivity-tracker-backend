@@ -239,7 +239,7 @@ make run
 Or:
 
 ```bash
-poetry run uvicorn productivity_tracker.main:app --reload --host 0.0.0.0 --port 8000
+poetry run uvicorn productivity_tracker.main:app --reload --host 0.0.0.0 --port 3456
 ```
 
 The API will be available at:
@@ -276,7 +276,7 @@ make test-cov
 Comprehensive guides are available in the `docs/` folder:
 
 - **[Error Handling Guide](docs/ERROR_HANDLING.md)** - Learn about the error handling system, custom exceptions, and user-friendly error messages
-- **[RBAC Guide](docs/RBAC_HANDLING.md)** - Complete guide to Role-Based Access Control, permissions, and security best practices
+- **[RBAC Guide](docs/general/RBAC_HANDLING.md)** - Complete guide to Role-Based Access Control, permissions, and security best practices
 
 ### Key Concepts
 
@@ -297,7 +297,7 @@ Fine-grained access control through a Users → Roles → Permissions model:
 - Roles contain multiple permissions
 - Permissions follow the format `resource:action` (e.g., `users:delete`)
 
-See the [RBAC Guide](docs/RBAC_HANDLING.md) for complete documentation.
+See the [RBAC Guide](docs/general/RBAC_HANDLING.md) for complete documentation.
 
 ## 📝 Development
 

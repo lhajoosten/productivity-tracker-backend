@@ -74,6 +74,8 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     """Schema for user update."""
 
+    first_name: str | None = None
+    last_name: str | None = None
     email: EmailStr | None = None
     username: str | None = Field(None, min_length=3, max_length=100)
     is_active: bool | None = None
@@ -90,6 +92,10 @@ class UserResponse(UserBase):
     """Schema for user response."""
 
     id: UUID
+    first_name: str | None = None
+    last_name: str | None = None
+    username: str
+    email: str
     is_active: bool
     is_superuser: bool
     created_at: datetime
@@ -103,6 +109,8 @@ class UserListResponse(BaseModel):
     """Schema for user list response."""
 
     id: UUID
+    first_name: str | None = None
+    last_name: str | None = None
     username: str
     email: str
     is_active: bool

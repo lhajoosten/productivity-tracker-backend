@@ -13,6 +13,8 @@ from productivity_tracker.core.exceptions import (
     InvalidCredentialsError,
     InvalidTokenError,
 )
+from productivity_tracker.core.logging_config import get_logger
+from productivity_tracker.core.redis_client import get_redis_client
 from productivity_tracker.core.security import (
     create_access_token,
     create_refresh_token,
@@ -36,6 +38,21 @@ from productivity_tracker.models.auth import (
 from productivity_tracker.services.user_service import UserService
 
 router = APIRouter()
+logger = get_logger(__name__)
+
+
+def set_auth_cookie(response: Response, token: str) -> None:
+    """Set authentication cookie in response."""
+    response.set_cookie(
+        key=settings.COOKIE_NAME,
+        value=token,
+        domain=settings.COOKIE_DOMAIN or None,
+        path=settings.COOKIE_PATH,
+        httponly=settings.COOKIE_HTTPONLY,
+        secure=settings.COOKIE_SECURE,
+        samesite=settings.COOKIE_SAMESITE,
+        max_age=settings.COOKIE_MAX_AGE,
+    )
 
 
 @router.post(
@@ -68,7 +85,7 @@ def login(
         raise InactiveUserError(user_id=str(user.id))
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
+    access_token, jti = create_access_token(
         data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
 
@@ -77,14 +94,22 @@ def login(
         data={"sub": str(user.id)}, expires_delta=refresh_token_expires
     )
 
-    response.set_cookie(
-        key=settings.COOKIE_NAME,
-        value=access_token,
-        httponly=settings.COOKIE_HTTPONLY,
-        secure=settings.COOKIE_SECURE,
-        samesite=settings.COOKIE_SAMESITE,  # type: ignore[arg-type]
-        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-    )
+    # Create session in Redis
+    redis_client = get_redis_client()
+    if redis_client.is_connected:
+        redis_client.create_session(
+            session_id=jti,
+            user_id=user.id,
+            metadata={
+                "username": user.username,
+                "login_time": str(timedelta(seconds=0)),
+            },
+            ttl_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        )
+        logger.info(f"Created Redis session {jti} for user {user.id}")
+
+    # Set authentication cookie
+    set_auth_cookie(response, access_token)
 
     return LoginResponse(
         message="Login successful",
@@ -96,8 +121,23 @@ def login(
 
 
 @router.post("/auth/logout", operation_id="logout")
-def logout(response: Response):
-    """Logout user by clearing the access token cookie."""
+def logout(
+    response: Response,
+    access_token: str | None = None,
+):
+    """Logout user by clearing the access token cookie and deleting Redis session."""
+    # Try to get token from cookie
+    if access_token:
+        payload = decode_token(access_token)
+        if payload:
+            jti = payload.get("jti")
+            if jti:
+                # Delete session from Redis
+                redis_client = get_redis_client()
+                if redis_client.is_connected:
+                    redis_client.delete_session(jti)
+                    logger.info(f"Deleted Redis session {jti}")
+
     response.delete_cookie(key=settings.COOKIE_NAME)
     return {"message": "Logout successful"}
 
@@ -121,21 +161,25 @@ def refresh_token(
         if not user_id:
             raise InvalidTokenError(reason="Missing user ID in token")
 
-        # Create new access token
+        # Create new access token with new session ID
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(
+        access_token, jti = create_access_token(
             data={"sub": user_id}, expires_delta=access_token_expires
         )
 
-        # Set new cookie
-        response.set_cookie(
-            key=settings.COOKIE_NAME,
-            value=access_token,
-            httponly=settings.COOKIE_HTTPONLY,
-            secure=settings.COOKIE_SECURE,
-            samesite=settings.COOKIE_SAMESITE,  # type: ignore[arg-type]
-            max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        )
+        # Create new session in Redis
+        redis_client = get_redis_client()
+        if redis_client.is_connected:
+            redis_client.create_session(
+                session_id=jti,
+                user_id=UUID(user_id),
+                metadata={"refreshed": True},
+                ttl_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            )
+            logger.info(f"Created new Redis session {jti} after token refresh")
+
+        # Set authentication cookie
+        set_auth_cookie(response, access_token)
 
         return Token(access_token=access_token, token_type="bearer")  # nosec
 

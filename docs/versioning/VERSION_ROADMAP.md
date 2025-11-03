@@ -565,7 +565,7 @@ Changes to this roadmap require:
 
 - [VERSIONING_STRATEGY.md](VERSIONING_STRATEGY.md) - Semantic versioning guidelines
 - [ERROR_HANDLING.md](../ERROR_HANDLING.md) - Error handling patterns
-- [RBAC_HANDLING.md](../RBAC_HANDLING.md) - Role-based access control design
+- [RBAC_HANDLING.md](../general/RBAC_HANDLING.md) - Role-based access control design
 - [TESTING.md](../TESTING.md) - Testing strategy and guidelines
 - [README.md](../../README.md) - Project overview and setup
 

@@ -73,7 +73,7 @@ test-ci-full: ## Run all tests with coverage for CI environment
 	@$(MAKE) test-db-clean
 
 run: ## Run the development server
-	poetry run uvicorn productivity_tracker.main:app --reload --host 0.0.0.0 --port 8000
+	poetry run uvicorn productivity_tracker.main:app --host api.localhost --port 3456 --reload  --ssl-keyfile ./certs/api.localhost-key.pem --ssl-certfile ./certs/api.localhost.pem
 
 migrate: ## Create a new migration
 	@read -p "Migration message: " message; \
