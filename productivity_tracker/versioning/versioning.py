@@ -69,7 +69,7 @@ class Feature(str, Enum):
     # Version 1.1.0-beta - Security update (COMPLETED)
     # ========================================================================
     REDIS_CACHING = "redis_caching"
-    COOKIE_AUTHENTHICATION = "cookie_authentication"
+    COOKIE_AUTHENTICATION = "cookie_authentication"
     HTTPS_CONFIGURATION = "https_configuration"
 
     # ========================================================================
