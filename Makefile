@@ -75,6 +75,9 @@ test-ci-full: ## Run all tests with coverage for CI environment
 run: ## Run the development server
 	poetry run uvicorn productivity_tracker.main:app --host api.localhost --port 3456 --reload  --ssl-keyfile ./certs/api.localhost-key.pem --ssl-certfile ./certs/api.localhost.pem
 
+run-docker: ## Run the development server inside Docker
+	docker compose -f docker-compose.yml up --build
+
 migrate: ## Create a new migration
 	@read -p "Migration message: " message; \
 	poetry run alembic revision --autogenerate -m "$$message"

@@ -66,14 +66,14 @@ class Feature(str, Enum):
     DATABASE_MIGRATIONS = "database_migrations"
 
     # ========================================================================
-    # Version 1.1.0-beta - Security update (COMPLETED)
+    # Version 1.1.1-alpha - Security update (COMPLETED)
     # ========================================================================
     REDIS_CACHING = "redis_caching"
     COOKIE_AUTHENTICATION = "cookie_authentication"
     HTTPS_CONFIGURATION = "https_configuration"
 
     # ========================================================================
-    # Version 1.1.0-alpha - Security & Validation Enhancement (PLANNED)
+    # Version 1.1.1-beta - Security & Validation Enhancement (PLANNED)
     # ========================================================================
     RATE_LIMITING = "rate_limiting"
     PASSWORD_COMPLEXITY = "password_complexity"  # nosec
@@ -340,10 +340,11 @@ class DeprecationInfo:
 V1_0 = Version(
     major=1,
     minor=1,
-    patch=0,
-    prerelease="beta",
+    patch=1,
+    prerelease="alpha",
+    build_metadata="2025-11-03",
     status=VersionStatus.ACTIVE,
-    release_date=date(2025, 11, 3),
+    release_date=date(2025, 11, 4),
     docs_url="/docs",
 )
 

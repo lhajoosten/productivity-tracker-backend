@@ -1,3 +1,4 @@
+# python
 """Redis client for session management."""
 
 import json
@@ -48,6 +49,9 @@ class RedisClient:
         """Check if Redis is connected."""
         return self._client is not None
 
+    def _user_set_key(self, user_id: UUID) -> str:
+        return f"user_sessions:{user_id}"
+
     def create_session(
         self,
         session_id: str,
@@ -56,16 +60,7 @@ class RedisClient:
         ttl_seconds: int | None = None,
     ) -> bool:
         """
-        Create a new session in Redis.
-
-        Args:
-            session_id: Unique session identifier (typically JTI from JWT)
-            user_id: User ID associated with the session
-            metadata: Additional session metadata
-            ttl_seconds: Session TTL in seconds (defaults to ACCESS_TOKEN_EXPIRE_MINUTES)
-
-        Returns:
-            True if session created successfully, False otherwise
+        Create a new session in Redis and add the session id to the user's session set.
         """
         if not self._client:
             return False
@@ -80,7 +75,14 @@ class RedisClient:
             ttl = ttl_seconds or (settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60)
 
             key = f"session:{session_id}"
-            self._client.setex(key, ttl, json.dumps(session_data))
+            user_key = self._user_set_key(user_id)
+
+            # Use pipeline to set session and record the index atomically
+            pipe = self._client.pipeline()
+            pipe.setex(key, ttl, json.dumps(session_data))
+            pipe.sadd(user_key, session_id)
+            pipe.execute()
+
             logger.debug(f"Created session {session_id} for user {user_id}")
             return True
         except Exception as e:
@@ -113,20 +115,29 @@ class RedisClient:
 
     def delete_session(self, session_id: str) -> bool:
         """
-        Delete a session from Redis.
-
-        Args:
-            session_id: Session identifier
-
-        Returns:
-            True if session deleted, False otherwise
+        Delete a session from Redis and remove it from the user's session set.
         """
         if not self._client:
             return False
 
         try:
             key = f"session:{session_id}"
-            self._client.delete(key)
+            data = self._client.get(key)
+            user_key = None
+
+            if data:
+                session_data = json.loads(data)
+                user_id = session_data.get("user_id")
+                if user_id:
+                    user_key = f"user_sessions:{user_id}"
+
+            # Use pipeline to remove session and update index
+            pipe = self._client.pipeline()
+            pipe.delete(key)
+            if user_key:
+                pipe.srem(user_key, session_id)
+            pipe.execute()
+
             logger.debug(f"Deleted session {session_id}")
             return True
         except Exception as e:
@@ -135,10 +146,7 @@ class RedisClient:
 
     def delete_user_sessions(self, user_id: UUID) -> int:
         """
-        Delete all sessions for a user.
-
-        Args:
-            user_id: User ID
+        Delete all sessions for a user using the user-to-sessions index set.
 
         Returns:
             Number of sessions deleted
@@ -147,20 +155,23 @@ class RedisClient:
             return 0
 
         try:
-            # Find all session keys for this user
-            pattern = "session:*"
-            deleted = 0
+            user_key = self._user_set_key(user_id)
+            session_ids = self._client.smembers(user_key)
+            if not session_ids:
+                logger.info(f"No sessions found for user {user_id}")
+                return 0
 
-            for key in self._client.scan_iter(pattern):
-                data = self._client.get(key)
-                if data:
-                    session_data = json.loads(data)
-                    if session_data.get("user_id") == str(user_id):
-                        self._client.delete(key)
-                        deleted += 1
+            # Build session keys and delete them in a pipeline, then remove the user set
+            session_keys = [f"session:{sid}" for sid in session_ids]
+            pipe = self._client.pipeline()
+            if session_keys:
+                pipe.delete(*session_keys)
+            pipe.delete(user_key)
+            results = pipe.execute()
 
+            deleted = results[0] if results else 0
             logger.info(f"Deleted {deleted} sessions for user {user_id}")
-            return deleted
+            return int(deleted)
         except Exception as e:
             logger.error(f"Failed to delete user sessions: {e}")
             return 0
@@ -189,29 +200,17 @@ class RedisClient:
 
     def get_user_sessions_count(self, user_id: UUID) -> int:
         """
-        Get count of active sessions for a user.
+        Get count of active sessions for a user using SCARD on the user set.
 
-        Args:
-            user_id: User ID
-
-        Returns:
-            Number of active sessions
+        Note: This may include stale entries if sessions expired without explicit removal.
         """
         if not self._client:
             return 0
 
         try:
-            pattern = "session:*"
-            count = 0
-
-            for key in self._client.scan_iter(pattern):
-                data = self._client.get(key)
-                if data:
-                    session_data = json.loads(data)
-                    if session_data.get("user_id") == str(user_id):
-                        count += 1
-
-            return count
+            user_key = self._user_set_key(user_id)
+            count = self._client.scard(user_key)
+            return int(count)
         except Exception as e:
             logger.error(f"Failed to get user sessions count: {e}")
             return 0

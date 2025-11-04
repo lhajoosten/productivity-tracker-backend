@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Response, status
@@ -102,7 +102,7 @@ def login(
             user_id=user.id,
             metadata={
                 "username": user.username,
-                "login_time": str(timedelta(seconds=0)),
+                "login_time": datetime.utcnow().isoformat(),
             },
             ttl_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         )
