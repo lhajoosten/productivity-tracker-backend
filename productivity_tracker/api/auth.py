@@ -43,6 +43,11 @@ logger = get_logger(__name__)
 
 def set_auth_cookie(response: Response, token: str) -> None:
     """Set authentication cookie in response."""
+    # Cast to Literal for type safety
+    samesite: str | None = settings.COOKIE_SAMESITE
+    if samesite not in ("lax", "strict", "none"):
+        samesite = "lax"  # Default to lax if invalid
+
     response.set_cookie(
         key=settings.COOKIE_NAME,
         value=token,
@@ -50,7 +55,7 @@ def set_auth_cookie(response: Response, token: str) -> None:
         path=settings.COOKIE_PATH,
         httponly=settings.COOKIE_HTTPONLY,
         secure=settings.COOKIE_SECURE,
-        samesite=settings.COOKIE_SAMESITE,
+        samesite=samesite,  # type: ignore
         max_age=settings.COOKIE_MAX_AGE,
     )
 
@@ -90,7 +95,7 @@ def login(
     )
 
     refresh_token_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    refresh_token = create_refresh_token(
+    created_refresh_token = create_refresh_token(
         data={"sub": str(user.id)}, expires_delta=refresh_token_expires
     )
 
@@ -115,7 +120,7 @@ def login(
         message="Login successful",
         user=UserListResponse.model_validate(user),
         access_token=access_token,
-        refresh_token=refresh_token,
+        refresh_token=created_refresh_token,
         token_type="bearer",  # nosec
     )
 

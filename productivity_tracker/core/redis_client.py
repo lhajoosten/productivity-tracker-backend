@@ -1,4 +1,3 @@
-# python
 """Redis client for session management."""
 
 import json
@@ -17,12 +16,12 @@ logger = logging.getLogger(__name__)
 class RedisClient:
     """Redis client for managing user sessions."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize Redis connection."""
         self._client: Redis | None = None
         self._connect()
 
-    def _connect(self):
+    def _connect(self) -> None:
         """Connect to Redis server."""
         if not settings.REDIS_URL:
             logger.warning("Redis URL not configured, session management disabled")
@@ -50,6 +49,7 @@ class RedisClient:
         return self._client is not None
 
     def _user_set_key(self, user_id: UUID) -> str:
+        """Generate Redis key for user sessions set."""
         return f"user_sessions:{user_id}"
 
     def create_session(
@@ -106,7 +106,7 @@ class RedisClient:
             key = f"session:{session_id}"
             data = self._client.get(key)
             if data:
-                session_data: dict[str, Any] = json.loads(data)
+                session_data: dict[str, Any] = json.loads(str(data))
                 return session_data
             return None
         except Exception as e:
@@ -126,7 +126,7 @@ class RedisClient:
             user_key = None
 
             if data:
-                session_data = json.loads(data)
+                session_data = json.loads(str(data))
                 user_id = session_data.get("user_id")
                 if user_id:
                     user_key = f"user_sessions:{user_id}"
@@ -156,7 +156,7 @@ class RedisClient:
 
         try:
             user_key = self._user_set_key(user_id)
-            session_ids = self._client.smembers(user_key)
+            session_ids = set(self._client.smembers(user_key))  # type: ignore[arg-type]
             if not session_ids:
                 logger.info(f"No sessions found for user {user_id}")
                 return 0
@@ -210,12 +210,12 @@ class RedisClient:
         try:
             user_key = self._user_set_key(user_id)
             count = self._client.scard(user_key)
-            return int(count)
+            return int(count) if count is not None else 0  # type: ignore[arg-type]
         except Exception as e:
             logger.error(f"Failed to get user sessions count: {e}")
             return 0
 
-    def close(self):
+    def close(self) -> None:
         """Close Redis connection."""
         if self._client:
             self._client.close()
