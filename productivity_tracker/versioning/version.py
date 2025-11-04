@@ -26,7 +26,7 @@ VERSION_HISTORY = [
         "version": "1.0.0-beta",
         "release_date": "2025-11-01",
         "release_name": "Foundation - First Beta",
-        "status": "previous",
+        "status": "deprecated",
     },
     {
         "version": "1.1.0-alpha",

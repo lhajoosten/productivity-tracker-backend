@@ -39,7 +39,9 @@ def setup_versioned_routers(app: FastAPI) -> None:
         logger.info("Adding auth router")
         app.include_router(auth_router, prefix=CURRENT_VERSION.api_prefix, tags=["Authentication"])
         logger.info("Adding sessions router")
-        app.include_router(sessions_router, prefix=CURRENT_VERSION.api_prefix, tags=["Sessions"])
+        app.include_router(
+            sessions_router, prefix=CURRENT_VERSION.api_prefix, tags=["Authentication"]
+        )
 
     # RBAC - Roles
     if is_feature_enabled(Feature.RBAC_SYSTEM):

@@ -34,6 +34,7 @@ class VersionStatus(str, Enum):
 
     PLANNED = "planned"  # Version is planned but not yet in development
     IN_DEVELOPMENT = "in_development"  # Active development
+    ALPHA = "alpha"  # Early testing, may be unstable
     BETA = "beta"  # Feature complete, in testing
     RC = "rc"  # Release candidate, final testing
     ACTIVE = "active"  # Current production version
@@ -64,6 +65,7 @@ class Feature(str, Enum):
     API_DOCUMENTATION = "api_documentation"
     ERROR_HANDLING = "error_handling"
     DATABASE_MIGRATIONS = "database_migrations"
+    RATE_LIMITING = "rate_limiting"
 
     # ========================================================================
     # Version 1.1.1-alpha - Security update (COMPLETED)
@@ -71,17 +73,16 @@ class Feature(str, Enum):
     REDIS_CACHING = "redis_caching"
     COOKIE_AUTHENTICATION = "cookie_authentication"
     HTTPS_CONFIGURATION = "https_configuration"
+    XSS_PROTECTION = "xss_protection"
 
     # ========================================================================
     # Version 1.1.1-beta - Security & Validation Enhancement (PLANNED)
     # ========================================================================
-    RATE_LIMITING = "rate_limiting"
     PASSWORD_COMPLEXITY = "password_complexity"  # nosec
     ACCOUNT_LOCKOUT = "account_lockout"  # nosec
     PASSWORD_RESET = "password_reset"  # nosec
     API_KEY_AUTH = "api_key_auth"
     INPUT_SANITIZATION = "input_sanitization"
-    XSS_PROTECTION = "xss_protection"
     AUDIT_LOGGING = "audit_logging"
     LOGIN_ACTIVITY_TRACKING = "login_activity_tracking"
 
@@ -286,6 +287,7 @@ class Version:
     def is_supported(self) -> bool:
         """Check if version is currently supported."""
         return self.status in [
+            VersionStatus.ALPHA,
             VersionStatus.BETA,
             VersionStatus.RC,
             VersionStatus.ACTIVE,
@@ -339,6 +341,17 @@ class DeprecationInfo:
 # All versions in chronological order
 V1_0 = Version(
     major=1,
+    minor=0,
+    patch=0,
+    prerelease="beta",
+    status=VersionStatus.ACTIVE,
+    release_date=date(2025, 10, 31),
+    eol_date=date(2025, 12, 31),
+    docs_url="/docs",
+)
+
+V1_1 = Version(
+    major=1,
     minor=1,
     patch=1,
     prerelease="alpha",
@@ -346,14 +359,6 @@ V1_0 = Version(
     status=VersionStatus.ACTIVE,
     release_date=date(2025, 11, 4),
     docs_url="/docs",
-)
-
-V1_1 = Version(
-    major=1,
-    minor=1,
-    patch=0,
-    status=VersionStatus.PLANNED,
-    docs_url="/docs/v1.1",
 )
 
 V1_2 = Version(
@@ -429,10 +434,10 @@ V2_3 = Version(
 )
 
 # Current version (what's deployed)
-CURRENT_VERSION = V1_0
+CURRENT_VERSION = V1_1
 
 # Latest version (may be in development)
-LATEST_VERSION = V1_0
+LATEST_VERSION = V1_1
 
 # All versions
 ALL_VERSIONS = [V1_0, V1_1, V1_2, V1_3, V1_4, V1_5, V1_6, V2_0, V2_1, V2_2, V2_3]
