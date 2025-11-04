@@ -3,7 +3,11 @@
 import pytest
 from fastapi import status
 
+from productivity_tracker.versioning import CURRENT_VERSION
+
 pytestmark = [pytest.mark.integration, pytest.mark.asyncio]
+
+API_PREFIX = CURRENT_VERSION.api_prefix
 
 
 class TestOrganizationCreation:
@@ -17,7 +21,7 @@ class TestOrganizationCreation:
             "description": "A test organization",
         }
 
-        response = authenticated_client.post("/api/v1.1/organizations", json=data)
+        response = authenticated_client.post(f"{API_PREFIX}/organizations", json=data)
 
         assert response.status_code == status.HTTP_201_CREATED
         org = response.json()
@@ -37,7 +41,7 @@ class TestOrganizationCreation:
             "description": "Another org",
         }
 
-        response = authenticated_client.post("/api/v1.1/organizations", json=data)
+        response = authenticated_client.post(f"{API_PREFIX}/organizations", json=data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -45,7 +49,7 @@ class TestOrganizationCreation:
         """Should reject invalid data."""
         data = {"name": ""}  # Empty name
 
-        response = authenticated_client.post("/api/v1.1/organizations", json=data)
+        response = authenticated_client.post(f"{API_PREFIX}/organizations", json=data)
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -56,7 +60,7 @@ class TestOrganizationCreation:
             "slug": "test-org",
         }
 
-        response = client_integration.post("/api/v1.1/organizations", json=data)
+        response = client_integration.post(f"{API_PREFIX}/organizations", json=data)
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -66,7 +70,7 @@ class TestOrganizationRetrieval:
 
     async def test_get_all_organizations(self, authenticated_client, test_organization):
         """Should get all organizations."""
-        response = authenticated_client.get("/api/v1.1/organizations")
+        response = authenticated_client.get(f"{API_PREFIX}/organizations")
 
         assert response.status_code == status.HTTP_200_OK
         orgs = response.json()
@@ -76,7 +80,7 @@ class TestOrganizationRetrieval:
 
     async def test_get_organization_by_id(self, authenticated_client, test_organization):
         """Should get organization by ID."""
-        response = authenticated_client.get(f"/api/v1.1/organizations/{test_organization.id}")
+        response = authenticated_client.get(f"{API_PREFIX}/organizations/{test_organization.id}")
 
         assert response.status_code == status.HTTP_200_OK
         org = response.json()
@@ -100,7 +104,7 @@ class TestOrganizationRetrieval:
         )
         db_session.commit()
 
-        response = authenticated_client.get("/api/v1.1/organizations/current")
+        response = authenticated_client.get(f"{API_PREFIX}/organizations/current")
 
         assert response.status_code == status.HTTP_200_OK
         org = response.json()
@@ -111,7 +115,7 @@ class TestOrganizationRetrieval:
         from uuid import uuid4
 
         fake_id = uuid4()
-        response = authenticated_client.get(f"/api/v1.1/organizations/{fake_id}")
+        response = authenticated_client.get(f"{API_PREFIX}/organizations/{fake_id}")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -127,7 +131,7 @@ class TestOrganizationUpdate:
         }
 
         response = authenticated_client.put(
-            f"/api/v1.1/organizations/{test_organization.id}", json=data
+            f"{API_PREFIX}/organizations/{test_organization.id}", json=data
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -143,7 +147,7 @@ class TestOrganizationUpdate:
         fake_id = uuid4()
         data = {"name": "Updated"}
 
-        response = authenticated_client.put(f"/api/v1.1/organizations/{fake_id}", json=data)
+        response = authenticated_client.put(f"{API_PREFIX}/organizations/{fake_id}", json=data)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -153,7 +157,7 @@ class TestOrganizationDeletion:
 
     async def test_delete_organization_success(self, authenticated_client, test_organization):
         """Should soft delete organization successfully."""
-        response = authenticated_client.delete(f"/api/v1.1/organizations/{test_organization.id}")
+        response = authenticated_client.delete(f"{API_PREFIX}/organizations/{test_organization.id}")
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
@@ -162,7 +166,7 @@ class TestOrganizationDeletion:
         from uuid import uuid4
 
         fake_id = uuid4()
-        response = authenticated_client.delete(f"/api/v1.1/organizations/{fake_id}")
+        response = authenticated_client.delete(f"{API_PREFIX}/organizations/{fake_id}")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -190,7 +194,7 @@ class TestOrganizationMembers:
         db_session.refresh(new_user)
 
         response = authenticated_client.post(
-            f"/api/v1.1/organizations/{test_organization.id}/members/{new_user.id}"
+            f"{API_PREFIX}/organizations/{test_organization.id}/members/{new_user.id}"
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -214,7 +218,7 @@ class TestOrganizationMembers:
         db_session.commit()
 
         response = authenticated_client.delete(
-            f"/api/v1.1/organizations/{test_organization.id}/members/{test_user.id}"
+            f"{API_PREFIX}/organizations/{test_organization.id}/members/{test_user.id}"
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -236,7 +240,7 @@ class TestOrganizationMembers:
         db_session.commit()
 
         response = authenticated_client.get(
-            f"/api/v1.1/organizations/{test_organization.id}/members"
+            f"{API_PREFIX}/organizations/{test_organization.id}/members"
         )
 
         assert response.status_code == status.HTTP_200_OK

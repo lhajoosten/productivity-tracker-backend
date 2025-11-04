@@ -3,9 +3,12 @@
 import pytest
 from fastapi import status
 
+from productivity_tracker.versioning import CURRENT_VERSION
 from tests.utilities import assert_problem_detail_response
 
 pytestmark = [pytest.mark.integration, pytest.mark.asyncio]
+
+API_PREFIX = CURRENT_VERSION.api_prefix
 
 
 class TestTeamCreation:
@@ -19,7 +22,7 @@ class TestTeamCreation:
             "description": "Backend development team",
         }
 
-        response = authenticated_client.post("/api/v1.1/teams", json=data)
+        response = authenticated_client.post(f"{API_PREFIX}/teams", json=data)
 
         assert response.status_code == status.HTTP_201_CREATED
         team = response.json()
@@ -37,7 +40,7 @@ class TestTeamCreation:
             "lead_id": str(test_user.id),
         }
 
-        response = authenticated_client.post("/api/v1.1/teams", json=data)
+        response = authenticated_client.post(f"{API_PREFIX}/teams", json=data)
 
         assert response.status_code == status.HTTP_201_CREATED
         team = response.json()
@@ -53,7 +56,7 @@ class TestTeamCreation:
             "department_id": str(uuid4()),
         }
 
-        response = authenticated_client.post("/api/v1.1/teams", json=data)
+        response = authenticated_client.post(f"{API_PREFIX}/teams", json=data)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert_problem_detail_response(
@@ -70,7 +73,7 @@ class TestTeamCreation:
             "lead_id": str(uuid4()),
         }
 
-        response = authenticated_client.post("/api/v1.1/teams", json=data)
+        response = authenticated_client.post(f"{API_PREFIX}/teams", json=data)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -78,7 +81,7 @@ class TestTeamCreation:
         """Should reject missing required fields."""
         data = {"name": ""}  # Empty name
 
-        response = authenticated_client.post("/api/v1.1/teams", json=data)
+        response = authenticated_client.post(f"{API_PREFIX}/teams", json=data)
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -89,7 +92,7 @@ class TestTeamCreation:
             "department_id": str(test_department.id),
         }
 
-        response = client_integration.post("/api/v1.1/teams", json=data)
+        response = client_integration.post(f"{API_PREFIX}/teams", json=data)
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -99,7 +102,7 @@ class TestTeamRetrieval:
 
     async def test_get_all_teams(self, authenticated_client, test_team):
         """Should get all teams."""
-        response = authenticated_client.get("/api/v1.1/teams")
+        response = authenticated_client.get(f"{API_PREFIX}/teams")
 
         assert response.status_code == status.HTTP_200_OK
         teams = response.json()
@@ -109,7 +112,7 @@ class TestTeamRetrieval:
 
     async def test_get_team_by_id(self, authenticated_client, test_team):
         """Should get team by ID."""
-        response = authenticated_client.get(f"/api/v1.1/teams/{test_team.id}")
+        response = authenticated_client.get(f"{API_PREFIX}/teams/{test_team.id}")
 
         assert response.status_code == status.HTTP_200_OK
         team = response.json()
@@ -132,7 +135,7 @@ class TestTeamRetrieval:
         from uuid import uuid4
 
         fake_id = uuid4()
-        response = authenticated_client.get(f"/api/v1.1/teams/{fake_id}")
+        response = authenticated_client.get(f"{API_PREFIX}/teams/{fake_id}")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert_problem_detail_response(
@@ -150,7 +153,7 @@ class TestTeamUpdate:
             "description": "Updated description",
         }
 
-        response = authenticated_client.put(f"/api/v1.1/teams/{test_team.id}", json=data)
+        response = authenticated_client.put(f"{API_PREFIX}/teams/{test_team.id}", json=data)
 
         assert response.status_code == status.HTTP_200_OK
         team = response.json()
@@ -161,7 +164,7 @@ class TestTeamUpdate:
         """Should update team lead."""
         data = {"lead_id": str(test_user.id)}
 
-        response = authenticated_client.put(f"/api/v1.1/teams/{test_team.id}", json=data)
+        response = authenticated_client.put(f"{API_PREFIX}/teams/{test_team.id}", json=data)
 
         assert response.status_code == status.HTTP_200_OK
         team = response.json()
@@ -174,7 +177,7 @@ class TestTeamUpdate:
         fake_id = uuid4()
         data = {"name": "Updated"}
 
-        response = authenticated_client.put(f"/api/v1.1/teams/{fake_id}", json=data)
+        response = authenticated_client.put(f"{API_PREFIX}/teams/{fake_id}", json=data)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -184,7 +187,7 @@ class TestTeamDeletion:
 
     async def test_delete_team_success(self, authenticated_client, test_team):
         """Should soft delete team successfully."""
-        response = authenticated_client.delete(f"/api/v1.1/teams/{test_team.id}")
+        response = authenticated_client.delete(f"{API_PREFIX}/teams/{test_team.id}")
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
@@ -193,7 +196,7 @@ class TestTeamDeletion:
         from uuid import uuid4
 
         fake_id = uuid4()
-        response = authenticated_client.delete(f"/api/v1.1/teams/{fake_id}")
+        response = authenticated_client.delete(f"{API_PREFIX}/teams/{fake_id}")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -205,7 +208,9 @@ class TestTeamMembers:
         """Should add member to team."""
         data = {"user_id": str(test_user.id)}
 
-        response = authenticated_client.post(f"/api/v1.1/teams/{test_team.id}/members", json=data)
+        response = authenticated_client.post(
+            f"{API_PREFIX}/teams/{test_team.id}/members", json=data
+        )
 
         assert response.status_code == status.HTTP_200_OK
         team = response.json()
@@ -217,7 +222,9 @@ class TestTeamMembers:
 
         data = {"user_id": str(uuid4())}
 
-        response = authenticated_client.post(f"/api/v1.1/teams/{test_team.id}/members", json=data)
+        response = authenticated_client.post(
+            f"{API_PREFIX}/teams/{test_team.id}/members", json=data
+        )
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -228,7 +235,7 @@ class TestTeamMembers:
         fake_id = uuid4()
         data = {"user_id": str(test_user.id)}
 
-        response = authenticated_client.post(f"/api/v1.1/teams/{fake_id}/members", json=data)
+        response = authenticated_client.post(f"{API_PREFIX}/teams/{fake_id}/members", json=data)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -243,7 +250,7 @@ class TestTeamMembers:
         db_session.commit()
 
         response = authenticated_client.delete(
-            f"/api/v1.1/teams/{test_team.id}/members/{test_user.id}"
+            f"{API_PREFIX}/teams/{test_team.id}/members/{test_user.id}"
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -256,7 +263,7 @@ class TestTeamMembers:
         db_session.execute(user_teams.insert().values(user_id=test_user.id, team_id=test_team.id))
         db_session.commit()
 
-        response = authenticated_client.get(f"/api/v1.1/teams/{test_team.id}/members")
+        response = authenticated_client.get(f"{API_PREFIX}/teams/{test_team.id}/members")
 
         assert response.status_code == status.HTTP_200_OK
         members = response.json()
@@ -277,7 +284,9 @@ class TestTeamMembers:
         # Try to add again
         data = {"user_id": str(test_user.id)}
 
-        response = authenticated_client.post(f"/api/v1.1/teams/{test_team.id}/members", json=data)
+        response = authenticated_client.post(
+            f"{API_PREFIX}/teams/{test_team.id}/members", json=data
+        )
 
         # Should succeed (idempotent) or return appropriate status
         # 200 means it succeeded (or was already a member), 400 means duplicate

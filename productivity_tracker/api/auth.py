@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
+from starlette.requests import Request
 
 from productivity_tracker.core.dependencies import (
     get_current_active_user,
@@ -51,7 +52,7 @@ def set_auth_cookie(response: Response, token: str) -> None:
     response.set_cookie(
         key=settings.COOKIE_NAME,
         value=token,
-        domain=settings.COOKIE_DOMAIN or None,
+        # domain=settings.COOKIE_DOMAIN or None,
         path=settings.COOKIE_PATH,
         httponly=settings.COOKIE_HTTPONLY,
         secure=settings.COOKIE_SECURE,
@@ -115,6 +116,9 @@ def login(
 
     # Set authentication cookie
     set_auth_cookie(response, access_token)
+    logger.info(
+        f"Set authentication cookie {settings.COOKIE_NAME} for user {user.id} over HTTPS secure: {settings.COOKIE_SECURE}"
+    )
 
     return LoginResponse(
         message="Login successful",
@@ -128,12 +132,15 @@ def login(
 @router.post("/auth/logout", operation_id="logout")
 def logout(
     response: Response,
+    request: Request,
     access_token: str | None = None,
 ):
     """Logout user by clearing the access token cookie and deleting Redis session."""
-    # Try to get token from cookie
-    if access_token:
-        payload = decode_token(access_token)
+    # Try to get token from parameter first, then from cookie
+    token = access_token or request.cookies.get(settings.COOKIE_NAME)
+
+    if token:
+        payload = decode_token(token)
         if payload:
             jti = payload.get("jti")
             if jti:
@@ -144,6 +151,8 @@ def logout(
                     logger.info(f"Deleted Redis session {jti}")
 
     response.delete_cookie(key=settings.COOKIE_NAME)
+    logger.info(f"Deleted authentication cookie {settings.COOKIE_NAME}")
+
     return {"message": "Logout successful"}
 
 
