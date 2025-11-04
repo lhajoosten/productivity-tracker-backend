@@ -252,7 +252,7 @@ The API will be available at:
 
 The API uses semantic versioning with the following structure:
 - **Current Version:** v1.0 (Production Ready)
-- **API Base Path:** `/api/v1.0/` or `/api/v1/` (major version alias)
+- **API Base Path:** `/api/v1.1/` or `/api/v1/` (major version alias)
 - **Feature Flags:** Controlled via version-specific feature toggles
 
 **Version Status:**

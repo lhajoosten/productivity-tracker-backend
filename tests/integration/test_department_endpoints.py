@@ -19,7 +19,7 @@ class TestDepartmentCreation:
             "description": "Engineering department",
         }
 
-        response = authenticated_client.post("/api/v1.0/departments", json=data)
+        response = authenticated_client.post("/api/v1.1/departments", json=data)
 
         assert response.status_code == status.HTTP_201_CREATED
         dept = response.json()
@@ -38,7 +38,7 @@ class TestDepartmentCreation:
             "organization_id": str(uuid4()),
         }
 
-        response = authenticated_client.post("/api/v1.0/departments", json=data)
+        response = authenticated_client.post("/api/v1.1/departments", json=data)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert_problem_detail_response(
@@ -49,7 +49,7 @@ class TestDepartmentCreation:
         """Should reject missing required fields."""
         data = {"name": ""}  # Empty name
 
-        response = authenticated_client.post("/api/v1.0/departments", json=data)
+        response = authenticated_client.post("/api/v1.1/departments", json=data)
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -60,7 +60,7 @@ class TestDepartmentCreation:
             "organization_id": str(test_organization.id),
         }
 
-        response = client_integration.post("/api/v1.0/departments", json=data)
+        response = client_integration.post("/api/v1.1/departments", json=data)
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -70,7 +70,7 @@ class TestDepartmentRetrieval:
 
     async def test_get_all_departments(self, authenticated_client, test_department):
         """Should get all departments."""
-        response = authenticated_client.get("/api/v1.0/departments")
+        response = authenticated_client.get("/api/v1.1/departments")
 
         assert response.status_code == status.HTTP_200_OK
         depts = response.json()
@@ -80,7 +80,7 @@ class TestDepartmentRetrieval:
 
     async def test_get_department_by_id(self, authenticated_client, test_department):
         """Should get department by ID."""
-        response = authenticated_client.get(f"/api/v1.0/departments/{test_department.id}")
+        response = authenticated_client.get(f"/api/v1.1/departments/{test_department.id}")
 
         assert response.status_code == status.HTTP_200_OK
         dept = response.json()
@@ -93,7 +93,7 @@ class TestDepartmentRetrieval:
     ):
         """Should get departments by organization."""
         response = authenticated_client.get(
-            f"/api/v1.0/organizations/{test_organization.id}/departments"
+            f"/api/v1.1/organizations/{test_organization.id}/departments"
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -107,7 +107,7 @@ class TestDepartmentRetrieval:
         from uuid import uuid4
 
         fake_id = uuid4()
-        response = authenticated_client.get(f"/api/v1.0/departments/{fake_id}")
+        response = authenticated_client.get(f"/api/v1.1/departments/{fake_id}")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert_problem_detail_response(
@@ -126,7 +126,7 @@ class TestDepartmentUpdate:
         }
 
         response = authenticated_client.put(
-            f"/api/v1.0/departments/{test_department.id}", json=data
+            f"/api/v1.1/departments/{test_department.id}", json=data
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -141,7 +141,7 @@ class TestDepartmentUpdate:
         fake_id = uuid4()
         data = {"name": "Updated"}
 
-        response = authenticated_client.put(f"/api/v1.0/departments/{fake_id}", json=data)
+        response = authenticated_client.put(f"/api/v1.1/departments/{fake_id}", json=data)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -151,7 +151,7 @@ class TestDepartmentDeletion:
 
     async def test_delete_department_success(self, authenticated_client, test_department):
         """Should soft delete department successfully."""
-        response = authenticated_client.delete(f"/api/v1.0/departments/{test_department.id}")
+        response = authenticated_client.delete(f"/api/v1.1/departments/{test_department.id}")
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
@@ -160,7 +160,7 @@ class TestDepartmentDeletion:
         from uuid import uuid4
 
         fake_id = uuid4()
-        response = authenticated_client.delete(f"/api/v1.0/departments/{fake_id}")
+        response = authenticated_client.delete(f"/api/v1.1/departments/{fake_id}")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -169,7 +169,7 @@ class TestDepartmentDeletion:
     ):
         """Should handle deletion of department with teams."""
         # This tests that the cascade behavior works correctly
-        response = authenticated_client.delete(f"/api/v1.0/departments/{test_department.id}")
+        response = authenticated_client.delete(f"/api/v1.1/departments/{test_department.id}")
 
         # Should succeed with soft delete
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -182,7 +182,7 @@ class TestDepartmentStatistics:
         self, authenticated_client, test_department, test_team, db_session
     ):
         """Should return correct team count for department."""
-        response = authenticated_client.get(f"/api/v1.0/departments/{test_department.id}")
+        response = authenticated_client.get(f"/api/v1.1/departments/{test_department.id}")
 
         assert response.status_code == status.HTTP_200_OK
         dept = response.json()

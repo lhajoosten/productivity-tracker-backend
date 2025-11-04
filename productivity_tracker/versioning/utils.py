@@ -70,7 +70,7 @@ def get_latest_version() -> Version:
 
 
 def get_version_by_prefix(prefix: str) -> Version | None:
-    """Get API version by prefix (e.g., '/api/v1.0')."""
+    """Get API version by prefix (e.g., '/api/v1.1')."""
     for version in ALL_VERSIONS:
         if version.api_prefix == prefix:
             return version
