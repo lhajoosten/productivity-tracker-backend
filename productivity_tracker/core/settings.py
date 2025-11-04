@@ -51,6 +51,8 @@ class Settings(BaseSettings):
     COOKIE_HTTPONLY: bool
     COOKIE_MAX_AGE: int
     COOKIE_SAMESITE: str
+    COOKIE_DOMAIN: str | None = None
+    COOKIE_PATH: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env.test" if os.getenv("TESTING") else ".env",
