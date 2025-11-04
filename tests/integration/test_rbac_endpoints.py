@@ -15,7 +15,7 @@ API_PREFIX = CURRENT_VERSION.api_prefix
 
 
 class TestRoleEndpoints:
-    """Integration tests for /api/v1.0/roles endpoints."""
+    """Integration tests for /api/v1.1/roles endpoints."""
 
     def test_create_role_as_superuser(
         self, client_integration: TestClient, sample_superuser_integration: User
@@ -362,7 +362,7 @@ class TestRoleEndpoints:
 
 
 class TestPermissionEndpoints:
-    """Integration tests for /api/v1.0/permissions endpoints."""
+    """Integration tests for /api/v1.1/permissions endpoints."""
 
     def test_create_permission_as_superuser(
         self, client_integration: TestClient, sample_superuser_integration: User

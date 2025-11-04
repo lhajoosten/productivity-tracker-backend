@@ -1,7 +1,6 @@
 import os
-from typing import Literal
 
-from pydantic import AliasChoices, Field
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -40,18 +39,6 @@ class Settings(BaseSettings):
     CORS_ALLOW_METHODS: list[str]
     CORS_ALLOW_HEADERS: list[str]
 
-    # Allowed hosts
-    ALLOWED_HOSTS: list[str] = Field(
-        default=[
-            "localhost",
-            "127.0.0.1",
-            "productivity-tracker-backend-jp1k.onrender.com",
-            "*.onrender.com",
-        ],
-        description="Allowed hosts for TrustedHostMiddleware",
-        validation_alias=AliasChoices("ALLOWED_HOSTS", "allowed_hosts"),
-    )
-
     # Security & Authentication
     SECRET_KEY: str
     ALGORITHM: str
@@ -62,8 +49,10 @@ class Settings(BaseSettings):
     COOKIE_NAME: str
     COOKIE_SECURE: bool
     COOKIE_HTTPONLY: bool
-    COOKIE_SAMESITE: Literal["lax", "strict", "none"]
     COOKIE_MAX_AGE: int
+    COOKIE_SAMESITE: str
+    COOKIE_DOMAIN: str | None = None
+    COOKIE_PATH: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env.test" if os.getenv("TESTING") else ".env",

@@ -7,6 +7,7 @@ from productivity_tracker.api.health import router as health_router
 from productivity_tracker.api.organizations import router as organizations_router
 from productivity_tracker.api.permissions import router as permissions_router
 from productivity_tracker.api.roles import router as roles_router
+from productivity_tracker.api.sessions import router as sessions_router
 from productivity_tracker.api.teams import router as teams_router
 from productivity_tracker.core.logging_config import get_logger
 from productivity_tracker.versioning import (
@@ -37,6 +38,10 @@ def setup_versioned_routers(app: FastAPI) -> None:
     if is_feature_enabled(Feature.JWT_AUTHENTICATION):
         logger.info("Adding auth router")
         app.include_router(auth_router, prefix=CURRENT_VERSION.api_prefix, tags=["Authentication"])
+        logger.info("Adding sessions router")
+        app.include_router(
+            sessions_router, prefix=CURRENT_VERSION.api_prefix, tags=["Authentication"]
+        )
 
     # RBAC - Roles
     if is_feature_enabled(Feature.RBAC_SYSTEM):

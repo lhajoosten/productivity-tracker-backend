@@ -1,6 +1,6 @@
 [project]
 name = "productivity-tracker-backend"
-version = "1.0.0-beta"
+version = "1.1.1-alpha"
 description = "Productivity Tracker API built with Python FastAPI"
 authors = [
     {name = "Luc Joosten", email = "lhajoosten@outlook.com"}

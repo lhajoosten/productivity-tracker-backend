@@ -31,7 +31,15 @@ console = Console()
 @app.command()
 def start():
     """Start the FastAPI development server."""
-    uvicorn.run("productivity_tracker.main:app", reload=True)
+    uvicorn.run(
+        "productivity_tracker.main:app",
+        reload=True,
+        port=3456,
+        host="api.localhost",
+        log_level="info",
+        ssl_keyfile="../certs/api.localhost-key.pem",
+        ssl_certfile="../certs/api.localhost.pem",
+    )
 
 
 @app.command()

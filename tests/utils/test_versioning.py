@@ -318,9 +318,11 @@ class TestVersionHelpers:
 
         # V1.0 is ACTIVE (supported)
         assert V1_0 in supported
+        assert V1_1 in supported
 
         # Planned versions are not supported
-        assert V1_1 not in supported  # PLANNED
+        assert V1_2 not in supported
+        assert V2_0 not in supported
 
     def test_get_version_from_string_valid(self):
         """Test parsing valid version strings."""
@@ -439,10 +441,10 @@ class TestUtilityFunctions:
     def test_is_version_accessible(self):
         """Test version accessibility check."""
         # Active versions are accessible
-        assert is_version_accessible(V1_0)
+        assert is_version_accessible(V1_1)
 
         # Planned versions are not accessible
-        assert not is_version_accessible(V1_1)
+        assert not is_version_accessible(V1_2)
 
     def test_add_version_headers_to_response(self):
         """Test adding version headers to response."""
@@ -489,7 +491,7 @@ class TestVersioningIntegration:
         """Test that CURRENT_VERSION is properly defined."""
         assert CURRENT_VERSION is not None
         assert isinstance(CURRENT_VERSION, Version)
-        assert CURRENT_VERSION == V1_0
+        assert CURRENT_VERSION == V1_1
 
     def test_latest_version_is_defined(self):
         """Test that LATEST_VERSION is properly defined."""

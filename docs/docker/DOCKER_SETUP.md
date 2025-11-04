@@ -391,7 +391,7 @@ docker compose up -d --build app
 
 ## See Also
 
-- [Makefile](../Makefile) - All available commands
-- [.env.example](../.env.example) - Environment variables template
-- [docker-compose.yml](../docker-compose.yml) - Development services
-- [Dockerfile](../Dockerfile) - Application image
+- [Makefile](../../Makefile) - All available commands
+- [.env.example](../../.env.example) - Environment variables template
+- [docker-compose.yml](../../docker-compose.yml) - Development services
+- [Dockerfile](../../Dockerfile) - Application image

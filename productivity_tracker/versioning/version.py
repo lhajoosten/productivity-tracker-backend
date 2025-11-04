@@ -11,14 +11,14 @@ Following Semantic Versioning 2.0.0 (https://semver.org/)
 from datetime import date
 
 # Single source of truth for version
-__version__ = "1.0.0-beta"
+__version__ = "1.1.1-alpha"
 
 # Version as tuple for programmatic comparison
-__version_info__ = (1, 0, 0, "beta", 0)
+__version_info__ = (1, 1, 1, "alpha", 0)
 
 # Release metadata
-RELEASE_DATE = date(2025, 11, 1)
-RELEASE_NAME = "Foundation - First Beta"
+RELEASE_DATE = date(2025, 11, 3)
+RELEASE_NAME = "Security & Validation Enhancement patch"
 
 # Version history for reference
 VERSION_HISTORY = [
@@ -26,9 +26,20 @@ VERSION_HISTORY = [
         "version": "1.0.0-beta",
         "release_date": "2025-11-01",
         "release_name": "Foundation - First Beta",
+        "status": "deprecated",
+    },
+    {
+        "version": "1.1.0-alpha",
+        "release_date": "2025-11-03",
+        "release_name": "Security update",
+        "status": "previous",
+    },
+    {
+        "version": "1.1.1-alpha",
+        "release_date": "2025-11-04",
+        "release_name": "Minor optimization patch",
         "status": "current",
     },
-    # Future versions will be added here
 ]
 
 

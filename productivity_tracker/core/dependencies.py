@@ -10,6 +10,7 @@ from productivity_tracker.core.exceptions import (
     InvalidTokenError,
     PermissionDeniedError,
 )
+from productivity_tracker.core.redis_client import get_redis_client
 from productivity_tracker.core.security import decode_token
 from productivity_tracker.core.settings import settings
 from productivity_tracker.database import get_db
@@ -33,9 +34,21 @@ async def get_current_user(
 
     user_id_str = payload.get("sub")
     token_type = payload.get("type")
+    jti = payload.get("jti")  # Session ID
 
     if user_id_str is None or token_type != "access":  # nosec
         raise InvalidTokenError(reason="Invalid token payload")
+
+    # Validate session in Redis if JTI is present and Redis is available
+    redis_client = get_redis_client()
+    if jti and redis_client.is_connected:
+        session_data = redis_client.get_session(jti)
+        if not session_data:
+            raise InvalidTokenError(reason="Session expired or invalid")
+
+        # Verify user_id matches session
+        if session_data.get("user_id") != user_id_str:
+            raise InvalidTokenError(reason="Session user mismatch")
 
     # Convert string UUID to UUID object
     try:

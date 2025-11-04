@@ -17,7 +17,7 @@ API_PREFIX = CURRENT_VERSION.api_prefix
 
 
 class TestAuthenticationEndpoints:
-    """Integration tests for /api/v1.0/auth endpoints."""
+    """Integration tests for /api/v1.1/auth endpoints."""
 
     pytestmark = pytest.mark.auth
 

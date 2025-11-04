@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from productivity_tracker.api.setup import setup_versioned_routers
 from productivity_tracker.core.database import Base, engine
 from productivity_tracker.core.logging_config import get_logger, setup_logging
+from productivity_tracker.core.redis_client import redis_client
 from productivity_tracker.core.settings import settings
 from productivity_tracker.core.setup import setup_exception_handling, setup_middleware
 from productivity_tracker.versioning.version import __version__
@@ -46,8 +47,17 @@ async def startup_event():
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables created/verified")
 
+    # Log Redis connection status
+    if redis_client.is_connected:
+        logger.info("Redis connected and ready for session management")
+    else:
+        logger.warning("Redis not connected - session management disabled")
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Run on application shutdown."""
     logger.info(f"Shutting down {settings.APP_NAME}")
+
+    # Close Redis connection
+    redis_client.close()

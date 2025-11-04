@@ -108,7 +108,7 @@ V1_0.is_compatible_with(V1_1)  # True (same major version)
 
 # Metadata
 V1_0.version_string  # "1.0.0-beta"
-V1_0.api_prefix  # "/api/v1.0"
+V1_0.api_prefix  # "/api/v1.1"
 V1_0.status  # VersionStatus.ACTIVE
 ```
 
