@@ -25,6 +25,7 @@ app = FastAPI(
     docs_url=f"{CURRENT_VERSION.api_prefix}/docs",
     redoc_url=f"{CURRENT_VERSION.api_prefix}/redoc",
     openapi_url=f"{CURRENT_VERSION.api_prefix}/openapi.json",
+    openapi_version="3.0.3",
 )
 
 # Setup exception handling

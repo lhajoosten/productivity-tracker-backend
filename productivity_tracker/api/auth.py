@@ -136,7 +136,6 @@ def logout(
     access_token: str | None = None,
 ):
     """Logout user by clearing the access token cookie and deleting Redis session."""
-    # Try to get token from parameter first, then from cookie
     token = access_token or request.cookies.get(settings.COOKIE_NAME)
 
     if token:
@@ -144,7 +143,6 @@ def logout(
         if payload:
             jti = payload.get("jti")
             if jti:
-                # Delete session from Redis
                 redis_client = get_redis_client()
                 if redis_client.is_connected:
                     redis_client.delete_session(jti)

@@ -1,5 +1,7 @@
 """Pydantic models/schemas for authentication and authorization."""
 
+from __future__ import annotations
+
 from datetime import datetime
 from uuid import UUID
 
@@ -54,68 +56,44 @@ class RefreshTokenRequest(BaseModel):
 
 
 # ============================================================================
-# User Schemas
+# Permission Schemas (moved before Role/User)
 # ============================================================================
 
 
-class UserBase(BaseModel):
-    """Base user schema with common fields."""
+class PermissionBase(BaseModel):
+    """Base permission schema."""
 
-    email: EmailStr
-    username: str = Field(..., min_length=3, max_length=100)
-
-
-class UserCreate(UserBase):
-    """Schema for user creation."""
-
-    password: str = Field(..., min_length=8, max_length=100)
+    name: str = Field(..., min_length=1, max_length=100)
+    resource: str = Field(..., min_length=1, max_length=50)
+    action: str = Field(..., min_length=1, max_length=50)
+    description: str | None = Field(None, max_length=255)
 
 
-class UserUpdate(BaseModel):
-    """Schema for user update."""
+class PermissionCreate(PermissionBase):
+    """Schema for permission creation."""
 
-    first_name: str | None = None
-    last_name: str | None = None
-    email: EmailStr | None = None
-    username: str | None = Field(None, min_length=3, max_length=100)
-    is_active: bool | None = None
+    pass
 
 
-class UserPasswordUpdate(BaseModel):
-    """Schema for updating user password."""
+class PermissionUpdate(BaseModel):
+    """Schema for permission update."""
 
-    current_password: str
-    new_password: str = Field(..., min_length=8, max_length=100)
+    name: str | None = Field(None, min_length=1, max_length=100)
+    resource: str | None = Field(None, min_length=1, max_length=50)
+    action: str | None = Field(None, min_length=1, max_length=50)
+    description: str | None = Field(None, max_length=255)
 
 
-class UserResponse(UserBase):
-    """Schema for user response."""
+class PermissionResponse(BaseModel):
+    """Schema for permission response."""
 
     id: UUID
-    first_name: str | None = None
-    last_name: str | None = None
-    username: str
-    email: str
-    is_active: bool
-    is_superuser: bool
+    name: str = Field(..., min_length=1, max_length=100)
+    resource: str = Field(..., min_length=1, max_length=50)
+    action: str = Field(..., min_length=1, max_length=50)
+    description: str | None = Field(None, max_length=255)
     created_at: datetime
     updated_at: datetime | None = None
-    roles: list["RoleResponse"] = []
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class UserListResponse(BaseModel):
-    """Schema for user list response."""
-
-    id: UUID
-    first_name: str | None = None
-    last_name: str | None = None
-    username: str
-    email: str
-    is_active: bool
-    is_superuser: bool
-    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -146,13 +124,15 @@ class RoleUpdate(BaseModel):
     permission_ids: list[UUID] | None = None
 
 
-class RoleResponse(RoleBase):
+class RoleResponse(BaseModel):
     """Schema for role response."""
 
     id: UUID
+    name: str = Field(..., min_length=1, max_length=50)
+    description: str | None = Field(None, max_length=255)
     created_at: datetime
     updated_at: datetime | None = None
-    permissions: list["PermissionResponse"] = []
+    permissions: list[PermissionResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -169,40 +149,70 @@ class RoleListResponse(BaseModel):
 
 
 # ============================================================================
-# Permission Schemas
+# User Schemas
 # ============================================================================
 
 
-class PermissionBase(BaseModel):
-    """Base permission schema."""
+class UserBase(BaseModel):
+    """Base user schema with common fields."""
 
-    name: str = Field(..., min_length=1, max_length=100)
-    resource: str = Field(..., min_length=1, max_length=50)
-    action: str = Field(..., min_length=1, max_length=50)
-    description: str | None = Field(None, max_length=255)
+    email: EmailStr
+    username: str = Field(..., min_length=3, max_length=100)
 
 
-class PermissionCreate(PermissionBase):
-    """Schema for permission creation."""
+class UserCreate(UserBase):
+    """Schema for user creation."""
 
-    pass
-
-
-class PermissionUpdate(BaseModel):
-    """Schema for permission update."""
-
-    name: str | None = Field(None, min_length=1, max_length=100)
-    resource: str | None = Field(None, min_length=1, max_length=50)
-    action: str | None = Field(None, min_length=1, max_length=50)
-    description: str | None = Field(None, max_length=255)
+    password: str = Field(..., min_length=8, max_length=100)
 
 
-class PermissionResponse(PermissionBase):
-    """Schema for permission response."""
+class UserUpdate(BaseModel):
+    """Schema for user update."""
+
+    first_name: str | None = None
+    last_name: str | None = None
+    email: EmailStr | None = None
+    bio: str | None = None
+    username: str | None = Field(None, min_length=3, max_length=100)
+    is_active: bool | None = None
+
+
+class UserPasswordUpdate(BaseModel):
+    """Schema for updating user password."""
+
+    current_password: str
+    new_password: str = Field(..., min_length=8, max_length=100)
+
+
+class UserResponse(BaseModel):
+    """Schema for user response."""
 
     id: UUID
+    first_name: str | None = None
+    last_name: str | None = None
+    username: str
+    email: str
+    bio: str | None = None
+    is_active: bool
+    is_superuser: bool
     created_at: datetime
     updated_at: datetime | None = None
+    roles: list[RoleResponse] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserListResponse(BaseModel):
+    """Schema for user list response."""
+
+    id: UUID
+    first_name: str | None = None
+    last_name: str | None = None
+    username: str
+    email: str
+    is_active: bool
+    is_superuser: bool
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -244,8 +254,3 @@ class LoginResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str
-
-
-# Resolve forward references
-UserResponse.model_rebuild()
-RoleResponse.model_rebuild()
