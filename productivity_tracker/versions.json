@@ -1,0 +1,455 @@
+{
+  "versions": [
+    {
+      "version": "0.1.0-alpha",
+      "status": "completed",
+      "name": "Foundation - Early Development",
+      "releaseDate": "2025-10-15",
+      "apiPrefix": "/api/v0.1",
+      "features": [
+        "Basic API structure",
+        "Database setup",
+        "Cookie authentication scaffold"
+      ]
+    },
+    {
+      "version": "0.1.0-beta",
+      "status": "active",
+      "name": "Foundation - Organization & User Management",
+      "releaseDate": "2025-11-09",
+      "eolDate": "2026-05-09",
+      "apiPrefix": "/api/v0.1",
+      "breaking": false,
+      "features": [
+        "API Docs & Health checks",
+        "Cookie authentication",
+        "Organization management",
+        "Department management",
+        "Team management",
+        "User management",
+        "RBAC & Permission system",
+        "Database migrations"
+      ]
+    },
+    {
+      "version": "0.2.0-alpha",
+      "status": "planned",
+      "name": "Security Hardening - Early Build",
+      "apiPrefix": "/api/v0.2",
+      "features": [
+        "Rate limiting prototype",
+        "Password rules testing",
+        "MFA exploration"
+      ]
+    },
+    {
+      "version": "0.2.0-beta",
+      "status": "planned",
+      "name": "Security Hardening",
+      "apiPrefix": "/api/v0.2",
+      "breaking": false,
+      "features": [
+        "Rate limiting",
+        "Password complexity rules",
+        "Multifactor authentication with OTP",
+        "Account lockout",
+        "Password reset flow",
+        "Input sanitization",
+        "Audit logging"
+      ]
+    },
+    {
+      "version": "0.3.0-beta",
+      "status": "planned",
+      "name": "Collaboration and Feedback",
+      "apiPrefix": "/api/v0.3",
+      "breaking": false,
+      "features": [
+        "Workspace management",
+        "Feedback system",
+        "Comment system"
+      ]
+    },
+    {
+      "version": "0.4.0-beta",
+      "status": "planned",
+      "name": "Time Tracking Core",
+      "apiPrefix": "/api/v0.4",
+      "breaking": false,
+      "features": [
+        "Time tracking",
+        "Time sheets",
+        "Basic reporting"
+      ]
+    },
+    {
+      "version": "0.5.0-beta",
+      "status": "planned",
+      "name": "Task & Project Management",
+      "apiPrefix": "/api/v0.5",
+      "breaking": false,
+      "features": [
+        "Task management",
+        "Task dependencies",
+        "Kanban Board",
+        "Task Calendar",
+        "Project management",
+        "Milestones",
+        "Archiving"
+      ]
+    },
+    {
+      "version": "0.6.0-beta",
+      "status": "planned",
+      "name": "Analytics & Notifications",
+      "apiPrefix": "/api/v0.6",
+      "breaking": false,
+      "features": [
+        "Notifications system",
+        "Email notifications",
+        "Analytics dashboard",
+        "Productivity trends"
+      ]
+    },
+    {
+      "version": "0.7.0-beta",
+      "status": "planned",
+      "name": "Search & Filtering",
+      "apiPrefix": "/api/v0.7",
+      "breaking": false,
+      "features": [
+        "Advanced search",
+        "Full-text search",
+        "Saved searches",
+        "Custom filters",
+        "Tags system"
+      ]
+    },
+    {
+      "version": "0.8.0-beta",
+      "status": "planned",
+      "name": "Integration & Extensions",
+      "apiPrefix": "/api/v0.8",
+      "breaking": false,
+      "features": [
+        "Webhooks",
+        "API key authentication",
+        "Calendar sync (Google, Outlook)",
+        "Email integration",
+        "Slack notifications"
+      ]
+    },
+    {
+      "version": "0.9.0-beta",
+      "status": "planned",
+      "name": "Performance & Scalability",
+      "apiPrefix": "/api/v0.9",
+      "breaking": false,
+      "features": [
+        "Redis caching",
+        "Query optimization",
+        "Bulk operations",
+        "Async task processing",
+        "Database indexing"
+      ]
+    },
+    {
+      "version": "1.0.0-alpha.1",
+      "status": "planned",
+      "name": "First Alpha - Integration Testing",
+      "apiPrefix": "/api/v1",
+      "notes": "All beta features integrated, initial stability testing"
+    },
+    {
+      "version": "1.0.0-alpha.2",
+      "status": "planned",
+      "name": "Second Alpha - Bug Fixes",
+      "apiPrefix": "/api/v1",
+      "fixes": [
+        "Critical bugs from alpha.1",
+        "Performance issues",
+        "Security vulnerabilities"
+      ]
+    },
+    {
+      "version": "1.0.0-beta.1",
+      "status": "planned",
+      "name": "First Beta - Feature Freeze",
+      "apiPrefix": "/api/v1",
+      "notes": "Feature complete, no new features, bug fixes only"
+    },
+    {
+      "version": "1.0.0-rc.1",
+      "status": "planned",
+      "name": "Release Candidate 1",
+      "apiPrefix": "/api/v1",
+      "notes": "Production-ready candidate, final testing phase"
+    },
+    {
+      "version": "1.0.0-rc.2",
+      "status": "planned",
+      "name": "Release Candidate 2",
+      "apiPrefix": "/api/v1",
+      "fixes": [
+        "Final polish from RC1 testing"
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "status": "planned",
+      "name": "First Stable Release",
+      "apiPrefix": "/api/v1",
+      "breaking": false,
+      "notes": "Production stable, core features complete"
+    },
+    {
+      "version": "1.1.0",
+      "status": "planned",
+      "name": "Collaboration Enhancements",
+      "apiPrefix": "/api/v1",
+      "breaking": false,
+      "features": [
+        "Real-time collaboration",
+        "Live cursors",
+        "Mentions system",
+        "Activity feed"
+      ]
+    },
+    {
+      "version": "1.2.0",
+      "status": "planned",
+      "name": "Mobile Optimization",
+      "apiPrefix": "/api/v1",
+      "breaking": false,
+      "features": [
+        "Mobile-optimized endpoints",
+        "Offline sync",
+        "Push notifications",
+        "Mobile app support"
+      ]
+    },
+    {
+      "version": "2.0.0-alpha.1",
+      "status": "planned",
+      "name": "AI Foundation - Infrastructure",
+      "apiPrefix": "/api/v2",
+      "breaking": true,
+      "notes": "Setting up AI/ML infrastructure and core services",
+      "features": [
+        "Vector database integration (Pinecone/Qdrant/Weaviate)",
+        "LLM provider abstraction layer (OpenAI, Anthropic, Azure OpenAI)",
+        "Embedding service infrastructure",
+        "AI request queue and job processing",
+        "Token usage tracking and billing",
+        "AI model configuration management"
+      ]
+    },
+    {
+      "version": "2.0.0-alpha.2",
+      "status": "planned",
+      "name": "AI Foundation - RAG Core",
+      "apiPrefix": "/api/v2",
+      "features": [
+        "Document ingestion pipeline",
+        "Text chunking strategies",
+        "Semantic search implementation",
+        "Context retrieval service",
+        "RAG prompt engineering templates",
+        "Citation and source tracking"
+      ]
+    },
+    {
+      "version": "2.0.0-beta.1",
+      "status": "planned",
+      "name": "AI Intelligence - Smart Assistant",
+      "apiPrefix": "/api/v2",
+      "breaking": false,
+      "features": [
+        "AI chat assistant for tasks and projects",
+        "Natural language task creation",
+        "Intelligent task suggestions",
+        "Context-aware recommendations",
+        "Meeting notes summarization",
+        "Action item extraction from text"
+      ]
+    },
+    {
+      "version": "2.0.0-beta.2",
+      "status": "planned",
+      "name": "AI Intelligence - Predictive Analytics",
+      "apiPrefix": "/api/v2",
+      "breaking": false,
+      "features": [
+        "Task duration prediction (ML models)",
+        "Project timeline forecasting",
+        "Workload balancing recommendations",
+        "Burnout risk detection",
+        "Productivity pattern analysis",
+        "Anomaly detection in time tracking"
+      ]
+    },
+    {
+      "version": "2.0.0-beta.3",
+      "status": "planned",
+      "name": "AI Intelligence - Knowledge Management",
+      "apiPrefix": "/api/v2",
+      "breaking": false,
+      "features": [
+        "Organization knowledge base (RAG-powered)",
+        "Semantic document search",
+        "Automatic documentation generation",
+        "Knowledge graph construction",
+        "Intelligent FAQ system",
+        "Cross-project insight discovery"
+      ]
+    },
+    {
+      "version": "2.0.0-beta.4",
+      "status": "planned",
+      "name": "AI Automation - MCP Integration",
+      "apiPrefix": "/api/v2",
+      "breaking": false,
+      "features": [
+        "Model Context Protocol (MCP) server implementation",
+        "Tool calling and function execution",
+        "Agentic workflow automation",
+        "Multi-step task orchestration",
+        "External system integration via MCP",
+        "Custom MCP tool development framework"
+      ]
+    },
+    {
+      "version": "2.0.0-beta.5",
+      "status": "planned",
+      "name": "AI Automation - Smart Workflows",
+      "apiPrefix": "/api/v2",
+      "breaking": false,
+      "features": [
+        "AI-powered workflow suggestions",
+        "Automated task prioritization",
+        "Smart notification filtering",
+        "Intelligent email triage and categorization",
+        "Auto-tagging and classification",
+        "Adaptive scheduling algorithms"
+      ]
+    },
+    {
+      "version": "2.0.0-beta.6",
+      "status": "planned",
+      "name": "AI Enhancement - Natural Language",
+      "apiPrefix": "/api/v2",
+      "breaking": false,
+      "features": [
+        "Natural language query interface",
+        "Voice-to-task conversion",
+        "Sentiment analysis in feedback",
+        "Multi-language support with translation",
+        "Writing assistance and grammar checking",
+        "Smart command palette with NLP"
+      ]
+    },
+    {
+      "version": "2.0.0-beta.7",
+      "status": "planned",
+      "name": "AI Insights - Advanced Analytics",
+      "apiPrefix": "/api/v2",
+      "breaking": false,
+      "features": [
+        "AI-generated productivity reports",
+        "Team dynamics analysis",
+        "Skill gap identification",
+        "Resource optimization recommendations",
+        "Predictive project risk assessment",
+        "Custom ML model training interface"
+      ]
+    },
+    {
+      "version": "2.0.0-rc.1",
+      "status": "planned",
+      "name": "AI Release Candidate 1",
+      "apiPrefix": "/api/v2",
+      "notes": "All AI features integrated, comprehensive testing phase",
+      "focus": [
+        "AI model performance optimization",
+        "Token usage optimization",
+        "RAG accuracy improvements",
+        "Latency reduction",
+        "Security and privacy audits for AI features"
+      ]
+    },
+    {
+      "version": "2.0.0-rc.2",
+      "status": "planned",
+      "name": "AI Release Candidate 2",
+      "apiPrefix": "/api/v2",
+      "fixes": [
+        "Critical AI feature bugs from RC1",
+        "RAG retrieval accuracy issues",
+        "LLM response quality improvements",
+        "Performance bottlenecks"
+      ]
+    },
+    {
+      "version": "2.0.0",
+      "status": "planned",
+      "name": "AI-Powered Productivity Platform",
+      "apiPrefix": "/api/v2",
+      "breaking": true,
+      "notes": "Production-ready AI-first productivity platform with comprehensive ML/LLM capabilities",
+      "highlights": [
+        "Full RAG implementation with semantic search",
+        "AI assistant for task and project management",
+        "Predictive analytics and forecasting",
+        "MCP-powered automation",
+        "Natural language interface",
+        "Knowledge management system",
+        "Smart workflows and recommendations"
+      ]
+    },
+    {
+      "version": "2.1.0",
+      "status": "planned",
+      "name": "AI Personalization",
+      "apiPrefix": "/api/v2",
+      "breaking": false,
+      "features": [
+        "Personalized AI models per user",
+        "Learning from user behavior",
+        "Adaptive UI based on AI insights",
+        "Custom AI assistant personalities",
+        "Fine-tuning on organizational data"
+      ]
+    },
+    {
+      "version": "2.2.0",
+      "status": "planned",
+      "name": "AI Collaboration",
+      "apiPrefix": "/api/v2",
+      "breaking": false,
+      "features": [
+        "AI-facilitated team matching",
+        "Collaborative AI brainstorming",
+        "Multi-agent coordination",
+        "AI meeting facilitator",
+        "Intelligent conflict resolution suggestions"
+      ]
+    },
+    {
+      "version": "3.0.0",
+      "status": "planned",
+      "name": "Enterprise Edition",
+      "apiPrefix": "/api/v3",
+      "breaking": true,
+      "notes": "Enterprise features - deferred for future planning",
+      "features": [
+        "SSO/SAML integration",
+        "Multi-tenancy",
+        "Advanced RBAC",
+        "SLA/SLO compliance",
+        "Enhanced audit trails",
+        "Data residency options",
+        "On-premise AI model deployment"
+      ]
+    }
+  ]
+}
